@@ -15,17 +15,26 @@ const WritingTest = () => {
   const navigate = useNavigate();
   const { 
     currentTest, 
+    loadTest,
     startSection, 
     saveAnswer, 
     userAnswers, 
     submitSection,
-    timeRemaining
+    timeRemaining,
+    testType
   } = useTest();
   
   const [isStarted, setIsStarted] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("task1");
   const [wordCounts, setWordCounts] = useState({ task1: 0, task2: 0 });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Load test if it's not already loaded
+  useEffect(() => {
+    if (!currentTest) {
+      loadTest('sample', testType);
+    }
+  }, [currentTest, loadTest, testType]);
   
   useEffect(() => {
     if (currentTest) {
@@ -92,7 +101,7 @@ const WritingTest = () => {
     return userAnswers.find(a => a.questionId === taskId)?.userResponse || '';
   };
 
-  if (!writingSection || !writingContent) {
+  if (!currentTest || !writingSection || !writingContent) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">
