@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -191,8 +190,7 @@ const Results = () => {
                   </div>
                   <Progress 
                     value={section.bandScore * 11.11} 
-                    className="h-2" 
-                    indicatorClassName={getBandScoreProgressColor(section.bandScore)}
+                    className={`h-2 ${getBandScoreProgressColor(section.bandScore)}`}
                   />
                 </div>
               ))}
@@ -454,8 +452,7 @@ const Results = () => {
                           </div>
                           <Progress 
                             value={criterion.score * 11.11} 
-                            className="h-2" 
-                            indicatorClassName={getBandScoreProgressColor(criterion.score)}
+                            className={`h-2 ${getBandScoreProgressColor(criterion.score)}`}
                           />
                         </div>
                       ))}

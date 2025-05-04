@@ -11,7 +11,8 @@ interface TestContextType {
   isTestActive: boolean;
   activeQuestionId: string | null;
   timeRemaining: number;
-  loadTest: (testId: string) => void;
+  testType: 'academic' | 'general';
+  loadTest: (testId: string, type?: 'academic' | 'general') => void;
   startTest: () => void;
   startSection: (sectionId: string) => void;
   setCurrentSection: (section: TestSection | null) => void;
@@ -33,11 +34,13 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isTestActive, setIsTestActive] = useState(false);
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [testType, setTestType] = useState<'academic' | 'general'>('academic');
 
-  const loadTest = (testId: string) => {
+  const loadTest = (testId: string, type: 'academic' | 'general' = 'academic') => {
     // In a real app, this would fetch the test from an API
     if (testId === 'sample') {
       setCurrentTest(sampleTest);
+      setTestType(type);
     }
   };
 
@@ -97,6 +100,7 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isTestActive,
         activeQuestionId,
         timeRemaining,
+        testType,
         loadTest,
         startTest,
         startSection,

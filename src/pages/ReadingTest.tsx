@@ -20,20 +20,26 @@ const ReadingTest = () => {
     saveAnswer, 
     userAnswers, 
     submitSection,
+    testType
   } = useTest();
   
   const [isStarted, setIsStarted] = useState(false);
   
   useEffect(() => {
     if (currentTest) {
-      const readingSection = currentTest.sections.find(section => section.type === 'reading');
+      const sectionId = testType === 'academic' ? 
+        'reading-academic-001' : 'reading-general-001';
+      
+      const readingSection = currentTest.sections.find(section => section.id === sectionId);
       if (readingSection) {
         startSection(readingSection.id);
       }
     }
-  }, [currentTest, startSection]);
+  }, [currentTest, startSection, testType]);
 
-  const readingSection = currentTest?.sections.find(section => section.type === 'reading');
+  const readingSection = currentTest?.sections.find(section => 
+    section.id === (testType === 'academic' ? 'reading-academic-001' : 'reading-general-001')
+  );
   const readingContent = readingSection?.content as any;
 
   const handleStart = () => {
@@ -78,7 +84,9 @@ const ReadingTest = () => {
         {!isStarted ? (
           <Card className="bg-white shadow-md">
             <CardHeader>
-              <CardTitle className="text-center">IELTS Reading Test</CardTitle>
+              <CardTitle className="text-center">
+                IELTS Reading Test ({testType === 'academic' ? 'Academic' : 'General Training'})
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-green-50 p-4 rounded-md">
@@ -86,7 +94,7 @@ const ReadingTest = () => {
                 <ul className="list-disc list-inside space-y-2 text-slate-700">
                   <li>You will read a passage and answer questions based on it.</li>
                   <li>The test consists of 10 questions related to the passage.</li>
-                  <li>You will have 20 minutes to complete the test.</li>
+                  <li>You will have 15 minutes to complete the test.</li>
                   <li>Read carefully and refer back to the passage when necessary.</li>
                 </ul>
               </div>
@@ -100,7 +108,9 @@ const ReadingTest = () => {
         ) : (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">IELTS Reading Test</h1>
+              <h1 className="text-2xl font-bold">
+                IELTS Reading Test ({testType === 'academic' ? 'Academic' : 'General Training'})
+              </h1>
               <Timer onTimeUp={handleTimeUp} />
             </div>
 
