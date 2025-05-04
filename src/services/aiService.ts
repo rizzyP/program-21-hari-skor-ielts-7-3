@@ -191,7 +191,7 @@ function mockSpeakingAIResponse(): Feedback {
       {
         name: 'Pronunciation',
         score: 7,
-        feedback: 'Generally clear pronunciation with some effective use of intonation and stress. There are some issues with certain sounds and occasional mispronunciations, but these don't significantly affect understanding.'
+        feedback: 'Generally clear pronunciation with some effective use of intonation and stress. There are some issues with certain sounds and occasional mispronunciations, but these don\'t significantly affect understanding.'
       }
     ],
     overallScore: 6.5,
