@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -12,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { PlayCircle, PauseCircle, Clock } from 'lucide-react';
-import { TestPhases } from '@/components/test/TestPhases';
+import { TestPhases, Phase } from '@/components/test/TestPhases';
 
 // Test phases
 enum Phase {
@@ -602,7 +601,9 @@ const ListeningTest = () => {
               )}
               
               {/* Emergency submit button (administrative use only) */}
-              {(currentPhase !== Phase.INSTRUCTIONS && currentPhase !== Phase.COMPLETED && currentPhase !== Phase.FINAL_REVIEW) && (
+              {(currentPhase !== Phase.INSTRUCTIONS && 
+                currentPhase !== Phase.COMPLETED && 
+                currentPhase !== Phase.FINAL_REVIEW) && (
                 <Button 
                   variant="outline" 
                   onClick={handleForceSubmit}
