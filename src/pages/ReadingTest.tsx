@@ -80,7 +80,7 @@ const ReadingTest = () => {
 
   return (
     <Layout className="pb-16">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="w-full max-w-6xl mx-auto space-y-6 px-4 sm:px-6">
         {!isStarted ? (
           <Card className="bg-white shadow-md">
             <CardHeader>
@@ -107,16 +107,16 @@ const ReadingTest = () => {
           </Card>
         ) : (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+              <h1 className="text-xl sm:text-2xl font-bold">
                 IELTS Reading Test ({testType === 'academic' ? 'Academic' : 'General Training'})
               </h1>
               <Timer onTimeUp={handleTimeUp} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Reading Passage */}
-              <Card className="bg-white h-[calc(100vh-220px)] sticky top-24">
+              <Card className="bg-white h-[500px] md:h-[calc(100vh-220px)] md:sticky md:top-24 order-1">
                 <CardHeader className="pb-2 border-b">
                   <CardTitle className="text-lg">Reading Passage</CardTitle>
                 </CardHeader>
@@ -142,7 +142,7 @@ const ReadingTest = () => {
               </Card>
 
               {/* Questions */}
-              <div className="space-y-6">
+              <div className="space-y-6 order-2">
                 <h2 className="text-xl font-semibold">Questions</h2>
                 
                 {readingContent.questions.map((question: any, index: number) => {
@@ -191,7 +191,7 @@ const ReadingTest = () => {
                             placeholder="Type your answer here" 
                             value={savedAnswer}
                             onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                            className="max-w-sm"
+                            className="max-w-full md:max-w-sm"
                           />
                         )}
                         
@@ -199,7 +199,7 @@ const ReadingTest = () => {
                           <select 
                             value={savedAnswer}
                             onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                            className="border rounded p-2 w-full max-w-sm"
+                            className="border rounded p-2 w-full max-w-full md:max-w-sm"
                           >
                             <option value="">Select an option</option>
                             {question.options.map((option: string, optionIndex: number) => (
@@ -212,10 +212,10 @@ const ReadingTest = () => {
                   );
                 })}
                 
-                <div className="flex justify-end pt-6 border-t sticky bottom-0 bg-white p-4 -mx-4">
+                <div className="flex justify-end pt-6 border-t sticky bottom-0 bg-white p-4 -mx-4 md:mx-0">
                   <Button 
                     onClick={handleSubmit} 
-                    className="bg-ielts-green hover:bg-ielts-blue"
+                    className="bg-ielts-green hover:bg-ielts-blue w-full sm:w-auto"
                   >
                     Submit Test
                   </Button>
