@@ -111,8 +111,18 @@ const WritingTest = () => {
     );
   }
 
-  const task1 = writingContent.tasks.find((t: any) => t.taskNumber === 1);
-  const task2 = writingContent.tasks.find((t: any) => t.taskNumber === 2);
+  // Safely access task1 and task2, ensuring they exist before accessing properties
+  const writingTasks = writingContent.tasks || [];
+  const task1 = writingTasks.find((t: any) => t.taskNumber === 1) || {
+    id: 'w-task1',
+    prompt: 'Default task 1 prompt',
+    taskNumber: 1
+  };
+  const task2 = writingTasks.find((t: any) => t.taskNumber === 2) || {
+    id: 'w-task2',
+    prompt: 'Default task 2 prompt',
+    taskNumber: 2
+  };
 
   return (
     <Layout className="pb-16">
