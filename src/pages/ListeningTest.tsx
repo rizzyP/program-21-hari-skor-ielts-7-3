@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -122,7 +123,7 @@ const ListeningTest = () => {
     setAudioPlaying(false);
     
     // Check if we need to move to next section or final review
-    if (currentSectionIndex < listeningContent.sections.length - 1) {
+    if (currentSectionIndex < 1) { // Changed from listeningContent.sections.length - 1
       startSectionTransition();
     } else {
       startFinalReview();
@@ -244,7 +245,7 @@ const ListeningTest = () => {
     setAudioPlaying(false);
     setAudioProgress(100);
     
-    if (currentSectionIndex < listeningContent.sections.length - 1) {
+    if (currentSectionIndex < 1) { // Changed from listeningContent.sections.length - 1
       startSectionTransition();
     } else {
       startFinalReview();
@@ -303,7 +304,7 @@ const ListeningTest = () => {
               <TestPhases 
                 currentPhase={currentPhase} 
                 currentSection={currentSectionIndex + 1}
-                totalSections={listeningContent.sections.length}
+                totalSections={2} // Changed from listeningContent.sections.length
               />
             </div>
             
@@ -380,7 +381,7 @@ const ListeningTest = () => {
               <CardTitle className="text-base font-medium">
                 {currentPhase === Phase.FINAL_REVIEW 
                   ? "Review All Sections" 
-                  : `Section ${currentSectionIndex + 1} Questions`}
+                  : `Section ${currentSectionIndex === 0 ? '1' : '4'} Questions`}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
