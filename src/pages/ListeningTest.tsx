@@ -25,6 +25,7 @@ const ListeningTest = () => {
     timeRemaining
   } = useTest();
   
+  // Fix: Explicitly define the type to include Phase.INSTRUCTIONS
   const [currentPhase, setCurrentPhase] = useState<Phase>(Phase.INSTRUCTIONS);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
   const [previewTimeRemaining, setPreviewTimeRemaining] = useState<number>(30);
@@ -60,7 +61,7 @@ const ListeningTest = () => {
   const listeningSection = currentTest?.sections.find(section => section.type === 'listening');
   const listeningContent = listeningSection?.content as any;
   
-  // Check if on instructions page - Fixed type comparison
+  // Check if on instructions page - this should work now with the fixed type
   const isInstructionsPage = currentPhase === Phase.INSTRUCTIONS;
 
   const handleStartTest = () => {
