@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { PlayCircle, PauseCircle, Clock } from 'lucide-react';
+import { PlayCircle, PauseCircle, Clock, Volume2, VolumeX } from 'lucide-react';
 import { TestPhases, Phase } from '@/components/test/TestPhases';
 
 const ListeningTest = () => {
@@ -26,16 +26,19 @@ const ListeningTest = () => {
   } = useTest();
   
   // Fix: Explicitly define the type to include Phase.INSTRUCTIONS
-  const [currentPhase, setCurrentPhase] = useState<Phase>(Phase.INSTRUCTIONS);
+  const [currentPhase, setCurrentPhase] = useState<Phase | "INSTRUCTIONS">(Phase.INSTRUCTIONS);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
   const [previewTimeRemaining, setPreviewTimeRemaining] = useState<number>(30);
   const [transitionTimeRemaining, setTransitionTimeRemaining] = useState<number>(5);
   const [reviewTimeRemaining, setReviewTimeRemaining] = useState<number>(120);
   const [audioProgress, setAudioProgress] = useState<number>(0);
   const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
+  const [audioMuted, setAudioMuted] = useState<boolean>(false);
+  
+  // Audio element ref
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Refs for timers
-  const audioTimerRef = useRef<NodeJS.Timeout | null>(null);
   const previewTimerRef = useRef<NodeJS.Timeout | null>(null);
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
   const reviewTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -49,20 +52,38 @@ const ListeningTest = () => {
       }
     }
     
-    // Cleanup timers on unmount
+    // Create audio element for the test
+    audioRef.current = new Audio();
+    
+    // Add event listeners for audio element
+    if (audioRef.current) {
+      // Update progress when time updates
+      audioRef.current.addEventListener('timeupdate', updateAudioProgress);
+      
+      // Handle when audio ends
+      audioRef.current.addEventListener('ended', handleAudioEnd);
+    }
+    
+    // Cleanup timers and event listeners on unmount
     return () => {
-      if (audioTimerRef.current) clearInterval(audioTimerRef.current);
       if (previewTimerRef.current) clearInterval(previewTimerRef.current);
       if (transitionTimerRef.current) clearInterval(transitionTimerRef.current);
       if (reviewTimerRef.current) clearInterval(reviewTimerRef.current);
+      
+      // Remove event listeners
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('timeupdate', updateAudioProgress);
+        audioRef.current.removeEventListener('ended', handleAudioEnd);
+        audioRef.current.pause();
+      }
     };
   }, [currentTest, startSection]);
 
   const listeningSection = currentTest?.sections.find(section => section.type === 'listening');
   const listeningContent = listeningSection?.content as any;
   
-  // Check if on instructions page - this should work now with the fixed type
-  const isInstructionsPage = currentPhase === Phase.INSTRUCTIONS;
+  // Check if on instructions page
+  const isInstructionsPage = currentPhase === "INSTRUCTIONS";
 
   const handleStartTest = () => {
     setCurrentPhase(Phase.PREVIEW);
@@ -87,38 +108,95 @@ const ListeningTest = () => {
       });
     }, 1000);
   };
+  
+  // Update audio progress based on current playback time
+  const updateAudioProgress = () => {
+    if (audioRef.current) {
+      const duration = audioRef.current.duration;
+      const currentTime = audioRef.current.currentTime;
+      
+      if (duration) {
+        const progress = (currentTime / duration) * 100;
+        setAudioProgress(progress);
+      }
+    }
+  };
+  
+  // Handle audio ending
+  const handleAudioEnd = () => {
+    setAudioPlaying(false);
+    
+    // Check if we need to move to next section or final review
+    if (currentSectionIndex < listeningContent.sections.length - 1) {
+      startSectionTransition();
+    } else {
+      startFinalReview();
+    }
+  };
 
   const startAudioPlayback = () => {
     setCurrentPhase(Phase.LISTENING);
-    setAudioPlaying(true);
-    setAudioProgress(0);
-    toast.info('Listening started', {
-      description: 'Audio is now playing. Listen carefully as it will only play once.'
-    });
-
-    // Simulate audio playback (normally 2-3 minutes per section)
-    const audioDuration = 120; // 2 minutes for simulation
-    let elapsed = 0;
-
-    if (audioTimerRef.current) clearInterval(audioTimerRef.current);
     
-    audioTimerRef.current = setInterval(() => {
-      elapsed += 1;
-      const progress = Math.min((elapsed / audioDuration) * 100, 100);
-      setAudioProgress(progress);
-      
-      if (progress >= 100) {
-        clearInterval(audioTimerRef.current!);
-        setAudioPlaying(false);
-        
-        // Check if we need to move to next section or final review
-        if (currentSectionIndex < listeningContent.sections.length - 1) {
-          startSectionTransition();
-        } else {
-          startFinalReview();
-        }
+    // Set the appropriate audio source based on the current section
+    if (audioRef.current) {
+      if (currentSectionIndex === 0) {
+        audioRef.current.src = '/media/assessment/listening-1.mp3';
+      } else {
+        audioRef.current.src = '/media/assessment/listening-2.mp3';
       }
-    }, 1000);
+      
+      // Set initial volume (not muted by default)
+      audioRef.current.muted = audioMuted;
+      
+      // Load and play audio
+      audioRef.current.load();
+      
+      const playPromise = audioRef.current.play();
+      
+      // Handle play promise to catch any autoplay issues
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setAudioPlaying(true);
+            toast.info('Audio is now playing', {
+              description: 'Listen carefully as it will only play once.'
+            });
+          })
+          .catch(error => {
+            console.error('Audio playback failed:', error);
+            toast.error('Audio failed to play', {
+              description: 'Please check your device settings and click the play button manually.'
+            });
+          });
+      }
+    }
+  };
+  
+  // Toggle audio play/pause
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (audioPlaying) {
+        audioRef.current.pause();
+        setAudioPlaying(false);
+      } else {
+        audioRef.current.play()
+          .then(() => {
+            setAudioPlaying(true);
+          })
+          .catch(error => {
+            console.error('Audio playback failed:', error);
+            toast.error('Audio failed to play');
+          });
+      }
+    }
+  };
+  
+  // Toggle audio mute
+  const toggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !audioMuted;
+      setAudioMuted(!audioMuted);
+    }
   };
 
   const startSectionTransition = () => {
@@ -184,7 +262,9 @@ const ListeningTest = () => {
 
   // Skip this section and move to the next one (for demo purposes)
   const handleSkipSection = () => {
-    if (audioTimerRef.current) clearInterval(audioTimerRef.current);
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
     setAudioPlaying(false);
     setAudioProgress(100);
     
@@ -204,10 +284,14 @@ const ListeningTest = () => {
   // Force submission (manual override)
   const handleForceSubmit = () => {
     // Clear all timers
-    if (audioTimerRef.current) clearInterval(audioTimerRef.current);
     if (previewTimerRef.current) clearInterval(previewTimerRef.current);
     if (transitionTimerRef.current) clearInterval(transitionTimerRef.current);
     if (reviewTimerRef.current) clearInterval(reviewTimerRef.current);
+    
+    // Stop audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
     
     submitSection();
     toast.success('Test submitted', {
@@ -236,7 +320,7 @@ const ListeningTest = () => {
   return (
     <Layout className="pb-16">
       <div className="max-w-4xl mx-auto space-y-6 px-4 md:px-6">
-        {currentPhase === Phase.INSTRUCTIONS ? (
+        {currentPhase === "INSTRUCTIONS" ? (
           <Card className="bg-white shadow-md">
             <CardHeader>
               <CardTitle className="text-center">IELTS Listening Test</CardTitle>
@@ -301,20 +385,40 @@ const ListeningTest = () => {
             {currentPhase === Phase.LISTENING && (
               <div className="bg-slate-100 rounded-md p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Audio Player - Section {currentSectionIndex + 1}</span>
-                  <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                  <span className="text-sm font-medium">
+                    Audio Player - Section {currentSectionIndex + 1}
+                    {currentSectionIndex === 0 ? " (listening-1.mp3)" : " (listening-2.mp3)"}
+                  </span>
+                  <span className={`text-xs px-2 py-1 ${audioPlaying ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} rounded-full`}>
                     {audioPlaying ? 'Playing...' : 'Paused'}
                   </span>
                 </div>
                 <Progress value={audioProgress} className="h-2 mb-2" />
                 <div className="flex items-center justify-between">
-                  {audioPlaying ? (
-                    <PauseCircle className="text-blue-600 w-5 h-5" />
-                  ) : (
-                    <PlayCircle className="text-blue-600 w-5 h-5" />
-                  )}
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={toggleAudio}
+                      className="p-1 rounded hover:bg-slate-200 transition-colors"
+                    >
+                      {audioPlaying ? (
+                        <PauseCircle className="text-blue-600 w-5 h-5" />
+                      ) : (
+                        <PlayCircle className="text-blue-600 w-5 h-5" />
+                      )}
+                    </button>
+                    <button
+                      onClick={toggleMute}
+                      className="p-1 rounded hover:bg-slate-200 transition-colors"
+                    >
+                      {audioMuted ? (
+                        <VolumeX className="text-gray-600 w-5 h-5" />
+                      ) : (
+                        <Volume2 className="text-blue-600 w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
                   <span className="text-xs text-slate-500">
-                    This simulation represents the audio playing automatically in the real test
+                    Listening to authentic audio recording
                   </span>
                   {/* Skip button for demo purposes (would not exist in real test) */}
                   <Button 
@@ -595,7 +699,7 @@ const ListeningTest = () => {
               )}
               
               {/* Emergency submit button (administrative use only) */}
-              {currentPhase !== Phase.INSTRUCTIONS && 
+              {currentPhase !== "INSTRUCTIONS" && 
                currentPhase !== Phase.COMPLETED && 
                currentPhase !== Phase.FINAL_REVIEW && (
                 <Button 
