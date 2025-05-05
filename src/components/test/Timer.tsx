@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTest } from '@/context/TestContext';
 import { cn } from '@/lib/utils';
+import { Clock } from 'lucide-react';
 
 interface TimerProps {
   onTimeUp?: () => void;
@@ -13,11 +14,14 @@ const Timer: React.FC<TimerProps> = ({ onTimeUp, className }) => {
   const [isWarning, setIsWarning] = useState(false);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: NodeJS.Timeout | undefined;
 
     if (isTestActive && timeRemaining > 0) {
       interval = setInterval(() => {
-        setTimeRemaining(timeRemaining - 1);
+        setTimeRemaining((prev: number) => {
+          const newTime = prev - 1;
+          return newTime;
+        });
       }, 1000);
     } else if (timeRemaining === 0 && onTimeUp) {
       onTimeUp();
@@ -47,7 +51,7 @@ const Timer: React.FC<TimerProps> = ({ onTimeUp, className }) => {
         className
       )}
     >
-      <span className="w-5 h-5 rounded-full bg-current"></span>
+      <Clock className="text-current" />
       <span>{formatTime(timeRemaining)}</span>
     </div>
   );

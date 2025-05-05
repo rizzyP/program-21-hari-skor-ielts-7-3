@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { assessWritingTask } from '@/services/aiService';
+import { Progress } from '@/components/ui/progress';
+import { FileText } from 'lucide-react';
 
 const WritingTest = () => {
   const navigate = useNavigate();
@@ -20,7 +21,9 @@ const WritingTest = () => {
     userAnswers, 
     submitSection,
     timeRemaining,
-    testType
+    testType,
+    isTestActive,
+    setTimeRemaining
   } = useTest();
   
   const [isStarted, setIsStarted] = useState(false);
@@ -35,13 +38,15 @@ const WritingTest = () => {
   }, [currentTest, loadTest, testType]);
   
   useEffect(() => {
-    if (currentTest) {
+    if (currentTest && isStarted && !isTestActive) {
       const writingSection = currentTest.sections.find(section => section.type === 'writing');
       if (writingSection) {
         startSection(writingSection.id);
+        // Set timer to 20 minutes (1200 seconds)
+        setTimeRemaining(1200);
       }
     }
-  }, [currentTest, startSection]);
+  }, [currentTest, startSection, isStarted, isTestActive]);
 
   const writingSection = currentTest?.sections.find(section => section.type === 'writing');
   const writingContent = writingSection?.content as any;
@@ -117,6 +122,10 @@ const WritingTest = () => {
     taskNumber: 1
   };
 
+  // Calculate progress percentage for word count
+  const wordCountTarget = 150;
+  const wordCountProgress = Math.min(100, (wordCount / wordCountTarget) * 100);
+
   return (
     <Layout className="pb-16">
       <div className="max-w-5xl mx-auto space-y-6">
@@ -168,18 +177,31 @@ const WritingTest = () => {
                 )}
                 
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <label htmlFor="task1-answer" className="text-sm font-medium">
-                      Your Answer
-                    </label>
-                    <span 
-                      className={`text-sm ${
-                        wordCount < 150 ? 'text-red-600' : 'text-green-600'
-                      }`}
-                    >
-                      {wordCount} words {wordCount < 150 ? `(${150 - wordCount} more needed)` : '✓'}
-                    </span>
+                  <div className="flex justify-between mb-1 items-center">
+                    <div className="flex items-center gap-2">
+                      <FileText size={18} />
+                      <label htmlFor="task1-answer" className="text-sm font-medium">
+                        Your Answer
+                      </label>
+                    </div>
+                    <div className="text-right">
+                      <span 
+                        className={`text-sm ${
+                          wordCount < 150 ? 'text-amber-600' : 'text-green-600'
+                        }`}
+                      >
+                        {wordCount} words {wordCount < 150 ? `(${150 - wordCount} more needed)` : '✓'}
+                      </span>
+                    </div>
                   </div>
+                  
+                  <Progress
+                    value={wordCountProgress}
+                    className={`h-2 mb-2 ${
+                      wordCount >= 150 ? 'bg-green-100' : 'bg-amber-100'
+                    }`}
+                  />
+                  
                   <Textarea 
                     id="task1-answer"
                     placeholder="Write your answer here..."

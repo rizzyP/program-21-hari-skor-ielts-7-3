@@ -20,22 +20,26 @@ const ReadingTest = () => {
     saveAnswer, 
     userAnswers, 
     submitSection,
-    testType
+    testType,
+    isTestActive,
+    setTimeRemaining
   } = useTest();
   
   const [isStarted, setIsStarted] = useState(false);
   
   useEffect(() => {
-    if (currentTest) {
+    if (currentTest && isStarted && !isTestActive) {
       const sectionId = testType === 'academic' ? 
         'reading-academic-001' : 'reading-general-001';
       
       const readingSection = currentTest.sections.find(section => section.id === sectionId);
       if (readingSection) {
         startSection(readingSection.id);
+        // Set timer to 15 minutes (900 seconds)
+        setTimeRemaining(900);
       }
     }
-  }, [currentTest, startSection, testType]);
+  }, [currentTest, startSection, testType, isStarted, isTestActive]);
 
   const readingSection = currentTest?.sections.find(section => 
     section.id === (testType === 'academic' ? 'reading-academic-001' : 'reading-general-001')
