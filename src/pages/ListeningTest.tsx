@@ -60,6 +60,9 @@ const ListeningTest = () => {
   const listeningSection = currentTest?.sections.find(section => section.type === 'listening');
   const listeningContent = listeningSection?.content as any;
   
+  // Check if on instructions page
+  const isInstructionsPage = currentPhase === Phase.INSTRUCTIONS || currentPhase === null;
+
   const handleStartTest = () => {
     setCurrentPhase(Phase.PREVIEW);
     startPreviewTimer();
