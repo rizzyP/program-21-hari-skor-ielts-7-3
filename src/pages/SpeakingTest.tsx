@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { Square, ChevronRight } from 'lucide-react';
+import { Square, ChevronRight, Mic, StopCircle } from 'lucide-react';
 import { TestPhases, Phase } from '@/components/test/TestPhases';
 import { cn } from '@/lib/utils';
 
@@ -429,8 +429,8 @@ const SpeakingTest = () => {
                       variant="destructive"
                       className="flex items-center gap-2 animate-pulse"
                     >
-                      <Square className="h-4 w-4" />
-                      Stop Speaking
+                      <StopCircle className="h-4 w-4" />
+                      Stop Recording
                     </Button>
                   </div>
                 ) : examinerSpeaking ? (
@@ -444,12 +444,14 @@ const SpeakingTest = () => {
                   </div>
                 ) : (
                   <div className="flex justify-center mt-4">
-                    <div className="px-3 py-2 rounded-md bg-green-100 text-green-700">
-                      <span className="flex items-center">
-                        <span className="h-2 w-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                        Recording starting automatically...
-                      </span>
-                    </div>
+                    <Button 
+                      disabled
+                      variant="outline" 
+                      className="flex items-center gap-2 opacity-50"
+                    >
+                      <Mic className="h-4 w-4" />
+                      Recording will start automatically
+                    </Button>
                   </div>
                 )}
               </CardContent>
