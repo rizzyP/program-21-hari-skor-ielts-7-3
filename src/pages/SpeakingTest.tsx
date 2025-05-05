@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { Mic, MicOff, Play, ChevronRight, Clock, Square } from 'lucide-react';
+import { MicOff, Square, ChevronRight, Clock } from 'lucide-react';
 import { TestPhases, Phase } from '@/components/test/TestPhases';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +30,7 @@ const SpeakingTest = () => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [currentPart, setCurrentPart] = useState<number>(1);
   const [transcripts, setTranscripts] = useState<Record<string, string>>({});
-  const [showNextButton, setShowNextButton] = useState(false);
+  const [examinerSpeaking, setExaminerSpeaking] = useState(false);
   const [partCompleted, setPartCompleted] = useState<Record<string, boolean>>({
     part1: false,
     part2: false,
@@ -40,6 +40,9 @@ const SpeakingTest = () => {
   // Animation states
   const [fadeIn, setFadeIn] = useState(false);
   const [examinerMessage, setExaminerMessage] = useState("");
+  
+  // Audio simulation ref
+  const examinerAudioTimeout = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
     if (currentTest) {
@@ -71,19 +74,53 @@ const SpeakingTest = () => {
     return questions[currentQuestion] || "";
   };
 
+  // Simulate examiner speech
+  const simulateExaminerSpeaking = (message: string, duration: number) => {
+    setExaminerMessage(message);
+    setExaminerSpeaking(true);
+    
+    // Clear any existing timeout
+    if (examinerAudioTimeout.current) {
+      clearTimeout(examinerAudioTimeout.current);
+    }
+    
+    // Set timeout for when examiner finishes speaking
+    examinerAudioTimeout.current = setTimeout(() => {
+      setExaminerSpeaking(false);
+      
+      // Auto-start recording when examiner finishes speaking
+      if (currentPhase !== Phase.INSTRUCTIONS && 
+          currentPhase !== Phase.SPEAKING_INTRO && 
+          currentPhase !== Phase.COMPLETED &&
+          currentPhase !== Phase.SPEAKING_PART2_PREP) {
+        handleStartRecording();
+      }
+    }, duration);
+  };
+
   // Handle test start
   const handleStart = () => {
     setIsStarted(true);
     setCurrentPhase(Phase.SPEAKING_INTRO);
     
-    // Set initial examiner message
-    setExaminerMessage("Hello, my name is Dr. Sarah Wilson and I'll be your examiner today. Let's begin with some questions about yourself.");
+    // Simulate examiner introduction
+    simulateExaminerSpeaking(
+      "Hello, my name is Dr. Sarah Wilson and I'll be your examiner today. Let's begin with some questions about yourself.", 
+      4000
+    );
     
+    // After intro, move to Part 1
     setTimeout(() => {
       setCurrentPhase(Phase.SPEAKING_PART1);
-      setExaminerMessage("Let's start Part 1 of the test. I'll ask you some questions about yourself.");
+      simulateExaminerSpeaking(
+        "Let's start Part 1 of the test. I'll ask you some questions about yourself.", 
+        2500
+      );
+      
+      // After the part intro, ask the first question
       setTimeout(() => {
-        setExaminerMessage(getCurrentQuestion());
+        const firstQuestion = getCurrentQuestion();
+        simulateExaminerSpeaking(firstQuestion, 3000);
       }, 2500);
     }, 4000);
     
@@ -137,9 +174,6 @@ const SpeakingTest = () => {
     const questionKey = `p${currentPart}q${currentQuestion}`;
     setTranscripts(prev => ({ ...prev, [questionKey]: response }));
     
-    // Show next button
-    setShowNextButton(true);
-    
     // Save answer
     if (speakingContent && speakingContent.parts) {
       const part = speakingContent.parts.find((p: any) => p.partNumber === currentPart);
@@ -151,13 +185,20 @@ const SpeakingTest = () => {
     toast.success('Response recorded', {
       description: 'Your answer has been saved.'
     });
+    
+    // Automatically continue to next question/part
+    handleNextQuestion();
   };
 
   // Handle Part 2 preparation
   const handlePrepare = (seconds: number) => {
     setCurrentPhase(Phase.SPEAKING_PART2_PREP);
     setTimeRemaining(seconds);
-    setExaminerMessage("Now, I'm going to give you a topic. You'll have one minute to prepare and then you should speak for 1-2 minutes. Here is some paper and a pencil to make notes if you wish. Here is your topic:");
+    
+    simulateExaminerSpeaking(
+      "Now, I'm going to give you a topic. You'll have one minute to prepare and then you should speak for 1-2 minutes. Here is some paper and a pencil to make notes if you wish. Here is your topic:", 
+      5000
+    );
     
     toast.info('Preparation time started', {
       description: `You have ${seconds / 60} minutes to prepare your answer.`
@@ -166,10 +207,13 @@ const SpeakingTest = () => {
     // After preparation time is up, automatically move to recording
     setTimeout(() => {
       setCurrentPhase(Phase.SPEAKING_PART2_ANSWER);
-      setExaminerMessage("Now, please speak about the topic for 1-2 minutes.");
+      simulateExaminerSpeaking(
+        "Now, please speak about the topic for 1-2 minutes.", 
+        3000
+      );
       
       toast.info('Preparation time is over', {
-        description: 'You can now start recording your answer.'
+        description: 'Start speaking when the examiner finishes.'
       });
       
       // Set a timer for the speaking duration
@@ -184,19 +228,17 @@ const SpeakingTest = () => {
     // If there are more questions in this part
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setShowNextButton(false);
       
-      // Fade animation for question transition
+      // Simulate examiner asking the next question
       setTimeout(() => {
-        setExaminerMessage(questions[currentQuestion + 1]);
-      }, 300);
+        simulateExaminerSpeaking(questions[currentQuestion + 1], 3000);
+      }, 1000);
     } 
     // If this is the end of part 1
     else if (currentPart === 1) {
       setPartCompleted(prev => ({ ...prev, part1: true }));
       setCurrentPart(2);
       setCurrentQuestion(0);
-      setShowNextButton(false);
       handlePrepare(60); // 60 seconds for Part 2 preparation
     }
     // If this is the end of part 2
@@ -205,13 +247,18 @@ const SpeakingTest = () => {
       setCurrentPart(3);
       setCurrentQuestion(0);
       setCurrentPhase(Phase.SPEAKING_PART3);
-      setShowNextButton(false);
       
       // Transition to Part 3
-      setExaminerMessage("Let's talk more about this topic. I'll ask you some more questions.");
       setTimeout(() => {
-        setExaminerMessage(speakingContent?.parts.find((p: any) => p.partNumber === 3)?.questions[0] || "");
-      }, 3000);
+        simulateExaminerSpeaking(
+          "Let's talk more about this topic. I'll ask you some more questions.", 
+          3000
+        );
+        setTimeout(() => {
+          const firstPart3Question = speakingContent?.parts.find((p: any) => p.partNumber === 3)?.questions[0] || "";
+          simulateExaminerSpeaking(firstPart3Question, 3000);
+        }, 3000);
+      }, 1000);
     }
     // If this is the end of part 3
     else if (currentPart === 3 && currentQuestion >= questions.length - 1) {
@@ -221,12 +268,11 @@ const SpeakingTest = () => {
     // For Part 3 questions
     else {
       setCurrentQuestion(currentQuestion + 1);
-      setShowNextButton(false);
       
-      // Fade animation for question transition
+      // Simulate examiner asking the next question
       setTimeout(() => {
-        setExaminerMessage(questions[currentQuestion + 1]);
-      }, 300);
+        simulateExaminerSpeaking(questions[currentQuestion + 1], 3000);
+      }, 1000);
     }
   };
 
@@ -235,7 +281,10 @@ const SpeakingTest = () => {
     submitSection();
     completeTest();
     setCurrentPhase(Phase.COMPLETED);
-    setExaminerMessage("That's the end of the speaking test. Thank you for your participation.");
+    simulateExaminerSpeaking(
+      "That's the end of the speaking test. Thank you for your participation.", 
+      3000
+    );
     
     toast.success('Speaking test completed', {
       description: 'You have completed the IELTS speaking test!'
@@ -246,9 +295,21 @@ const SpeakingTest = () => {
     }, 3000);
   };
 
+  // Clean up timeouts when component unmounts
+  useEffect(() => {
+    return () => {
+      if (examinerAudioTimeout.current) {
+        clearTimeout(examinerAudioTimeout.current);
+      }
+    };
+  }, []);
+
   // Mock examiner avatar component
   const ExaminerAvatar = () => (
-    <Avatar className="w-16 h-16 border-2 border-ielts-red">
+    <Avatar className={cn(
+      "w-16 h-16 border-2",
+      examinerSpeaking ? "border-green-500 animate-pulse" : "border-ielts-red"
+    )}>
       <AvatarImage src="https://i.pravatar.cc/150?img=58" alt="Examiner" />
       <AvatarFallback>SW</AvatarFallback>
     </Avatar>
@@ -308,6 +369,8 @@ const SpeakingTest = () => {
                   <li>Part 2 (3-4 minutes): A longer talk on a specific topic with 1 minute preparation time.</li>
                   <li>Part 3 (4-5 minutes): A discussion related to the Part 2 topic.</li>
                   <li>Speak clearly and provide detailed responses as you would in a real test.</li>
+                  <li><strong>When the examiner stops speaking, your microphone will automatically turn on.</strong></li>
+                  <li><strong>Press the "Stop Speaking" button when you've finished answering.</strong></li>
                 </ul>
               </div>
               <div className="text-center">
@@ -330,7 +393,10 @@ const SpeakingTest = () => {
                   <ExaminerAvatar />
                   <div>
                     <h3 className="font-medium">Dr. Sarah Wilson</h3>
-                    <p className="text-sm text-slate-600">IELTS Speaking Examiner</p>
+                    <p className="text-sm text-slate-600">
+                      IELTS Speaking Examiner
+                      {examinerSpeaking && <span className="ml-2 text-green-500">(Speaking...)</span>}
+                    </p>
                   </div>
                 </div>
               </CardHeader>
@@ -340,7 +406,8 @@ const SpeakingTest = () => {
                 <div className="flex mb-6">
                   <div className={cn(
                     "bg-slate-100 p-3 rounded-lg max-w-[85%] text-slate-800 transition-opacity duration-300",
-                    fadeIn ? "opacity-100" : "opacity-0"
+                    fadeIn ? "opacity-100" : "opacity-0",
+                    examinerSpeaking ? "border-l-4 border-green-500" : ""
                   )}>
                     {examinerMessage}
                     
@@ -350,46 +417,59 @@ const SpeakingTest = () => {
                 </div>
                 
                 {/* User response area */}
-                {showNextButton ? (
-                  <div className="bg-blue-50 p-3 rounded-lg ml-auto max-w-[85%] text-slate-700">
+                {transcripts[`p${currentPart}q${currentQuestion}`] && (
+                  <div className="bg-blue-50 p-3 rounded-lg ml-auto max-w-[85%] text-slate-700 mb-4">
                     {transcripts[`p${currentPart}q${currentQuestion}`]}
                   </div>
+                )}
+                
+                {/* Recording status and controls */}
+                {isRecording ? (
+                  <div className="flex justify-center mt-4">
+                    <Button
+                      onClick={handleStopRecording}
+                      variant="destructive"
+                      className="flex items-center gap-2 animate-pulse"
+                    >
+                      <Square className="h-4 w-4" />
+                      Stop Speaking
+                    </Button>
+                  </div>
                 ) : (
-                  <div className="flex justify-center mt-6">
-                    {!isRecording ? (
-                      <Button
-                        onClick={handleStartRecording}
-                        disabled={currentPhase === Phase.SPEAKING_INTRO}
-                        className={cn(
-                          "bg-red-500 hover:bg-red-600 flex items-center gap-2",
-                          currentPhase === Phase.SPEAKING_INTRO && "opacity-50 cursor-not-allowed"
-                        )}
-                      >
-                        <Mic className="h-4 w-4" />
-                        {currentPhase === Phase.SPEAKING_INTRO ? "Please wait..." : "Start Speaking"}
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={handleStopRecording}
-                        variant="destructive"
-                        className="flex items-center gap-2"
-                      >
-                        <Square className="h-4 w-4" />
-                        Stop Speaking
-                      </Button>
-                    )}
+                  <div className="flex justify-center mt-4">
+                    <div className={cn(
+                      "px-3 py-2 rounded-md",
+                      isRecording ? "bg-red-100 text-red-700" : 
+                      examinerSpeaking ? "bg-yellow-100 text-yellow-700" : "bg-slate-100 text-slate-700"
+                    )}>
+                      {examinerSpeaking ? (
+                        <span className="flex items-center">
+                          <span className="h-2 w-2 bg-yellow-500 rounded-full mr-2"></span>
+                          Examiner is speaking...
+                        </span>
+                      ) : isRecording ? (
+                        <span className="flex items-center">
+                          <span className="h-2 w-2 bg-red-500 rounded-full mr-2 animate-pulse"></span>
+                          Recording in progress
+                        </span>
+                      ) : (
+                        <span className="flex items-center">
+                          <span className="h-2 w-2 bg-slate-400 rounded-full mr-2"></span>
+                          Waiting for examiner
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
               </CardContent>
               
               <CardFooter className="flex justify-end border-t bg-slate-50 py-3">
-                {showNextButton && (
+                {currentPhase === Phase.COMPLETED && (
                   <Button 
-                    onClick={handleNextQuestion}
+                    onClick={() => navigate('/results')}
                     className="flex items-center gap-2 bg-ielts-red hover:bg-ielts-blue"
                   >
-                    {currentPart === 3 && currentQuestion >= getCurrentPartQuestions().length - 1 ? 
-                      "Complete Test" : "Next Question"}
+                    View Results
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 )}
