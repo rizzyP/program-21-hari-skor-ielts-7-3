@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { MicOff, Square, ChevronRight, Clock } from 'lucide-react';
+import { Square, ChevronRight } from 'lucide-react';
 import { TestPhases, Phase } from '@/components/test/TestPhases';
 import { cn } from '@/lib/utils';
 
@@ -186,7 +186,7 @@ const SpeakingTest = () => {
       description: 'Your answer has been saved.'
     });
     
-    // Automatically continue to next question/part
+    // Immediately proceed to next question after stopping recording
     handleNextQuestion();
   };
 
@@ -229,10 +229,9 @@ const SpeakingTest = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       
-      // Simulate examiner asking the next question
-      setTimeout(() => {
-        simulateExaminerSpeaking(questions[currentQuestion + 1], 3000);
-      }, 1000);
+      // Simulate examiner asking the next question immediately
+      const nextQuestion = questions[currentQuestion + 1];
+      simulateExaminerSpeaking(nextQuestion, 3000);
     } 
     // If this is the end of part 1
     else if (currentPart === 1) {
@@ -248,17 +247,17 @@ const SpeakingTest = () => {
       setCurrentQuestion(0);
       setCurrentPhase(Phase.SPEAKING_PART3);
       
-      // Transition to Part 3
+      // Move directly to Part 3
+      simulateExaminerSpeaking(
+        "Let's talk more about this topic. I'll ask you some more questions.", 
+        3000
+      );
+      
+      // Queue up the first Part 3 question
       setTimeout(() => {
-        simulateExaminerSpeaking(
-          "Let's talk more about this topic. I'll ask you some more questions.", 
-          3000
-        );
-        setTimeout(() => {
-          const firstPart3Question = speakingContent?.parts.find((p: any) => p.partNumber === 3)?.questions[0] || "";
-          simulateExaminerSpeaking(firstPart3Question, 3000);
-        }, 3000);
-      }, 1000);
+        const firstPart3Question = speakingContent?.parts.find((p: any) => p.partNumber === 3)?.questions[0] || "";
+        simulateExaminerSpeaking(firstPart3Question, 3000);
+      }, 3000);
     }
     // If this is the end of part 3
     else if (currentPart === 3 && currentQuestion >= questions.length - 1) {
@@ -269,10 +268,9 @@ const SpeakingTest = () => {
     else {
       setCurrentQuestion(currentQuestion + 1);
       
-      // Simulate examiner asking the next question
-      setTimeout(() => {
-        simulateExaminerSpeaking(questions[currentQuestion + 1], 3000);
-      }, 1000);
+      // Simulate examiner asking the next question immediately
+      const nextQuestion = questions[currentQuestion + 1];
+      simulateExaminerSpeaking(nextQuestion, 3000);
     }
   };
 
@@ -369,7 +367,7 @@ const SpeakingTest = () => {
                   <li>Part 2 (3-4 minutes): A longer talk on a specific topic with 1 minute preparation time.</li>
                   <li>Part 3 (4-5 minutes): A discussion related to the Part 2 topic.</li>
                   <li>Speak clearly and provide detailed responses as you would in a real test.</li>
-                  <li><strong>When the examiner stops speaking, your microphone will automatically turn on.</strong></li>
+                  <li><strong>When the examiner stops speaking, recording will automatically start.</strong></li>
                   <li><strong>Press the "Stop Speaking" button when you've finished answering.</strong></li>
                 </ul>
               </div>
@@ -435,29 +433,22 @@ const SpeakingTest = () => {
                       Stop Speaking
                     </Button>
                   </div>
+                ) : examinerSpeaking ? (
+                  <div className="flex justify-center mt-4">
+                    <div className="px-3 py-2 rounded-md bg-yellow-100 text-yellow-700">
+                      <span className="flex items-center">
+                        <span className="h-2 w-2 bg-yellow-500 rounded-full mr-2"></span>
+                        Examiner is speaking...
+                      </span>
+                    </div>
+                  </div>
                 ) : (
                   <div className="flex justify-center mt-4">
-                    <div className={cn(
-                      "px-3 py-2 rounded-md",
-                      isRecording ? "bg-red-100 text-red-700" : 
-                      examinerSpeaking ? "bg-yellow-100 text-yellow-700" : "bg-slate-100 text-slate-700"
-                    )}>
-                      {examinerSpeaking ? (
-                        <span className="flex items-center">
-                          <span className="h-2 w-2 bg-yellow-500 rounded-full mr-2"></span>
-                          Examiner is speaking...
-                        </span>
-                      ) : isRecording ? (
-                        <span className="flex items-center">
-                          <span className="h-2 w-2 bg-red-500 rounded-full mr-2 animate-pulse"></span>
-                          Recording in progress
-                        </span>
-                      ) : (
-                        <span className="flex items-center">
-                          <span className="h-2 w-2 bg-slate-400 rounded-full mr-2"></span>
-                          Waiting for examiner
-                        </span>
-                      )}
+                    <div className="px-3 py-2 rounded-md bg-green-100 text-green-700">
+                      <span className="flex items-center">
+                        <span className="h-2 w-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                        Recording starting automatically...
+                      </span>
                     </div>
                   </div>
                 )}
