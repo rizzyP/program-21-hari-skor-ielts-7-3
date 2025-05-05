@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 
 // This replicates the Phase enum from ListeningTest.tsx
-enum Phase {
+export enum Phase {
   INSTRUCTIONS,
   PREVIEW,
   LISTENING,
@@ -86,4 +85,4 @@ const TestPhases: React.FC<TestPhasesProps> = ({
   );
 };
 
-export { TestPhases, Phase };
+export { TestPhases };
