@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -118,8 +117,9 @@ const WritingTest = () => {
   const writingTasks = writingContent.tasks || [];
   const task1 = writingTasks.find((t: any) => t.taskNumber === 1) || {
     id: 'w-task1',
-    prompt: 'Default task 1 prompt',
-    taskNumber: 1
+    prompt: 'The chart below shows preferences for different types of art items by age group. Summarize the information by selecting and reporting the main features, and make comparisons where relevant.',
+    taskNumber: 1,
+    resources: true
   };
 
   // Calculate progress percentage for word count
@@ -167,11 +167,13 @@ const WritingTest = () => {
               <CardContent className="space-y-4">
                 {task1.resources && (
                   <div className="border rounded p-4 text-center bg-slate-50">
-                    <p className="mb-3 text-sm text-slate-500">Visual data would appear here</p>
-                    <div className="h-64 flex items-center justify-center border border-dashed border-slate-300 bg-white">
-                      <p className="text-slate-400">
-                        [In a production app, a graph/chart would be displayed here]
-                      </p>
+                    <p className="mb-3 text-sm text-slate-500">Art Preferences by Age Group (Percentage)</p>
+                    <div className="flex items-center justify-center">
+                      <img 
+                        src="/lovable-uploads/524a31ce-69f7-4fa6-a38d-a83a066dc0ef.png"
+                        alt="Chart showing preferences for different types of art items by age group"
+                        className="w-full max-w-3xl border bg-white"
+                      />
                     </div>
                   </div>
                 )}
