@@ -18,10 +18,9 @@ const Timer: React.FC<TimerProps> = ({ onTimeUp, className }) => {
 
     if (isTestActive && timeRemaining > 0) {
       interval = setInterval(() => {
-        setTimeRemaining((prev: number) => {
-          const newTime = prev - 1;
-          return newTime;
-        });
+        // Fix: Use the number directly instead of the updater function
+        // since the TestContext expects a direct number value
+        setTimeRemaining(timeRemaining - 1);
       }, 1000);
     } else if (timeRemaining === 0 && onTimeUp) {
       onTimeUp();
