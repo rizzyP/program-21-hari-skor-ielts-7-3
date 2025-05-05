@@ -595,8 +595,8 @@ const ListeningTest = () => {
               
               {/* Emergency submit button (administrative use only) */}
               {currentPhase !== Phase.INSTRUCTIONS && 
-                currentPhase !== Phase.COMPLETED && 
-                currentPhase !== Phase.FINAL_REVIEW && (
+               currentPhase !== Phase.COMPLETED && 
+               currentPhase !== Phase.FINAL_REVIEW && (
                 <Button 
                   variant="outline" 
                   onClick={handleForceSubmit}
