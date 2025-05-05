@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { PlayCircle, PauseCircle, Clock, Volume2, VolumeX } from 'lucide-react';
+import { Clock, Volume2, VolumeX } from 'lucide-react';
 import { TestPhases, Phase } from '@/components/test/TestPhases';
 
 const ListeningTest = () => {
@@ -159,28 +159,9 @@ const ListeningTest = () => {
           })
           .catch(error => {
             console.error('Audio playback failed:', error);
-            toast.error('Audio failed to play', {
-              description: 'Please check your device settings and click the play button manually.'
+            toast.error('Audio failed to play automatically', {
+              description: 'Please click the play button manually or check your device settings.'
             });
-          });
-      }
-    }
-  };
-  
-  // Toggle audio play/pause
-  const toggleAudio = () => {
-    if (audioRef.current) {
-      if (audioPlaying) {
-        audioRef.current.pause();
-        setAudioPlaying(false);
-      } else {
-        audioRef.current.play()
-          .then(() => {
-            setAudioPlaying(true);
-          })
-          .catch(error => {
-            console.error('Audio playback failed:', error);
-            toast.error('Audio failed to play');
           });
       }
     }
@@ -366,16 +347,6 @@ const ListeningTest = () => {
               <Progress value={audioProgress} className="h-2 mb-2" />
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={toggleAudio}
-                    className="p-1 rounded hover:bg-slate-200 transition-colors"
-                  >
-                    {audioPlaying ? (
-                      <PauseCircle className="text-blue-600 w-5 h-5" />
-                    ) : (
-                      <PlayCircle className="text-blue-600 w-5 h-5" />
-                    )}
-                  </button>
                   <button
                     onClick={toggleMute}
                     className="p-1 rounded hover:bg-slate-200 transition-colors"
