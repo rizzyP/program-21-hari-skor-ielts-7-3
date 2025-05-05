@@ -1,4 +1,3 @@
-
 import { IELTSTest } from "@/types/test";
 
 export const sampleTest: IELTSTest = {
@@ -416,8 +415,8 @@ The Torpedo Factory's biggest draw, particularly for visitors with children, is 
           {
             id: "w-general-task1",
             taskNumber: 1,
-            prompt: "You have just received an invitation to an art exhibition. You would like more details about the event before you decide to go. Write a letter to the organizer asking for more details. In your letter: * thank them for the invitation * ask what kind of art will be on display and the size of each section * ask if any of the artists will be present",
-            wordCount: 120,
+            prompt: "You have just received an invitation to an art exhibition. You would like more details about the event before you decide to go.\nWrite a letter to the organizer asking for more details. In your letter:\n* thank them for the invitation\n* ask what kind of art will be on display and the size of each section\n* ask if any of the artists will be present\nWrite at least 150 words. Begin your letter as follows: Dear .....................,",
+            wordCount: 150,
             timeInMinutes: 8
           }
         ]
