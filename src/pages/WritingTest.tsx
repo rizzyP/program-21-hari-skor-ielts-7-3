@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -38,16 +39,21 @@ const WritingTest = () => {
   
   useEffect(() => {
     if (currentTest && isStarted && !isTestActive) {
-      const writingSection = currentTest.sections.find(section => section.type === 'writing');
+      // Select the appropriate writing section based on test type
+      const sectionId = testType === 'academic' ? 'writing-academic-001' : 'writing-general-001';
+      const writingSection = currentTest.sections.find(section => section.id === sectionId);
       if (writingSection) {
         startSection(writingSection.id);
         // Set timer to 20 minutes (1200 seconds)
         setTimeRemaining(1200);
       }
     }
-  }, [currentTest, startSection, isStarted, isTestActive]);
+  }, [currentTest, startSection, isStarted, isTestActive, testType]);
 
-  const writingSection = currentTest?.sections.find(section => section.type === 'writing');
+  // Get the appropriate writing section based on test type
+  const writingSection = currentTest?.sections.find(section => 
+    section.id === (testType === 'academic' ? 'writing-academic-001' : 'writing-general-001')
+  );
   const writingContent = writingSection?.content as any;
 
   const handleStart = () => {
@@ -113,17 +119,17 @@ const WritingTest = () => {
     );
   }
 
-  // Safely access task1, ensuring it exists before accessing properties
+  // Safely access tasks, ensuring they exist before accessing properties
   const writingTasks = writingContent.tasks || [];
   const task1 = writingTasks.find((t: any) => t.taskNumber === 1) || {
     id: 'w-task1',
-    prompt: 'The chart below shows preferences for different types of art items by age group. Summarize the information by selecting and reporting the main features, and make comparisons where relevant.',
+    prompt: 'Task prompt unavailable',
     taskNumber: 1,
-    resources: true
+    resources: false
   };
 
   // Calculate progress percentage for word count
-  const wordCountTarget = 150;
+  const wordCountTarget = testType === 'academic' ? 150 : 150; // Both targets are 150 for now, but can be adjusted
   const wordCountProgress = Math.min(100, (wordCount / wordCountTarget) * 100);
 
   return (
@@ -132,17 +138,28 @@ const WritingTest = () => {
         {!isStarted ? (
           <Card className="bg-white shadow-md">
             <CardHeader>
-              <CardTitle className="text-center">IELTS Writing Test</CardTitle>
+              <CardTitle className="text-center">
+                IELTS Writing Test ({testType === 'academic' ? 'Academic' : 'General Training'})
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-cyan-50 p-4 rounded-md">
                 <h3 className="font-medium text-lg mb-2">Instructions:</h3>
-                <ul className="list-disc list-inside space-y-2 text-slate-700">
-                  <li>You will complete one writing task.</li>
-                  <li>Task (20 minutes): Describe visual information (chart, graph, diagram).</li>
-                  <li>You will have a total of 20 minutes for the task.</li>
-                  <li>Suggested word count: 150+ words.</li>
-                </ul>
+                {testType === 'academic' ? (
+                  <ul className="list-disc list-inside space-y-2 text-slate-700">
+                    <li>You will complete one writing task.</li>
+                    <li>Task (20 minutes): Describe visual information (chart, graph, diagram).</li>
+                    <li>You will have a total of 20 minutes for the task.</li>
+                    <li>Suggested word count: 150+ words.</li>
+                  </ul>
+                ) : (
+                  <ul className="list-disc list-inside space-y-2 text-slate-700">
+                    <li>You will complete one writing task.</li>
+                    <li>Task (20 minutes): Write a letter to address a specific situation.</li>
+                    <li>You will have a total of 20 minutes for the task.</li>
+                    <li>Required word count: At least 150 words.</li>
+                  </ul>
+                )}
               </div>
               <div className="text-center">
                 <Button onClick={handleStart} size="lg" className="bg-ielts-lightblue hover:bg-ielts-blue">
@@ -154,7 +171,9 @@ const WritingTest = () => {
         ) : (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">IELTS Writing Test</h1>
+              <h1 className="text-2xl font-bold">
+                IELTS Writing Test ({testType === 'academic' ? 'Academic' : 'General Training'})
+              </h1>
               <Timer onTimeUp={handleTimeUp} />
             </div>
 
@@ -165,7 +184,7 @@ const WritingTest = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {task1.resources && (
+                {testType === 'academic' && task1.resources && (
                   <div className="border rounded p-4 text-center bg-slate-50">
                     <p className="mb-3 text-sm text-slate-500">Art Preferences by Age Group (Percentage)</p>
                     <div className="flex items-center justify-center">
@@ -189,10 +208,10 @@ const WritingTest = () => {
                     <div className="text-right">
                       <span 
                         className={`text-sm ${
-                          wordCount < 150 ? 'text-amber-600' : 'text-green-600'
+                          wordCount < wordCountTarget ? 'text-amber-600' : 'text-green-600'
                         }`}
                       >
-                        {wordCount} words {wordCount < 150 ? `(${150 - wordCount} more needed)` : '✓'}
+                        {wordCount} words {wordCount < wordCountTarget ? `(${wordCountTarget - wordCount} more needed)` : '✓'}
                       </span>
                     </div>
                   </div>
@@ -200,13 +219,15 @@ const WritingTest = () => {
                   <Progress
                     value={wordCountProgress}
                     className={`h-2 mb-2 ${
-                      wordCount >= 150 ? 'bg-green-100' : 'bg-amber-100'
+                      wordCount >= wordCountTarget ? 'bg-green-100' : 'bg-amber-100'
                     }`}
                   />
                   
                   <Textarea 
                     id="task1-answer"
-                    placeholder="Write your answer here..."
+                    placeholder={testType === 'academic' 
+                      ? "Write your answer here..." 
+                      : "Dear .....................,\n\nWrite your letter here..."}
                     className="min-h-[300px]"
                     value={getTaskAnswer(task1.id)}
                     onChange={(e) => handleTextChange(task1.id, e.target.value)}
