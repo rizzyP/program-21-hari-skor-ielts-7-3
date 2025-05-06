@@ -142,7 +142,7 @@ const TestSelection = () => {
                     Take all four test sections in sequence and receive a comprehensive assessment with an overall band score prediction.
                   </p>
                   <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
-                    <li>Duration: Approximately 55 minutes</li>
+                    <li>Duration: Approximately 60 minutes</li>
                     <li>AI-powered assessment and feedback</li>
                     <li>Detailed score breakdown and recommendations</li>
                   </ul>
