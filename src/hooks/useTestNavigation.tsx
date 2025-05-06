@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { useTest } from '@/context/TestContext';
 import { toast } from 'sonner';
@@ -55,6 +54,13 @@ export const useTestNavigation = (
     "What kind of art lessons did you have at school?",
     "Are these lessons quite traditional or quite new?", // Updated to match the correct question for 1c
     "How useful do you think it is to study art at school? (Why/Why not?)"
+  ];
+
+  // Fixed part 3 questions that correspond to audio files
+  const FIXED_PART3_QUESTIONS = [
+    "What qualities do you think are important for a good teacher?",
+    "How has education changed in your country in the last few decades?",
+    "Do you think technology will eventually replace teachers in the classroom?"
   ];
 
   // Handle test start with opening audio sequence
@@ -209,9 +215,8 @@ export const useTestNavigation = (
         setCurrentQuestion(0);
         setCurrentPhase(Phase.SPEAKING_PART3);
         
-        // Play first part 3 question
-        const firstPart3Question = questions[0] || 
-          "What qualities do you think are important for a good teacher?";
+        // Play first part 3 question using our fixed questions
+        const firstPart3Question = FIXED_PART3_QUESTIONS[0];
         
         simulateExaminerSpeaking(
           firstPart3Question, 
@@ -226,9 +231,8 @@ export const useTestNavigation = (
       if (currentQuestion < 2) { // We have 3 questions (0-2) in part 3
         setCurrentQuestion(currentQuestion + 1);
         
-        // Simulate examiner asking the next question with audio
-        const nextQuestion = questions[currentQuestion + 1] || 
-          `Question ${currentQuestion + 2} for part 3`;
+        // Simulate examiner asking the next question with audio using our fixed questions
+        const nextQuestion = FIXED_PART3_QUESTIONS[currentQuestion + 1];
         
         simulateExaminerSpeaking(
           nextQuestion, 
