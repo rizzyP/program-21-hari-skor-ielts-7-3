@@ -50,19 +50,30 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
       </CardHeader>
       
       <CardContent className="pt-6 pb-4">
-        {/* Examiner speech bubble */}
-        <div className="flex mb-6">
-          <div className={cn(
-            "bg-slate-100 p-3 rounded-lg max-w-[85%] text-slate-800 transition-opacity duration-300",
-            fadeIn ? "opacity-100" : "opacity-0",
-            examinerSpeaking ? "border-l-4 border-green-500" : ""
-          )}>
-            {examinerMessage}
-            
-            {/* Show cue card in Part 2 */}
-            {currentPhase === Phase.SPEAKING_PART2_PREP && <CueCard topic={examinerMessage} />}
+        {/* Current question displayed prominently in the center */}
+        {(currentPhase === Phase.SPEAKING_PART1 || 
+          currentPhase === Phase.SPEAKING_PART2_ANSWER || 
+          currentPhase === Phase.SPEAKING_PART3) && !examinerSpeaking && (
+          <div className="text-center my-8 max-w-2xl mx-auto">
+            <h2 className="text-2xl font-medium text-slate-800">{examinerMessage}</h2>
           </div>
-        </div>
+        )}
+        
+        {/* Examiner speech bubble */}
+        {examinerSpeaking && (
+          <div className="flex mb-6">
+            <div className={cn(
+              "bg-slate-100 p-3 rounded-lg max-w-[85%] text-slate-800 transition-opacity duration-300",
+              fadeIn ? "opacity-100" : "opacity-0",
+              examinerSpeaking ? "border-l-4 border-green-500" : ""
+            )}>
+              {examinerMessage}
+              
+              {/* Show cue card in Part 2 */}
+              {currentPhase === Phase.SPEAKING_PART2_PREP && <CueCard topic={examinerMessage} />}
+            </div>
+          </div>
+        )}
         
         {/* User response area */}
         {transcripts[`p${currentPart}q${currentQuestion}`] && (
@@ -88,6 +99,13 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
             View Results
             <ChevronRight className="h-4 w-4" />
           </Button>
+        )}
+        
+        {isRecording && (
+          <div className="mr-auto flex items-center">
+            <span className="h-3 w-3 bg-red-500 rounded-full mr-2 animate-pulse"></span>
+            <span className="text-sm text-red-600 font-semibold">Recording</span>
+          </div>
         )}
       </CardFooter>
     </Card>

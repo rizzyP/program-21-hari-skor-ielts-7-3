@@ -5,6 +5,13 @@ import { useTest } from '@/context/TestContext';
 import { toast } from 'sonner';
 import { Phase } from '@/components/test/TestPhases';
 
+// Define time limits for each part
+const TIME_LIMITS = {
+  part1: 20, // 20 seconds per question
+  part2: 60, // 1 minute per question
+  part3: 40  // 40 seconds per question
+};
+
 export const useSpeakingTest = () => {
   const navigate = useNavigate();
   const { 
@@ -36,12 +43,25 @@ export const useSpeakingTest = () => {
   
   // Audio simulation ref
   const examinerAudioTimeout = useRef<NodeJS.Timeout | null>(null);
+  const answerTimerTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // For tracking overall question number
+  const [questionNumber, setQuestionNumber] = useState(1);
+  const [totalQuestions, setTotalQuestions] = useState(0);
 
   useEffect(() => {
     if (currentTest) {
       const speakingSection = currentTest.sections.find(section => section.type === 'speaking');
       if (speakingSection) {
         startSection(speakingSection.id);
+        
+        // Calculate total questions across all parts
+        if (speakingSection.content && speakingSection.content.parts) {
+          const total = speakingSection.content.parts.reduce((sum: number, part: any) => {
+            return sum + (part.questions ? part.questions.length : 0);
+          }, 0);
+          setTotalQuestions(total);
+        }
       }
     }
   }, [currentTest, startSection]);
@@ -57,6 +77,9 @@ export const useSpeakingTest = () => {
     return () => {
       if (examinerAudioTimeout.current) {
         clearTimeout(examinerAudioTimeout.current);
+      }
+      if (answerTimerTimeout.current) {
+        clearTimeout(answerTimerTimeout.current);
       }
     };
   }, []);
@@ -74,6 +97,41 @@ export const useSpeakingTest = () => {
   const getCurrentQuestion = () => {
     const questions = getCurrentPartQuestions();
     return questions[currentQuestion] || "";
+  };
+
+  // Set timer based on current part
+  const setAnswerTimer = () => {
+    // Clear any existing timer
+    if (answerTimerTimeout.current) {
+      clearTimeout(answerTimerTimeout.current);
+    }
+    
+    let timeLimit: number;
+    
+    // Select time limit based on current part
+    switch(currentPart) {
+      case 1:
+        timeLimit = TIME_LIMITS.part1;
+        break;
+      case 2:
+        timeLimit = TIME_LIMITS.part2;
+        break;
+      case 3:
+        timeLimit = TIME_LIMITS.part3;
+        break;
+      default:
+        timeLimit = 30; // Default fallback
+    }
+    
+    // Update the timer in the UI
+    setTimeRemaining(timeLimit);
+    
+    // Set a timeout to automatically stop recording when time is up
+    answerTimerTimeout.current = setTimeout(() => {
+      if (isRecording) {
+        handleStopRecording();
+      }
+    }, timeLimit * 1000);
   };
 
   // Simulate examiner speech
@@ -134,16 +192,22 @@ export const useSpeakingTest = () => {
   // Handle recording
   const handleStartRecording = () => {
     setIsRecording(true);
-    toast.info('Recording started', {
+    
+    // Set timer for the current part
+    setAnswerTimer();
+    
+    toast.info(`Recording started (${currentPart === 1 ? '20 sec' : currentPart === 2 ? '60 sec' : '40 sec'})`, {
       description: 'Speak clearly and answer the question.'
     });
-    
-    // In a real app, this would start an actual recording
-    // For this demo, we'll just simulate it
   };
 
   const handleStopRecording = () => {
     setIsRecording(false);
+    
+    // Clear the answer timer
+    if (answerTimerTimeout.current) {
+      clearTimeout(answerTimerTimeout.current);
+    }
     
     // In a real app, this would stop the recording and process it
     // For this demo, we'll simulate getting a transcript
@@ -217,15 +281,15 @@ export const useSpeakingTest = () => {
       toast.info('Preparation time is over', {
         description: 'Start speaking when the examiner finishes.'
       });
-      
-      // Set a timer for the speaking duration
-      setTimeRemaining(120); // 2 minutes for speaking
     }, seconds * 1000);
   };
 
   // Handle moving to next question
   const handleNextQuestion = () => {
     const questions = getCurrentPartQuestions();
+    
+    // Update overall question counter
+    setQuestionNumber(prev => prev + 1);
     
     // If there are more questions in this part
     if (currentQuestion < questions.length - 1) {
@@ -312,6 +376,8 @@ export const useSpeakingTest = () => {
     examinerMessage,
     speakingSection,
     speakingContent,
+    totalQuestions,
+    questionNumber,
     getCurrentPartQuestions,
     getCurrentQuestion,
     handleStart,

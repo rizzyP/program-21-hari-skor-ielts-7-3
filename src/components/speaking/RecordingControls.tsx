@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, StopCircle } from 'lucide-react';
 
@@ -14,12 +14,9 @@ const RecordingControls: React.FC<RecordingControlsProps> = ({
   examinerSpeaking,
   onStopRecording,
 }) => {
-  // Immediately show the stop recording button when recording starts
-  // We're removing the delay that was causing the issue
-  
   if (isRecording) {
     return (
-      <div className="flex justify-center mt-4">
+      <div className="flex flex-col items-center mt-4">
         <Button
           onClick={onStopRecording}
           variant="destructive"
@@ -37,7 +34,7 @@ const RecordingControls: React.FC<RecordingControlsProps> = ({
       <div className="flex justify-center mt-4">
         <div className="px-3 py-2 rounded-md bg-yellow-100 text-yellow-700">
           <span className="flex items-center">
-            <span className="h-2 w-2 bg-yellow-500 rounded-full mr-2"></span>
+            <span className="h-2 w-2 bg-yellow-500 rounded-full mr-2 animate-pulse"></span>
             Examiner is speaking...
           </span>
         </div>

@@ -22,6 +22,8 @@ const SpeakingTest = () => {
     examinerMessage,
     speakingSection,
     speakingContent,
+    totalQuestions,
+    questionNumber,
     getCurrentPartQuestions,
     handleStart,
     handleStopRecording,
@@ -47,7 +49,14 @@ const SpeakingTest = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <TestPhases currentPhase={currentPhase} currentSection={1} totalSections={1} />
-              {(currentPhase === Phase.SPEAKING_PART2_PREP || currentPhase === Phase.SPEAKING_PART2_ANSWER) && <Timer />}
+              <div className="text-sm font-medium bg-slate-100 rounded px-3 py-1">
+                Total: {questionNumber} / {totalQuestions}
+              </div>
+            </div>
+
+            {/* Always show timer when test is active */}
+            <div className="flex justify-end">
+              <Timer />
             </div>
 
             <ExaminationPanel
