@@ -29,7 +29,7 @@ const TestSelection = () => {
       icon: <Headphones className="h-8 w-8 text-ielts-blue" />,
       color: 'bg-blue-50',
       time: '10 minutes',
-      questions: '15 questions',
+      questions: '2 sections',
       path: '/test/listening'
     },
     {
@@ -48,7 +48,7 @@ const TestSelection = () => {
       description: 'Essay writing and data interpretation',
       icon: <FileText className="h-8 w-8 text-ielts-lightblue" />,
       color: 'bg-cyan-50',
-      time: '15 minutes',
+      time: '20 minutes',
       questions: '1 task',
       path: '/test/writing'
     },
@@ -89,7 +89,7 @@ const TestSelection = () => {
                     Take all four test sections in sequence and receive a comprehensive assessment with an overall band score prediction.
                   </p>
                   <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
-                    <li>Duration: Approximately 55 minutes</li>
+                    <li>Duration: Approximately 60 minutes</li>
                     <li>AI-powered assessment and feedback</li>
                     <li>Detailed score breakdown and recommendations</li>
                   </ul>
