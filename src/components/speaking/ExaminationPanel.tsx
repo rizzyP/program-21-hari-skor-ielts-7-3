@@ -8,6 +8,7 @@ import { Phase } from '@/components/test/TestPhases';
 import ExaminerAvatar from './ExaminerAvatar';
 import CueCard from './CueCard';
 import RecordingControls from './RecordingControls';
+import Timer from '../test/Timer';
 
 interface ExaminationPanelProps {
   currentPhase: Phase;
@@ -37,15 +38,20 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
   return (
     <Card className="bg-white shadow-md overflow-hidden">
       <CardHeader className="bg-slate-50 border-b">
-        <div className="flex items-center space-x-4">
-          <ExaminerAvatar examinerSpeaking={examinerSpeaking} />
-          <div>
-            <h3 className="font-medium">Dr. Sarah Wilson</h3>
-            <p className="text-sm text-slate-600">
-              IELTS Speaking Examiner
-              {examinerSpeaking && <span className="ml-2 text-green-500">(Speaking...)</span>}
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <ExaminerAvatar examinerSpeaking={examinerSpeaking} />
+            <div>
+              <h3 className="font-medium">Dr. Sarah Wilson</h3>
+              <p className="text-sm text-slate-600">
+                IELTS Speaking Examiner
+                {examinerSpeaking && <span className="ml-2 text-green-500">(Speaking...)</span>}
+              </p>
+            </div>
           </div>
+          {isRecording && (
+            <Timer className="bg-red-50 border-red-200 text-red-700" />
+          )}
         </div>
       </CardHeader>
       

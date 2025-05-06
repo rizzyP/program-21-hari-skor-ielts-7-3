@@ -54,10 +54,12 @@ const SpeakingTest = () => {
               </div>
             </div>
 
-            {/* Always show timer when test is active */}
-            <div className="flex justify-end">
-              <Timer />
-            </div>
+            {/* Show overall test timer only when not recording */}
+            {!isRecording && (
+              <div className="flex justify-end">
+                <Timer />
+              </div>
+            )}
 
             <ExaminationPanel
               currentPhase={currentPhase}
