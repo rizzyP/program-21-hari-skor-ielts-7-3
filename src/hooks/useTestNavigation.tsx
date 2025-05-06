@@ -49,6 +49,14 @@ export const useTestNavigation = (
     ]
   };
 
+  // Fixed part 1 questions that correspond to each audio file
+  const FIXED_PART1_QUESTIONS = [
+    "Do you have any artistic hobbies, such as painting? (Why/Why not?)",
+    "What kind of art lessons did you have at school?",
+    "Are these lessons quite traditional or quite new?", // Updated to match the correct question for 1c
+    "How useful do you think it is to study art at school? (Why/Why not?)"
+  ];
+
   // Handle test start with opening audio sequence
   const handleStart = () => {
     setIsStarted(true);
@@ -94,9 +102,8 @@ export const useTestNavigation = (
     setCurrentPart(1);
     setCurrentQuestion(0);
     
-    // Get first question to display
-    const questions = getCurrentPartQuestions();
-    const firstQuestion = questions[0] || "Let's talk about where you live.";
+    // Use the fixed question for part 1 instead of from content
+    const firstQuestion = FIXED_PART1_QUESTIONS[0];
     
     // Play Part 1 first question with callback to start recording after
     simulateExaminerSpeaking(
@@ -144,8 +151,6 @@ export const useTestNavigation = (
 
   // Handle moving to next question
   const handleNextQuestion = () => {
-    const questions = getCurrentPartQuestions();
-    
     // Update overall question counter
     setQuestionNumber(prev => prev + 1);
     
@@ -156,8 +161,8 @@ export const useTestNavigation = (
         setCurrentQuestion(currentQuestion + 1);
         
         // Simulate examiner asking the next question with audio
-        const nextQuestion = questions[currentQuestion + 1] || 
-          `Question ${currentQuestion + 2} for part 1`;
+        // Use fixed part 1 questions that match the audio files
+        const nextQuestion = FIXED_PART1_QUESTIONS[currentQuestion + 1];
         
         simulateExaminerSpeaking(
           nextQuestion, 
