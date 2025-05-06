@@ -1,5 +1,5 @@
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useTest } from '@/context/TestContext';
 
@@ -19,6 +19,17 @@ export const useRecordingControls = (
 ) => {
   const { setTimeRemaining, saveAnswer } = useTest();
   const answerTimerTimeout = useRef<NodeJS.Timeout | null>(null);
+  const recordingDuration = useRef<number>(0);
+  
+  // Clean up on unmount or currentPart/question change
+  useEffect(() => {
+    return () => {
+      if (answerTimerTimeout.current) {
+        clearTimeout(answerTimerTimeout.current);
+        answerTimerTimeout.current = null;
+      }
+    };
+  }, [currentPart, currentQuestion]);
 
   // Set timer based on current part
   const setAnswerTimer = () => {
@@ -44,25 +55,30 @@ export const useRecordingControls = (
         timeLimit = 30; // Default fallback
     }
     
+    recordingDuration.current = timeLimit;
+    
     // Update the timer in the UI
     setTimeRemaining(timeLimit);
     
     // Set a timeout to automatically stop recording when time is up
     answerTimerTimeout.current = setTimeout(() => {
+      console.log("Timer completed, stopping recording automatically");
       handleStopRecording();
     }, timeLimit * 1000);
+    
+    return timeLimit;
   };
 
   const handleStartRecording = () => {
     setIsRecording(true);
     
     // Set timer for the current part
-    setAnswerTimer();
+    const timeLimit = setAnswerTimer();
     
-    const timeLimit = currentPart === 1 ? '20 sec' : 
-                      currentPart === 2 ? '2 min' : '40 sec';
+    const timeLimitText = currentPart === 1 ? '20 sec' : 
+                         currentPart === 2 ? '2 min' : '40 sec';
     
-    toast.info(`Recording started (${timeLimit})`, {
+    toast.info(`Recording started (${timeLimitText})`, {
       description: 'Speak clearly and answer the question.'
     });
   };
@@ -73,6 +89,7 @@ export const useRecordingControls = (
     // Clear the answer timer
     if (answerTimerTimeout.current) {
       clearTimeout(answerTimerTimeout.current);
+      answerTimerTimeout.current = null;
     }
     
     // Mock transcripts for demo purposes with different responses for each question
@@ -118,12 +135,14 @@ export const useRecordingControls = (
   const cleanupRecordingTimeout = () => {
     if (answerTimerTimeout.current) {
       clearTimeout(answerTimerTimeout.current);
+      answerTimerTimeout.current = null;
     }
   };
 
   return {
     handleStartRecording,
     handleStopRecording,
-    cleanupRecordingTimeout
+    cleanupRecordingTimeout,
+    recordingDuration: recordingDuration.current
   };
 };

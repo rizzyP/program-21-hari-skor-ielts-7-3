@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,17 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
   currentQuestion,
   transcripts,
 }) => {
+  const [recordingTime, setRecordingTime] = useState<number>(0);
+  
+  // Set recording time based on current part
+  useEffect(() => {
+    if (isRecording) {
+      if (currentPart === 1) setRecordingTime(20);
+      else if (currentPart === 2) setRecordingTime(120);
+      else if (currentPart === 3) setRecordingTime(40);
+    }
+  }, [isRecording, currentPart]);
+
   return (
     <Card className="bg-white shadow-md overflow-hidden">
       <CardHeader className="bg-slate-50 border-b">
@@ -50,7 +61,11 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
             </div>
           </div>
           {isRecording && (
-            <Timer className="bg-red-50 border-red-200 text-red-700" />
+            <Timer 
+              seconds={recordingTime} 
+              onTimeUp={onStopRecording}
+              className="bg-red-50 border-red-200 text-red-700" 
+            />
           )}
         </div>
       </CardHeader>

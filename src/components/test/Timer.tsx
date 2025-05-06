@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useTest } from '@/context/TestContext';
 import { cn } from '@/lib/utils';
@@ -7,32 +6,60 @@ import { Clock } from 'lucide-react';
 interface TimerProps {
   onTimeUp?: () => void;
   className?: string;
+  seconds?: number; // Optional prop to set a specific time
+  onTick?: (timeRemaining: number) => void; // Callback for each tick
 }
 
-const Timer: React.FC<TimerProps> = ({ onTimeUp, className }) => {
-  const { timeRemaining, setTimeRemaining, isTestActive } = useTest();
+const Timer: React.FC<TimerProps> = ({ 
+  onTimeUp, 
+  className,
+  seconds,
+  onTick
+}) => {
+  const { timeRemaining: contextTimeRemaining, setTimeRemaining: setContextTimeRemaining, isTestActive } = useTest();
+  const [localTimeRemaining, setLocalTimeRemaining] = useState(seconds || contextTimeRemaining);
   const [isWarning, setIsWarning] = useState(false);
+
+  // If the seconds prop changes, update the local time
+  useEffect(() => {
+    if (seconds !== undefined) {
+      setLocalTimeRemaining(seconds);
+    } else {
+      setLocalTimeRemaining(contextTimeRemaining);
+    }
+  }, [seconds, contextTimeRemaining]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
 
-    if (isTestActive && timeRemaining > 0) {
+    // Always use our local timer when seconds are provided
+    // Otherwise fall back to the context timer
+    if ((seconds !== undefined || isTestActive) && localTimeRemaining > 0) {
       interval = setInterval(() => {
-        // Fix: Use the number directly instead of the updater function
-        // since the TestContext expects a direct number value
-        setTimeRemaining(timeRemaining - 1);
+        const newTime = localTimeRemaining - 1;
+        setLocalTimeRemaining(newTime);
+        
+        // Only update context if we're not using a local timer
+        if (seconds === undefined) {
+          setContextTimeRemaining(newTime);
+        }
+        
+        // Call onTick callback if provided
+        if (onTick) {
+          onTick(newTime);
+        }
       }, 1000);
-    } else if (timeRemaining === 0 && onTimeUp) {
+    } else if (localTimeRemaining === 0 && onTimeUp) {
       onTimeUp();
     }
 
     // Set warning state when less than 5 minutes remain
-    setIsWarning(timeRemaining > 0 && timeRemaining <= 300);
+    setIsWarning(localTimeRemaining > 0 && localTimeRemaining <= 60);
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timeRemaining, isTestActive, setTimeRemaining, onTimeUp]);
+  }, [localTimeRemaining, isTestActive, setContextTimeRemaining, onTimeUp, seconds, onTick]);
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -51,7 +78,7 @@ const Timer: React.FC<TimerProps> = ({ onTimeUp, className }) => {
       )}
     >
       <Clock className="text-current" />
-      <span>{formatTime(timeRemaining)}</span>
+      <span>{formatTime(localTimeRemaining)}</span>
     </div>
   );
 };
