@@ -1,9 +1,9 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTest } from '@/context/TestContext';
 import { toast } from 'sonner';
 import { Phase } from '@/components/test/TestPhases';
+import { SpeakingContent } from '@/types/test';
 
 // Define time limits for each part
 const TIME_LIMITS = {
@@ -55,9 +55,10 @@ export const useSpeakingTest = () => {
       if (speakingSection) {
         startSection(speakingSection.id);
         
-        // Calculate total questions across all parts
-        if (speakingSection.content && speakingSection.content.parts) {
-          const total = speakingSection.content.parts.reduce((sum: number, part: any) => {
+        // Calculate total questions across all parts - now with proper type casting
+        const speakingContent = speakingSection.content as SpeakingContent;
+        if (speakingContent && speakingContent.parts) {
+          const total = speakingContent.parts.reduce((sum, part) => {
             return sum + (part.questions ? part.questions.length : 0);
           }, 0);
           setTotalQuestions(total);
@@ -85,12 +86,13 @@ export const useSpeakingTest = () => {
   }, []);
 
   const speakingSection = currentTest?.sections.find(section => section.type === 'speaking');
-  const speakingContent = speakingSection?.content as any;
+  // Properly cast the speaking content to SpeakingContent type
+  const speakingContent = speakingSection?.content as SpeakingContent | undefined;
 
   // Get current part questions
   const getCurrentPartQuestions = () => {
     if (!speakingContent || !speakingContent.parts) return [];
-    return speakingContent.parts.find((p: any) => p.partNumber === currentPart)?.questions || [];
+    return speakingContent.parts.find((p) => p.partNumber === currentPart)?.questions || [];
   };
 
   // Get current question
