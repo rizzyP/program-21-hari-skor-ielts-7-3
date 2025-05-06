@@ -6,7 +6,7 @@ import { useTest } from '@/context/TestContext';
 // Define time limits for each part
 const TIME_LIMITS = {
   part1: 20, // 20 seconds per question
-  part2: 60, // 1 minute per question
+  part2: 120, // 2 minutes (120 seconds) for part 2
   part3: 40  // 40 seconds per question
 };
 
@@ -49,9 +49,7 @@ export const useRecordingControls = (
     
     // Set a timeout to automatically stop recording when time is up
     answerTimerTimeout.current = setTimeout(() => {
-      if (true) { // Always execute since this is called only when recording
-        handleStopRecording();
-      }
+      handleStopRecording();
     }, timeLimit * 1000);
   };
 
@@ -61,7 +59,10 @@ export const useRecordingControls = (
     // Set timer for the current part
     setAnswerTimer();
     
-    toast.info(`Recording started (${currentPart === 1 ? '20 sec' : currentPart === 2 ? '60 sec' : '40 sec'})`, {
+    const timeLimit = currentPart === 1 ? '20 sec' : 
+                      currentPart === 2 ? '2 min' : '40 sec';
+    
+    toast.info(`Recording started (${timeLimit})`, {
       description: 'Speak clearly and answer the question.'
     });
   };
@@ -109,7 +110,7 @@ export const useRecordingControls = (
       description: 'Your answer has been saved.'
     });
     
-    // Immediately proceed to next question after stopping recording
+    // Proceed to next question after stopping recording
     handleNextQuestion();
   };
 

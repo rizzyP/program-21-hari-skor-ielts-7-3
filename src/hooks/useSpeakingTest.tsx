@@ -41,6 +41,7 @@ export const useSpeakingTest = () => {
     examinerSpeaking,
     examinerMessage,
     simulateExaminerSpeaking,
+    playExaminerAudioSequence,
     cleanupExaminerTimeout
   } = useExaminerSimulation(setIsRecording);
 
@@ -55,7 +56,7 @@ export const useSpeakingTest = () => {
   // We need to declare this after test content hook to have access to getCurrentPartQuestions
   const {
     handleStart,
-    handlePrepare: handleNavPrepare, // Rename to avoid name collision
+    handlePrepare,
     handleNextQuestion,
     handleComplete,
     handleNavigateResults
@@ -67,6 +68,7 @@ export const useSpeakingTest = () => {
     setPartCompleted,
     setQuestionNumber,
     simulateExaminerSpeaking,
+    playExaminerAudioSequence,
     getCurrentPartQuestions,
     currentPart,
     currentQuestion,
