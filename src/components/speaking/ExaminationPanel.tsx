@@ -39,12 +39,10 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
   
   // Set recording time based on current part
   useEffect(() => {
-    if (isRecording) {
-      if (currentPart === 1) setRecordingTime(20);
-      else if (currentPart === 2) setRecordingTime(120);
-      else if (currentPart === 3) setRecordingTime(40);
-    }
-  }, [isRecording, currentPart]);
+    if (currentPart === 1) setRecordingTime(20);
+    else if (currentPart === 2) setRecordingTime(120);
+    else if (currentPart === 3) setRecordingTime(40);
+  }, [currentPart]);
 
   return (
     <Card className="bg-white shadow-md overflow-hidden">
@@ -65,6 +63,12 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
               seconds={recordingTime} 
               onTimeUp={onStopRecording}
               className="bg-red-50 border-red-200 text-red-700" 
+            />
+          )}
+          {currentPhase === Phase.SPEAKING_PART2_PREP && (
+            <Timer 
+              seconds={60}
+              className="bg-yellow-50 border-yellow-200 text-yellow-700"
             />
           )}
         </div>

@@ -76,7 +76,7 @@ export const useRecordingControls = (
     const timeLimit = setAnswerTimer();
     
     const timeLimitText = currentPart === 1 ? '20 sec' : 
-                         currentPart === 2 ? '2 min' : '40 sec';
+                        currentPart === 2 ? '2 min' : '40 sec';
     
     toast.info(`Recording started (${timeLimitText})`, {
       description: 'Speak clearly and answer the question.'

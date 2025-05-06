@@ -98,7 +98,7 @@ export const useTestNavigation = (
     const questions = getCurrentPartQuestions();
     const firstQuestion = questions[0] || "Let's talk about where you live.";
     
-    // Play Part 1 first question
+    // Play Part 1 first question with callback to start recording after
     simulateExaminerSpeaking(
       firstQuestion, 
       AUDIO_FILES.part1[0], 
@@ -108,9 +108,9 @@ export const useTestNavigation = (
   };
 
   // Handle Part 2 preparation
-  const handlePrepare = (seconds: number) => {
+  const handlePrepare = () => {
     setCurrentPhase(Phase.SPEAKING_PART2_PREP);
-    setTimeRemaining(seconds);
+    setTimeRemaining(60);
     
     const cueCardTopic = getCurrentPartQuestions()[0] || 
       "Describe a teacher who has influenced you in your education.";
@@ -123,10 +123,10 @@ export const useTestNavigation = (
     );
     
     toast.info('Preparation time started', {
-      description: `You have ${seconds / 60} minutes to prepare your answer.`
+      description: 'You have 1 minute to prepare your answer.'
     });
     
-    // After preparation time is up, automatically move to recording
+    // After preparation time is up, start Part 2 answer phase
     setTimeout(() => {
       setCurrentPhase(Phase.SPEAKING_PART2_ANSWER);
       simulateExaminerSpeaking(
@@ -139,7 +139,7 @@ export const useTestNavigation = (
       toast.info('Preparation time is over', {
         description: 'Start speaking when the examiner finishes.'
       });
-    }, seconds * 1000);
+    }, 60 * 1000);
   };
 
   // Handle moving to next question
@@ -182,7 +182,7 @@ export const useTestNavigation = (
         setTimeout(() => {
           setCurrentPart(2);
           setCurrentQuestion(0);
-          handlePrepare(60); // 60 seconds for Part 2 preparation
+          handlePrepare(); // Start Part 2 preparation (60 seconds)
         }, 3000);
       }
     }

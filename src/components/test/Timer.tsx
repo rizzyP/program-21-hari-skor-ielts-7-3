@@ -47,13 +47,16 @@ const Timer: React.FC<TimerProps> = ({
         // Call onTick callback if provided
         if (onTick) {
           onTick(newTime);
+
+          // Call onTimeUp when timer reaches zero
+          if (newTime === 0 && onTimeUp) {
+            onTimeUp();
+          }
         }
       }, 1000);
-    } else if (localTimeRemaining === 0 && onTimeUp) {
-      onTimeUp();
     }
 
-    // Set warning state when less than 5 minutes remain
+    // Set warning state when less than 1 minute remains
     setIsWarning(localTimeRemaining > 0 && localTimeRemaining <= 60);
 
     return () => {

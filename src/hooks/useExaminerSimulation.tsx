@@ -38,10 +38,10 @@ export const useExaminerSimulation = (setIsRecording: (value: boolean) => void) 
       setExaminerSpeaking(false);
       
       // Auto-start recording when examiner finishes speaking
-      if (currentPhase !== Phase.INSTRUCTIONS && 
-          currentPhase !== Phase.SPEAKING_INTRO && 
-          currentPhase !== Phase.COMPLETED &&
-          currentPhase !== Phase.SPEAKING_PART2_PREP) {
+      // But don't start recording during preparation time or intro/completed phases
+      if (currentPhase === Phase.SPEAKING_PART1 || 
+          currentPhase === Phase.SPEAKING_PART2_ANSWER ||
+          currentPhase === Phase.SPEAKING_PART3) {
         setIsRecording(true);
       }
     }, duration);
