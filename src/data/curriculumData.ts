@@ -1,4 +1,3 @@
-
 import { Day } from '../types/curriculum';
 
 export const getDefaultCurriculum = (): Day[] => [
@@ -11,9 +10,7 @@ export const getDefaultCurriculum = (): Day[] => [
   {
     title: "IELTS Overview and Strategy",
     materials: [
-      { title: "Introduction to IELTS", type: "video", durationMinutes: 15, completed: false },
-      { title: "Understanding IELTS Scoring", type: "reading", durationMinutes: 20, completed: false },
-      { title: "Self-Assessment Quiz", type: "exercise", durationMinutes: 18, completed: false }
+      { title: "Self-Assessment Quiz", type: "exercise", durationMinutes: 18, completed: false, path: "/test" }
     ]
   },
   {
