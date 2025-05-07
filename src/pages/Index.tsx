@@ -1,14 +1,11 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import Layout from '@/components/layout/Layout';
 import { BookOpen, Headphones, FileText, Mic, BarChart } from 'lucide-react';
-
 const Index = () => {
-  return (
-    <Layout>
+  return <Layout>
       <div className="space-y-10 py-6">
         {/* Hero section */}
         <section className="text-center space-y-6">
@@ -25,9 +22,7 @@ const Index = () => {
               </Button>
             </Link>
             <Link to="/practice">
-              <Button variant="outline" size="lg">
-                Practice Sections
-              </Button>
+              <Button variant="outline" size="lg">Start Program</Button>
             </Link>
           </div>
         </section>
@@ -36,41 +31,35 @@ const Index = () => {
         <section className="space-y-6">
           <h2 className="text-2xl font-semibold text-center">IELTS Test Components</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                title: "Listening",
-                description: "Audio-based test with various question types",
-                icon: <Headphones className="h-8 w-8 text-ielts-blue" />,
-                color: "bg-blue-50",
-                time: "15 minutes",
-                questions: "2 sections",
-              },
-              {
-                title: "Reading",
-                description: "Comprehension test with academic passages",
-                icon: <BookOpen className="h-8 w-8 text-ielts-green" />,
-                color: "bg-green-50",
-                time: "15 minutes",
-                questions: "10 questions",
-              },
-              {
-                title: "Writing",
-                description: "Essay writing and data interpretation",
-                icon: <FileText className="h-8 w-8 text-ielts-lightblue" />,
-                color: "bg-cyan-50",
-                time: "20 minutes",
-                questions: "1 task",
-              },
-              {
-                title: "Speaking",
-                description: "Recorded responses to interview questions",
-                icon: <Mic className="h-8 w-8 text-ielts-red" />,
-                color: "bg-red-50",
-                time: "11-14 minutes",
-                questions: "3 parts",
-              },
-            ].map((module, idx) => (
-              <Card key={idx} className={`${module.color} border-none shadow-sm hover:shadow transition-shadow`}>
+            {[{
+            title: "Listening",
+            description: "Audio-based test with various question types",
+            icon: <Headphones className="h-8 w-8 text-ielts-blue" />,
+            color: "bg-blue-50",
+            time: "15 minutes",
+            questions: "2 sections"
+          }, {
+            title: "Reading",
+            description: "Comprehension test with academic passages",
+            icon: <BookOpen className="h-8 w-8 text-ielts-green" />,
+            color: "bg-green-50",
+            time: "15 minutes",
+            questions: "10 questions"
+          }, {
+            title: "Writing",
+            description: "Essay writing and data interpretation",
+            icon: <FileText className="h-8 w-8 text-ielts-lightblue" />,
+            color: "bg-cyan-50",
+            time: "20 minutes",
+            questions: "1 task"
+          }, {
+            title: "Speaking",
+            description: "Recorded responses to interview questions",
+            icon: <Mic className="h-8 w-8 text-ielts-red" />,
+            color: "bg-red-50",
+            time: "11-14 minutes",
+            questions: "3 parts"
+          }].map((module, idx) => <Card key={idx} className={`${module.color} border-none shadow-sm hover:shadow transition-shadow`}>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg font-semibold">{module.title}</CardTitle>
                   {module.icon}
@@ -83,17 +72,13 @@ const Index = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Link 
-                    to={`/test/${module.title.toLowerCase()}`} 
-                    className="w-full"
-                  >
+                  <Link to={`/test/${module.title.toLowerCase()}`} className="w-full">
                     <Button variant="outline" className="w-full">
                       Practice {module.title}
                     </Button>
                   </Link>
                 </CardFooter>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </section>
 
@@ -101,31 +86,25 @@ const Index = () => {
         <section className="space-y-6">
           <h2 className="text-2xl font-semibold text-center">Key Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "AI Assessment",
-                description: "Get detailed feedback and scores analyzed by AI based on official IELTS criteria",
-                icon: <BarChart className="h-6 w-6 text-ielts-blue" />,
-              },
-              {
-                title: "Complete Test Simulation",
-                description: "Experience all four IELTS test components with authentic questions and timing",
-                icon: <BookOpen className="h-6 w-6 text-ielts-blue" />,
-              },
-              {
-                title: "Detailed Analytics",
-                description: "Review strengths, weaknesses, and get personalized recommendations for improvement",
-                icon: <BarChart className="h-6 w-6 text-ielts-blue" />,
-              },
-            ].map((feature, idx) => (
-              <div key={idx} className="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+            {[{
+            title: "AI Assessment",
+            description: "Get detailed feedback and scores analyzed by AI based on official IELTS criteria",
+            icon: <BarChart className="h-6 w-6 text-ielts-blue" />
+          }, {
+            title: "Complete Test Simulation",
+            description: "Experience all four IELTS test components with authentic questions and timing",
+            icon: <BookOpen className="h-6 w-6 text-ielts-blue" />
+          }, {
+            title: "Detailed Analytics",
+            description: "Review strengths, weaknesses, and get personalized recommendations for improvement",
+            icon: <BarChart className="h-6 w-6 text-ielts-blue" />
+          }].map((feature, idx) => <div key={idx} className="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
                 <div className="bg-blue-100 p-3 rounded-full w-fit mb-4">
                   {feature.icon}
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
                 <p className="text-slate-600">{feature.description}</p>
-              </div>
-            ))}
+              </div>)}
           </div>
         </section>
 
@@ -140,8 +119,6 @@ const Index = () => {
           </Link>
         </section>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Index;
