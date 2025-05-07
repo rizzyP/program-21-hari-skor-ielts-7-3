@@ -7,6 +7,7 @@ import { useRecordingControls } from './useRecordingControls';
 import { useTestContent } from './useTestContent';
 import { useTestNavigation } from './useTestNavigation';
 import { SpeakingContent } from '@/types/test';
+import { Phase } from '@/components/test/TestPhases';
 
 export const useSpeakingTest = () => {
   const { 
