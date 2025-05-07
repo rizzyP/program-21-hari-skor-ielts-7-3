@@ -33,8 +33,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     );
   }
 
-  // Always allow answering questions during all phases
-  const allowAnswering = true;
+  // Only allow answering during LISTENING phase or FINAL_REVIEW phase
+  const allowAnswering = currentPhase === Phase.LISTENING || currentPhase === Phase.FINAL_REVIEW;
 
   return (
     <Card className="bg-white shadow-sm">
@@ -53,7 +53,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               listeningContent={listeningContent}
               userAnswers={userAnswers}
               handleAnswerChange={handleAnswerChange}
-              isPlaying={isPlaying}
+              allowAnswering={allowAnswering}
             />
           </div>
         )}
@@ -64,7 +64,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             <SectionFourQuestions
               userAnswers={userAnswers}
               handleAnswerChange={handleAnswerChange}
-              isPlaying={isPlaying}
+              allowAnswering={allowAnswering}
               currentSectionIndex={currentSectionIndex}
             />
           </div>

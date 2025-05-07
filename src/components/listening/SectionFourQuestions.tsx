@@ -6,14 +6,14 @@ import { Input } from '@/components/ui/input';
 interface SectionFourQuestionsProps {
   userAnswers: UserAnswer[];
   handleAnswerChange: (questionId: string, value: string) => void;
-  isPlaying: boolean;
+  allowAnswering: boolean;
   currentSectionIndex: number;
 }
 
 export const SectionFourQuestions: React.FC<SectionFourQuestionsProps> = ({
   userAnswers,
   handleAnswerChange,
-  isPlaying,
+  allowAnswering,
   currentSectionIndex
 }) => {
   return (
@@ -35,7 +35,7 @@ export const SectionFourQuestions: React.FC<SectionFourQuestionsProps> = ({
                     value={userAnswers.find(a => a.questionId === 'l-q11')?.userResponse || ''}
                     onChange={(e) => handleAnswerChange('l-q11', e.target.value)}
                     className="w-32 inline-block h-7"
-                    disabled={isPlaying && currentSectionIndex !== 1}
+                    disabled={!allowAnswering}
                   /> 
                   'high art' and 'popular culture' is not so clear (Question 11)
                 </li>
@@ -51,7 +51,7 @@ export const SectionFourQuestions: React.FC<SectionFourQuestionsProps> = ({
                     value={userAnswers.find(a => a.questionId === 'l-q12')?.userResponse || ''}
                     onChange={(e) => handleAnswerChange('l-q12', e.target.value)}
                     className="w-32 inline-block h-7"
-                    disabled={isPlaying && currentSectionIndex !== 1}
+                    disabled={!allowAnswering}
                   /> 
                   away from the US and Europe (Question 12)
                 </li>
@@ -70,7 +70,7 @@ export const SectionFourQuestions: React.FC<SectionFourQuestionsProps> = ({
                 value={userAnswers.find(a => a.questionId === 'l-q13')?.userResponse || ''}
                 onChange={(e) => handleAnswerChange('l-q13', e.target.value)}
                 className="w-32 inline-block h-7"
-                disabled={isPlaying && currentSectionIndex !== 1}
+                disabled={!allowAnswering}
               /> (Question 13)
             </li>
             <li className="flex flex-wrap items-center gap-2">
@@ -80,7 +80,7 @@ export const SectionFourQuestions: React.FC<SectionFourQuestionsProps> = ({
                 value={userAnswers.find(a => a.questionId === 'l-q14')?.userResponse || ''}
                 onChange={(e) => handleAnswerChange('l-q14', e.target.value)}
                 className="w-32 inline-block h-7"
-                disabled={isPlaying && currentSectionIndex !== 1}
+                disabled={!allowAnswering}
               /> 
               of previous definitions (Question 14)
             </li>
@@ -98,7 +98,7 @@ export const SectionFourQuestions: React.FC<SectionFourQuestionsProps> = ({
                 value={userAnswers.find(a => a.questionId === 'l-q15')?.userResponse || ''}
                 onChange={(e) => handleAnswerChange('l-q15', e.target.value)}
                 className="w-32 inline-block h-7"
-                disabled={isPlaying && currentSectionIndex !== 1}
+                disabled={!allowAnswering}
               /> (Question 15)
             </li>
           </ul>

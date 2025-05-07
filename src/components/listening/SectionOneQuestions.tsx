@@ -9,14 +9,14 @@ interface SectionOneQuestionsProps {
   listeningContent: any;
   userAnswers: UserAnswer[];
   handleAnswerChange: (questionId: string, value: string) => void;
-  isPlaying: boolean;
+  allowAnswering: boolean;
 }
 
 export const SectionOneQuestions: React.FC<SectionOneQuestionsProps> = ({
   listeningContent,
   userAnswers,
   handleAnswerChange,
-  isPlaying
+  allowAnswering
 }) => {
   return (
     <>
@@ -51,7 +51,7 @@ export const SectionOneQuestions: React.FC<SectionOneQuestionsProps> = ({
                   value={savedAnswer} 
                   onValueChange={(value) => handleAnswerChange(question.id, value)}
                   className="flex flex-wrap gap-4"
-                  disabled={isPlaying}
+                  disabled={!allowAnswering}
                 >
                   {question.options.map((option: string) => (
                     <div key={option} className="flex items-center space-x-2">
@@ -82,7 +82,7 @@ export const SectionOneQuestions: React.FC<SectionOneQuestionsProps> = ({
                   value={userAnswers.find(a => a.questionId === 'l-q6')?.userResponse || ''}
                   onChange={(e) => handleAnswerChange('l-q6', e.target.value)}
                   className="w-32 inline-block h-7"
-                  disabled={isPlaying}
+                  disabled={!allowAnswering}
                 /> evening courses
               </li>
               <li>Basic fee: $450</li>
@@ -101,7 +101,7 @@ export const SectionOneQuestions: React.FC<SectionOneQuestionsProps> = ({
                   value={userAnswers.find(a => a.questionId === 'l-q7')?.userResponse || ''}
                   onChange={(e) => handleAnswerChange('l-q7', e.target.value)}
                   className="w-32 inline-block h-7"
-                  disabled={isPlaying}
+                  disabled={!allowAnswering}
                 /> 
               </li>
               <li>Plus $50 enrolment fee</li>
@@ -119,7 +119,7 @@ export const SectionOneQuestions: React.FC<SectionOneQuestionsProps> = ({
                   value={userAnswers.find(a => a.questionId === 'l-q8')?.userResponse || ''}
                   onChange={(e) => handleAnswerChange('l-q8', e.target.value)}
                   className="w-32 inline-block h-7"
-                  disabled={isPlaying}
+                  disabled={!allowAnswering}
                 /> 
               </li>
               <li className="flex items-center gap-2">
@@ -129,7 +129,7 @@ export const SectionOneQuestions: React.FC<SectionOneQuestionsProps> = ({
                   value={userAnswers.find(a => a.questionId === 'l-q9')?.userResponse || ''}
                   onChange={(e) => handleAnswerChange('l-q9', e.target.value)}
                   className="w-32 inline-block h-7"
-                  disabled={isPlaying}
+                  disabled={!allowAnswering}
                 /> of this month
               </li>
               <li className="flex items-center gap-2">
@@ -139,7 +139,7 @@ export const SectionOneQuestions: React.FC<SectionOneQuestionsProps> = ({
                   value={userAnswers.find(a => a.questionId === 'l-q10')?.userResponse || ''}
                   onChange={(e) => handleAnswerChange('l-q10', e.target.value)}
                   className="w-32 inline-block h-7"
-                  disabled={isPlaying}
+                  disabled={!allowAnswering}
                 /> 
               </li>
             </ul>
