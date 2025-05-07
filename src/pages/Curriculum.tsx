@@ -92,8 +92,8 @@ const Curriculum = () => {
                                 </Badge>
                               </div>
                               
-                              {/* Different button for test type vs other types */}
-                              {material.type === 'test' ? (
+                              {/* For Day 1 assessment test, should navigate to test page */}
+                              {dayNumber === 1 ? (
                                 <Button
                                   variant={material.completed ? "secondary" : "default"}
                                   size="sm"
@@ -111,22 +111,42 @@ const Curriculum = () => {
                                   ) : "Take Test"}
                                 </Button>
                               ) : (
-                                <Button 
-                                  variant={material.completed ? "secondary" : "outline"} 
-                                  size="sm"
-                                  className={cn(
-                                    "gap-1",
-                                    material.completed ? "bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700" : ""
-                                  )}
-                                  onClick={() => markAsCompleted(dayNumber, mIndex)}
-                                >
-                                  {material.completed ? (
-                                    <>
-                                      <Check size={16} />
-                                      <span>Completed</span>
-                                    </>
-                                  ) : "Mark as complete"}
-                                </Button>
+                                // For other day materials
+                                material.type === 'test' ? (
+                                  <Button
+                                    variant={material.completed ? "secondary" : "default"}
+                                    size="sm"
+                                    className={cn(
+                                      "gap-1",
+                                      material.completed ? "bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700" : ""
+                                    )}
+                                    onClick={() => navigateToMaterial(dayNumber, mIndex)}
+                                  >
+                                    {material.completed ? (
+                                      <>
+                                        <Check size={16} />
+                                        <span>Retake Test</span>
+                                      </>
+                                    ) : "Take Test"}
+                                  </Button>
+                                ) : (
+                                  <Button 
+                                    variant={material.completed ? "secondary" : "outline"} 
+                                    size="sm"
+                                    className={cn(
+                                      "gap-1",
+                                      material.completed ? "bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700" : ""
+                                    )}
+                                    onClick={() => markAsCompleted(dayNumber, mIndex)}
+                                  >
+                                    {material.completed ? (
+                                      <>
+                                        <Check size={16} />
+                                        <span>Completed</span>
+                                      </>
+                                    ) : "Mark as complete"}
+                                  </Button>
+                                )
                               )}
                             </div>
                           </div>

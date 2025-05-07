@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,12 +25,12 @@ export function useCurriculum() {
       return JSON.parse(savedCurriculum);
     }
     
-    // Default curriculum structure with Day 1 as assessment test
+    // Default curriculum structure with Day 1 as assessment test only
     return [
       {
         title: "Assessment Test",
         materials: [
-          { title: "IELTS Assessment Test", type: "test", durationMinutes: 60, completed: false, path: "/test" }
+          { title: "Taking Assessment IELTS Test", type: "test", durationMinutes: 60, completed: false, path: "/test" }
         ]
       },
       {
