@@ -17,9 +17,7 @@ const Index = () => {
           </p>
           <div className="flex justify-center gap-4">
             <Link to="/test">
-              <Button size="lg" className="bg-ielts-blue hover:bg-ielts-lightblue">
-                Start Full Test
-              </Button>
+              <Button size="lg" className="bg-ielts-blue hover:bg-ielts-lightblue">Start Assessment Test</Button>
             </Link>
             <Link to="/practice">
               <Button variant="outline" size="lg">Start Program</Button>
