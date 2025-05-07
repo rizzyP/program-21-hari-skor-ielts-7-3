@@ -476,7 +476,7 @@ const ListeningTest = () => {
                             value={savedAnswer} 
                             onValueChange={(value) => handleAnswerChange(question.id, value)}
                             className="flex flex-wrap gap-4"
-                            disabled={currentPhase === Phase.LISTENING && audioPlaying}
+                            disabled={currentPhase === Phase.LISTENING && isPlaying}
                           >
                             {question.options.map((option: string) => (
                               <div key={option} className="flex items-center space-x-2">
@@ -509,7 +509,7 @@ const ListeningTest = () => {
                             value={userAnswers.find(a => a.questionId === 'l-q6')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q6', e.target.value)}
                             className="w-32 inline-block h-7"
-                            disabled={currentPhase === Phase.LISTENING && audioPlaying}
+                            disabled={currentPhase === Phase.LISTENING && isPlaying}
                           /> evening courses
                         </li>
                         <li>Basic fee: $450</li>
@@ -528,7 +528,7 @@ const ListeningTest = () => {
                             value={userAnswers.find(a => a.questionId === 'l-q7')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q7', e.target.value)}
                             className="w-32 inline-block h-7"
-                            disabled={currentPhase === Phase.LISTENING && audioPlaying}
+                            disabled={currentPhase === Phase.LISTENING && isPlaying}
                           />
                         </li>
                         <li>Plus $50 enrolment fee</li>
@@ -546,7 +546,7 @@ const ListeningTest = () => {
                             value={userAnswers.find(a => a.questionId === 'l-q8')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q8', e.target.value)}
                             className="w-32 inline-block h-7"
-                            disabled={currentPhase === Phase.LISTENING && audioPlaying}
+                            disabled={currentPhase === Phase.LISTENING && isPlaying}
                           />
                         </li>
                         <li className="flex items-center gap-2">
@@ -556,7 +556,7 @@ const ListeningTest = () => {
                             value={userAnswers.find(a => a.questionId === 'l-q9')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q9', e.target.value)}
                             className="w-32 inline-block h-7"
-                            disabled={currentPhase === Phase.LISTENING && audioPlaying}
+                            disabled={currentPhase === Phase.LISTENING && isPlaying}
                           /> of this month
                         </li>
                         <li className="flex items-center gap-2">
@@ -566,7 +566,7 @@ const ListeningTest = () => {
                             value={userAnswers.find(a => a.questionId === 'l-q10')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q10', e.target.value)}
                             className="w-32 inline-block h-7"
-                            disabled={currentPhase === Phase.LISTENING && audioPlaying}
+                            disabled={currentPhase === Phase.LISTENING && isPlaying}
                           />
                         </li>
                       </ul>
@@ -595,7 +595,7 @@ const ListeningTest = () => {
                                 value={userAnswers.find(a => a.questionId === 'l-q11')?.userResponse || ''}
                                 onChange={(e) => handleAnswerChange('l-q11', e.target.value)}
                                 className="w-32 inline-block h-7"
-                                disabled={currentPhase === Phase.LISTENING && audioPlaying && currentSectionIndex !== 1}
+                                disabled={currentPhase === Phase.LISTENING && isPlaying && currentSectionIndex !== 1}
                               /> 
                               'high art' and 'popular culture' is not so clear (Question 11)
                             </li>
@@ -611,7 +611,7 @@ const ListeningTest = () => {
                                 value={userAnswers.find(a => a.questionId === 'l-q12')?.userResponse || ''}
                                 onChange={(e) => handleAnswerChange('l-q12', e.target.value)}
                                 className="w-32 inline-block h-7"
-                                disabled={currentPhase === Phase.LISTENING && audioPlaying && currentSectionIndex !== 1}
+                                disabled={currentPhase === Phase.LISTENING && isPlaying && currentSectionIndex !== 1}
                               /> 
                               away from the US and Europe (Question 12)
                             </li>
@@ -630,7 +630,7 @@ const ListeningTest = () => {
                             value={userAnswers.find(a => a.questionId === 'l-q13')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q13', e.target.value)}
                             className="w-32 inline-block h-7"
-                            disabled={currentPhase === Phase.LISTENING && audioPlaying && currentSectionIndex !== 1}
+                            disabled={currentPhase === Phase.LISTENING && isPlaying && currentSectionIndex !== 1}
                           /> (Question 13)
                         </li>
                         <li className="flex flex-wrap items-center gap-2">
@@ -640,7 +640,7 @@ const ListeningTest = () => {
                             value={userAnswers.find(a => a.questionId === 'l-q14')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q14', e.target.value)}
                             className="w-32 inline-block h-7"
-                            disabled={currentPhase === Phase.LISTENING && audioPlaying && currentSectionIndex !== 1}
+                            disabled={currentPhase === Phase.LISTENING && isPlaying && currentSectionIndex !== 1}
                           /> 
                           of previous definitions (Question 14)
                         </li>
@@ -658,7 +658,7 @@ const ListeningTest = () => {
                             value={userAnswers.find(a => a.questionId === 'l-q15')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q15', e.target.value)}
                             className="w-32 inline-block h-7"
-                            disabled={currentPhase === Phase.LISTENING && audioPlaying && currentSectionIndex !== 1}
+                            disabled={currentPhase === Phase.LISTENING && isPlaying && currentSectionIndex !== 1}
                           /> (Question 15)
                         </li>
                       </ul>
