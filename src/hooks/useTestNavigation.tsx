@@ -64,12 +64,12 @@ export const useTestNavigation = (
     "Do you think technology will eventually replace teachers in the classroom?"
   ];
 
-  // Handle test start with opening audio sequence
+  // Handle test start with opening audio sequence per exact requirements
   const handleStart = () => {
     setIsStarted(true);
     setCurrentPhase(Phase.SPEAKING_INTRO);
     
-    // Play opening audio sequence with specific delays as requested
+    // Play opening audio sequence with exact specified delays
     const openingSequence = [
       { 
         src: AUDIO_FILES.opening[0], 
@@ -103,30 +103,29 @@ export const useTestNavigation = (
     });
   };
 
-  // Start Part 1 with its questions
+  // Start Part 1 with each question following the specified flow
   const startPart1 = () => {
     setCurrentPhase(Phase.SPEAKING_PART1);
     setCurrentPart(1);
     setCurrentQuestion(0);
     
-    // Use the fixed question for part 1 instead of from content
-    const firstQuestion = FIXED_PART1_QUESTIONS[0];
-    
-    // Play Part 1 first question - when this ends, recording starts automatically
+    // Play the first part 1 audio and then show question
     simulateExaminerSpeaking(
-      firstQuestion, 
+      FIXED_PART1_QUESTIONS[0], 
       AUDIO_FILES.part1[0], 
       3000, 
       Phase.SPEAKING_PART1
     );
+    
+    // Note: At this point, when examiner stops speaking, recording will automatically start
+    // through the useEffect in useSpeakingTest.tsx
   };
 
-  // Handle Part 2 preparation - Fixed to match correct sequence
+  // Handle Part 2 preparation - Following specified flow
   const handlePrepare = () => {
     setCurrentPhase(Phase.SPEAKING_PART2_PREP);
     
-    const cueCardTopic = getCurrentPartQuestions()[0] || 
-      "Describe a teacher who has influenced you in your education.";
+    const cueCardTopic = "Describe a teacher who has influenced you in your education.";
     
     // Play the part 2 introduction audio first
     simulateExaminerSpeaking(
@@ -161,24 +160,22 @@ export const useTestNavigation = (
     }, 3000);
   };
 
-  // Handle moving to next question
+  // Handle moving to next question according to the specified flow
   const handleNextQuestion = () => {
     // Update overall question counter
     setQuestionNumber(prev => prev + 1);
     
-    // If there are more questions in this part
+    // Part 1 flow
     if (currentPart === 1) {
       // Handle Part 1 questions
       if (currentQuestion < 3) {  // We have 4 questions (0-3) in part 1
-        setCurrentQuestion(currentQuestion + 1);
+        const nextQuestionIndex = currentQuestion + 1;
+        setCurrentQuestion(nextQuestionIndex);
         
-        // Simulate examiner asking the next question with audio
-        // Use fixed part 1 questions that match the audio files
-        const nextQuestion = FIXED_PART1_QUESTIONS[currentQuestion + 1];
-        
+        // Play next question audio with the fixed question
         simulateExaminerSpeaking(
-          nextQuestion, 
-          AUDIO_FILES.part1[currentQuestion + 1], 
+          FIXED_PART1_QUESTIONS[nextQuestionIndex], 
+          AUDIO_FILES.part1[nextQuestionIndex], 
           3000, 
           Phase.SPEAKING_PART1
         );
@@ -199,11 +196,11 @@ export const useTestNavigation = (
         setTimeout(() => {
           setCurrentPart(2);
           setCurrentQuestion(0);
-          handlePrepare(); // Start Part 2 preparation (60 seconds)
+          handlePrepare(); // Start Part 2 preparation
         }, 3000);
       }
     }
-    // If this is the end of part 2 - Fixed to play the end audio
+    // Part 2 flow - Handle end of part 2
     else if (currentPart === 2) {
       setPartCompleted(prev => ({ ...prev, part2: true }));
       
@@ -220,17 +217,16 @@ export const useTestNavigation = (
         startPart3();
       }, 3000);
     }
-    // Handle Part 3 questions - Fixed to have proper sequencing for all questions
+    // Part 3 flow - Handle part 3 questions
     else if (currentPart === 3) {
       if (currentQuestion < 2) { // We have 3 questions (0-2) in part 3
-        setCurrentQuestion(currentQuestion + 1);
+        const nextQuestionIndex = currentQuestion + 1;
+        setCurrentQuestion(nextQuestionIndex);
         
-        // Simulate examiner asking the next question with audio using our fixed questions
-        const nextQuestion = FIXED_PART3_QUESTIONS[currentQuestion + 1];
-        
+        // Play next part 3 question audio with the fixed question
         simulateExaminerSpeaking(
-          nextQuestion, 
-          AUDIO_FILES.part3[currentQuestion + 1], 
+          FIXED_PART3_QUESTIONS[nextQuestionIndex], 
+          AUDIO_FILES.part3[nextQuestionIndex], 
           3000, 
           Phase.SPEAKING_PART3
         );
@@ -243,17 +239,15 @@ export const useTestNavigation = (
     }
   };
   
-  // New function to start Part 3 with correct sequencing
+  // Start Part 3 with its questions according to the flow
   const startPart3 = () => {
     setCurrentPart(3);
     setCurrentQuestion(0);
     setCurrentPhase(Phase.SPEAKING_PART3);
     
-    // Play first part 3 question using our fixed questions
-    const firstPart3Question = FIXED_PART3_QUESTIONS[0];
-    
+    // Play first part 3 question
     simulateExaminerSpeaking(
-      firstPart3Question, 
+      FIXED_PART3_QUESTIONS[0], 
       AUDIO_FILES.part3[0], 
       3000, 
       Phase.SPEAKING_PART3
