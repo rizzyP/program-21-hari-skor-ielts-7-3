@@ -108,13 +108,30 @@ export const useSpeakingTest = () => {
     }
   }, [currentTest, startSection, setTotalQuestions]);
 
+  // Automatically start recording when examiner stops speaking
+  useEffect(() => {
+    if (!examinerSpeaking && 
+        (currentPhase === Phase.SPEAKING_PART1 || 
+         currentPhase === Phase.SPEAKING_PART2_ANSWER || 
+         currentPhase === Phase.SPEAKING_PART3) && 
+        !isRecording) {
+      
+      // Give a small delay to make it feel natural
+      const timer = setTimeout(() => {
+        handleStartRecording();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [examinerSpeaking, currentPhase, isRecording, handleStartRecording]);
+
   // Clean up timeouts when component unmounts
   useEffect(() => {
     return () => {
       cleanupExaminerTimeout();
       cleanupRecordingTimeout();
     };
-  }, []);
+  }, [cleanupExaminerTimeout, cleanupRecordingTimeout]);
 
   return {
     currentPhase,
