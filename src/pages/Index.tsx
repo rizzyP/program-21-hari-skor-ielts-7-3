@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ const Index = () => {
             <Link to="/test">
               <Button size="lg" className="bg-ielts-blue hover:bg-ielts-lightblue">Start Assessment Test</Button>
             </Link>
-            <Link to="/practice">
+            <Link to="/curriculum">
               <Button variant="outline" size="lg">Start Program</Button>
             </Link>
           </div>
