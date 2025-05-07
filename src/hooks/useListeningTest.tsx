@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { toast } from 'sonner';
 import { Phase } from '@/components/test/TestPhases';
@@ -13,7 +13,7 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
   const [reviewTimeRemaining, setReviewTimeRemaining] = useState<number>(120);
   const [audioProgress, setAudioProgress] = useState<number>(0);
   const [audioMuted, setAudioMuted] = useState<boolean>(false);
-  const [userInteracted, setUserInteracted] = useState<boolean>(true); // Set to true by default to ensure autoplay
+  const [userInteracted, setUserInteracted] = useState<boolean>(false);
   
   // Use the enhanced audio player hook
   const { isPlaying, isReady, playAudio, forcePlayAudio, stopAudio, audioRef } = useAudioPlayer();
@@ -85,21 +85,30 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
     }
   }, [currentPhase, currentSectionIndex]);
   
-  const startPreviewTimer = () => {
+  // Fixed startPreviewTimer function - now defined with useCallback to prevent recreating on each render
+  const startPreviewTimer = useCallback(() => {
     setPreviewTimeRemaining(30);
-    if (previewTimerRef.current) clearInterval(previewTimerRef.current);
     
-    previewTimerRef.current = setInterval(() => {
+    // Clear any existing timer to prevent memory leaks
+    if (previewTimerRef.current) {
+      clearInterval(previewTimerRef.current);
+    }
+    
+    // Set up new timer for preview countdown
+    const timer = setInterval(() => {
       setPreviewTimeRemaining(prev => {
         if (prev <= 1) {
-          if (previewTimerRef.current) clearInterval(previewTimerRef.current);
+          clearInterval(timer);
           startAudioPlayback();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-  };
+    
+    // Store timer reference for cleanup
+    previewTimerRef.current = timer;
+  }, []);
   
   const startAudioPlayback = () => {
     setCurrentPhase(Phase.LISTENING);
@@ -116,6 +125,7 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
       // Try to play the audio immediately
       playAudio(audioSource)
         .then(() => {
+          setUserInteracted(true);
           toast.info('Audio is now playing', {
             description: 'Listen carefully as it will only play once.'
           });
@@ -261,15 +271,19 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
     });
   };
 
-  // Cleanup on unmount
+  // Initialize on component mount
   useEffect(() => {
+    // Start preview timer immediately
+    startPreviewTimer();
+    
+    // Cleanup on unmount
     return () => {
       if (previewTimerRef.current) clearInterval(previewTimerRef.current);
       if (transitionTimerRef.current) clearInterval(transitionTimerRef.current);
       if (reviewTimerRef.current) clearInterval(reviewTimerRef.current);
       stopAudio();
     };
-  }, []);
+  }, [startPreviewTimer]);
 
   return {
     currentPhase,

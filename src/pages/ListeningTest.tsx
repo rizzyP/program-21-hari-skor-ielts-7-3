@@ -39,7 +39,6 @@ const ListeningTest = () => {
     handleSkipReview,
     handleForceSubmit,
     handleAnswerChange,
-    startPreviewTimer,
     skipPreview
   } = useListeningTest(startSection, saveAnswer, () => {
     submitSection();
@@ -54,13 +53,7 @@ const ListeningTest = () => {
         startSection(listeningSection.id);
       }
     }
-    
-    // Start preview timer immediately when component mounts
-    startPreviewTimer();
-    toast.info('Preview time started', {
-      description: 'You have 30 seconds to preview the questions before the audio begins.'
-    });
-  }, [currentTest, startSection, startPreviewTimer]);
+  }, [currentTest, startSection]);
 
   const listeningSection = currentTest?.sections.find(section => section.type === 'listening');
   const listeningContent = listeningSection?.content as any;

@@ -21,7 +21,6 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   audioMuted,
   currentSectionIndex,
   userInteracted,
-  handleManualPlay,
   toggleMute,
   handleSkipSection
 }) => {
@@ -39,19 +38,10 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
       <Progress value={audioProgress} className="h-2 mb-2" />
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {/* Admin play button - hidden from test takers */}
-          <Button
-            onClick={handleManualPlay}
-            variant="outline"
-            size="sm"
-            className="hidden"
-          >
-            Admin: Play/Pause
-          </Button>
-          
           <button
             onClick={toggleMute}
             className="p-1 rounded hover:bg-slate-200 transition-colors"
+            aria-label={audioMuted ? "Unmute audio" : "Mute audio"}
           >
             {audioMuted ? (
               <VolumeX className="text-gray-600 w-5 h-5" />
