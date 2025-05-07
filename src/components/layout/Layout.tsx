@@ -1,12 +1,15 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Home, BookOpen, CheckSquare, BarChart } from 'lucide-react';
+
 interface LayoutProps {
   children: React.ReactNode;
   className?: string;
 }
+
 const Layout: React.FC<LayoutProps> = ({
   children,
   className
@@ -21,6 +24,9 @@ const Layout: React.FC<LayoutProps> = ({
           <nav className="flex gap-2">
             <Link to="/">
               <Button variant="ghost" size="sm">Home</Button>
+            </Link>
+            <Link to="/curriculum">
+              <Button variant="ghost" size="sm">Curriculum</Button>
             </Link>
             <Link to="/test">
               <Button variant="ghost" size="sm">Take Test</Button>
@@ -45,4 +51,5 @@ const Layout: React.FC<LayoutProps> = ({
       </footer>
     </div>;
 };
+
 export default Layout;
