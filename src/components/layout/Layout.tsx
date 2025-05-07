@@ -1,27 +1,22 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Home, BookOpen, CheckSquare, BarChart } from 'lucide-react';
-
 interface LayoutProps {
   children: React.ReactNode;
   className?: string;
 }
-
-const Layout: React.FC<LayoutProps> = ({ children, className }) => {
-  return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+const Layout: React.FC<LayoutProps> = ({
+  children,
+  className
+}) => {
+  return <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 py-4">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link to="/" className="flex items-center">
-            <img 
-              src="/lovable-uploads/afd8cd94-9d4e-4c9b-989c-ba66fd4ba3bc.png" 
-              alt="Program 21 Hari Skor IELTS 7.0" 
-              className="h-10"
-            />
+            <img alt="Program 21 Hari Skor IELTS 7.0" className="h-10" src="/lovable-uploads/ed4d6815-81ad-472b-add2-1c7a76391258.png" />
           </Link>
           <nav className="flex gap-2">
             <Link to="/">
@@ -48,8 +43,6 @@ const Layout: React.FC<LayoutProps> = ({ children, className }) => {
           Program 21 Hari Skor IELTS 7.0 © {new Date().getFullYear()} - Powered by AI
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Layout;
