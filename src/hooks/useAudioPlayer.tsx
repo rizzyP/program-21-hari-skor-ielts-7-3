@@ -1,10 +1,36 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export const useAudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioQueue = useRef<{src: string, onEnd?: () => void}[]>([]);
+
+  // Initialize audio element with proper event listeners
+  useEffect(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      
+      // Set up event listeners
+      audioRef.current.addEventListener('ended', handleAudioEnded);
+      audioRef.current.addEventListener('canplaythrough', () => {
+        setIsReady(true);
+      });
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('ended', handleAudioEnded);
+        audioRef.current.removeEventListener('canplaythrough', () => {
+          setIsReady(true);
+        });
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   // Create audio element if it doesn't exist
   const ensureAudioElement = () => {
@@ -13,28 +39,82 @@ export const useAudioPlayer = () => {
       
       // Set up event listeners
       audioRef.current.addEventListener('ended', handleAudioEnded);
+      audioRef.current.addEventListener('canplaythrough', () => {
+        setIsReady(true);
+      });
     }
     return audioRef.current;
   };
 
-  // Play a single audio file
+  // Play a single audio file with user interaction handling
   const playAudio = (src: string): Promise<void> => {
     return new Promise((resolve) => {
       const audio = ensureAudioElement();
-      audio.src = src;
-      setIsPlaying(true);
       
+      // Reset state
+      setIsReady(false);
+      
+      // Set source
+      audio.src = src;
+      audio.load();
+      
+      // Set up one-time end handler for this specific play request
       const onEndedOnce = () => {
         audio.removeEventListener('ended', onEndedOnce);
         resolve();
       };
       
       audio.addEventListener('ended', onEndedOnce);
-      audio.play().catch(error => {
-        console.error('Error playing audio:', error);
-        setIsPlaying(false);
-        resolve(); // Resolve anyway to prevent hanging
-      });
+      
+      // Play once ready
+      const playWhenReady = () => {
+        setIsPlaying(true);
+        
+        // Try to play with retry logic for autoplay restrictions
+        const attemptPlay = () => {
+          audio.play().catch(error => {
+            console.error('Error playing audio:', error);
+            
+            // If it's an autoplay restriction, we'll show a toast and retry
+            if (error.name === 'NotAllowedError') {
+              // We'll handle this in the component
+              setIsPlaying(false);
+            } else {
+              setIsPlaying(false);
+            }
+            
+            resolve(); // Resolve anyway to prevent hanging
+          });
+        };
+        
+        attemptPlay();
+      };
+      
+      // Play when canplaythrough event fires or immediately if already loaded
+      if (audio.readyState >= 3) { // HAVE_FUTURE_DATA or HAVE_ENOUGH_DATA
+        playWhenReady();
+      } else {
+        audio.addEventListener('canplaythrough', playWhenReady, { once: true });
+      }
+    });
+  };
+
+  // Force play - to be used after user interaction
+  const forcePlayAudio = (): Promise<void> => {
+    return new Promise((resolve) => {
+      if (!audioRef.current || !audioRef.current.src) {
+        resolve();
+        return;
+      }
+      
+      setIsPlaying(true);
+      audioRef.current.play()
+        .then(() => resolve())
+        .catch(error => {
+          console.error('Force play error:', error);
+          setIsPlaying(false);
+          resolve();
+        });
     });
   };
 
@@ -104,13 +184,17 @@ export const useAudioPlayer = () => {
     }
     audioQueue.current = [];
     setIsPlaying(false);
+    setIsReady(false);
   };
 
   return {
     isPlaying,
+    isReady,
     playAudio,
+    forcePlayAudio,
     queueAudioWithDelays,
     stopAudio,
-    cleanupAudio
+    cleanupAudio,
+    audioRef
   };
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -11,8 +10,9 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Clock, Volume2, VolumeX } from 'lucide-react';
+import { Clock, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { TestPhases, Phase } from '@/components/test/TestPhases';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 
 const ListeningTest = () => {
   const navigate = useNavigate();
@@ -33,16 +33,94 @@ const ListeningTest = () => {
   const [transitionTimeRemaining, setTransitionTimeRemaining] = useState<number>(5);
   const [reviewTimeRemaining, setReviewTimeRemaining] = useState<number>(120);
   const [audioProgress, setAudioProgress] = useState<number>(0);
-  const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
   const [audioMuted, setAudioMuted] = useState<boolean>(false);
+  const [userInteracted, setUserInteracted] = useState<boolean>(false);
   
-  // Audio element ref
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Use the enhanced audio player hook
+  const { isPlaying, isReady, playAudio, forcePlayAudio, stopAudio, audioRef } = useAudioPlayer();
   
   // Refs for timers
   const previewTimerRef = useRef<NodeJS.Timeout | null>(null);
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
   const reviewTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Load audio source when section changes
+  useEffect(() => {
+    if (currentPhase === Phase.LISTENING) {
+      const audioSource = currentSectionIndex === 0 ? 
+        '/media/assessment/listening-1.mp3' : 
+        '/media/assessment/listening-2.mp3';
+      
+      if (audioRef.current) {
+        audioRef.current.src = audioSource;
+        audioRef.current.load();
+      }
+    }
+  }, [currentPhase, currentSectionIndex]);
+  
+  // Update audio progress when playing
+  useEffect(() => {
+    const updateProgress = () => {
+      if (audioRef.current) {
+        const duration = audioRef.current.duration;
+        const currentTime = audioRef.current.currentTime;
+        
+        if (duration) {
+          const progress = (currentTime / duration) * 100;
+          setAudioProgress(progress);
+        }
+      }
+    };
+    
+    if (audioRef.current) {
+      audioRef.current.addEventListener('timeupdate', updateProgress);
+    }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('timeupdate', updateProgress);
+      }
+    };
+  }, [audioRef]);
+  
+  // Handle audio ended event
+  useEffect(() => {
+    const handleAudioEnd = () => {
+      if (currentPhase === Phase.LISTENING) {
+        if (currentSectionIndex < 1) {
+          startSectionTransition();
+        } else {
+          startFinalReview();
+        }
+      }
+    };
+    
+    if (audioRef.current) {
+      audioRef.current.addEventListener('ended', handleAudioEnd);
+    }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('ended', handleAudioEnd);
+      }
+    };
+  }, [currentPhase, currentSectionIndex]);
+  
+  // Effect for document-level interaction detection
+  useEffect(() => {
+    const handleInteraction = () => {
+      setUserInteracted(true);
+    };
+    
+    // Listen for any user interaction with the page
+    document.addEventListener('click', handleInteraction);
+    document.addEventListener('keydown', handleInteraction);
+    
+    return () => {
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+    };
+  }, []);
   
   useEffect(() => {
     // Load the listening section if not already loaded
@@ -53,36 +131,17 @@ const ListeningTest = () => {
       }
     }
     
-    // Create audio element for the test
-    audioRef.current = new Audio();
-    
-    // Add event listeners for audio element
-    if (audioRef.current) {
-      // Update progress when time updates
-      audioRef.current.addEventListener('timeupdate', updateAudioProgress);
-      
-      // Handle when audio ends
-      audioRef.current.addEventListener('ended', handleAudioEnd);
-    }
-    
     // Start preview timer immediately when component mounts
     startPreviewTimer();
     toast.info('Preview time started', {
       description: 'You have 30 seconds to preview the questions before the audio begins.'
     });
     
-    // Cleanup timers and event listeners on unmount
+    // Cleanup timers on unmount
     return () => {
       if (previewTimerRef.current) clearInterval(previewTimerRef.current);
       if (transitionTimerRef.current) clearInterval(transitionTimerRef.current);
       if (reviewTimerRef.current) clearInterval(reviewTimerRef.current);
-      
-      // Remove event listeners
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('timeupdate', updateAudioProgress);
-        audioRef.current.removeEventListener('ended', handleAudioEnd);
-        audioRef.current.pause();
-      }
     };
   }, [currentTest, startSection]);
 
@@ -105,65 +164,58 @@ const ListeningTest = () => {
     }, 1000);
   };
   
-  // Update audio progress based on current playback time
-  const updateAudioProgress = () => {
-    if (audioRef.current) {
-      const duration = audioRef.current.duration;
-      const currentTime = audioRef.current.currentTime;
-      
-      if (duration) {
-        const progress = (currentTime / duration) * 100;
-        setAudioProgress(progress);
-      }
-    }
-  };
-  
-  // Handle audio ending
-  const handleAudioEnd = () => {
-    setAudioPlaying(false);
-    
-    // Check if we need to move to next section or final review
-    if (currentSectionIndex < 1) { // Changed from listeningContent.sections.length - 1
-      startSectionTransition();
-    } else {
-      startFinalReview();
-    }
-  };
-
   const startAudioPlayback = () => {
     setCurrentPhase(Phase.LISTENING);
     
     // Set the appropriate audio source based on the current section
+    const audioSource = currentSectionIndex === 0 ? 
+      '/media/assessment/listening-1.mp3' : 
+      '/media/assessment/listening-2.mp3';
+    
+    // Prepare audio playback with enhanced handling
     if (audioRef.current) {
-      if (currentSectionIndex === 0) {
-        audioRef.current.src = '/media/assessment/listening-1.mp3';
-      } else {
-        audioRef.current.src = '/media/assessment/listening-2.mp3';
-      }
-      
-      // Set initial volume (not muted by default)
       audioRef.current.muted = audioMuted;
       
-      // Load and play audio
-      audioRef.current.load();
+      // Try to play the audio
+      playAudio(audioSource)
+        .then(() => {
+          toast.info('Audio is now playing', {
+            description: 'Listen carefully as it will only play once.'
+          });
+        })
+        .catch(error => {
+          console.error('Audio failed to play automatically:', error);
+          
+          // Show a message to the user that they need to interact
+          toast.error('Audio failed to play automatically', {
+            description: 'Please click the play button to start the audio.',
+            duration: 5000
+          });
+        });
+    }
+  };
+  
+  // Handle play button click (for when autoplay fails)
+  const handleManualPlay = () => {
+    if (audioRef.current) {
+      // Set user as having interacted
+      setUserInteracted(true);
       
-      const playPromise = audioRef.current.play();
-      
-      // Handle play promise to catch any autoplay issues
-      if (playPromise !== undefined) {
-        playPromise
+      if (!isPlaying) {
+        forcePlayAudio()
           .then(() => {
-            setAudioPlaying(true);
-            toast.info('Audio is now playing', {
+            toast.success('Audio now playing', {
               description: 'Listen carefully as it will only play once.'
             });
           })
           .catch(error => {
-            console.error('Audio playback failed:', error);
-            toast.error('Audio failed to play automatically', {
-              description: 'Please click the play button manually or check your device settings.'
+            console.error('Manual play failed:', error);
+            toast.error('Audio failed to play', {
+              description: 'Please check your audio settings and try again.'
             });
           });
+      } else {
+        stopAudio();
       }
     }
   };
@@ -239,13 +291,10 @@ const ListeningTest = () => {
 
   // Skip this section and move to the next one (for demo purposes)
   const handleSkipSection = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    setAudioPlaying(false);
+    stopAudio();
     setAudioProgress(100);
     
-    if (currentSectionIndex < 1) { // Changed from listeningContent.sections.length - 1
+    if (currentSectionIndex < 1) {
       startSectionTransition();
     } else {
       startFinalReview();
@@ -266,9 +315,7 @@ const ListeningTest = () => {
     if (reviewTimerRef.current) clearInterval(reviewTimerRef.current);
     
     // Stop audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    stopAudio();
     
     submitSection();
     toast.success('Test submitted', {
@@ -304,7 +351,7 @@ const ListeningTest = () => {
               <TestPhases 
                 currentPhase={currentPhase} 
                 currentSection={currentSectionIndex + 1}
-                totalSections={2} // Changed from listeningContent.sections.length
+                totalSections={2}
               />
             </div>
             
@@ -341,13 +388,23 @@ const ListeningTest = () => {
                   Audio Player - Section {currentSectionIndex + 1}
                   {currentSectionIndex === 0 ? " (listening-1.mp3)" : " (listening-2.mp3)"}
                 </span>
-                <span className={`text-xs px-2 py-1 ${audioPlaying ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} rounded-full`}>
-                  {audioPlaying ? 'Playing...' : 'Paused'}
+                <span className={`text-xs px-2 py-1 ${isPlaying ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} rounded-full`}>
+                  {isPlaying ? 'Playing...' : 'Paused'}
                 </span>
               </div>
               <Progress value={audioProgress} className="h-2 mb-2" />
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleManualPlay}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-1 bg-white hover:bg-blue-50"
+                  >
+                    {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    {isPlaying ? "Pause" : "Play"}
+                  </Button>
+                  
                   <button
                     onClick={toggleMute}
                     className="p-1 rounded hover:bg-slate-200 transition-colors"
@@ -360,7 +417,9 @@ const ListeningTest = () => {
                   </button>
                 </div>
                 <span className="text-xs text-slate-500">
-                  Listening to authentic audio recording
+                  {!userInteracted && !isPlaying ? 
+                    "Click Play to start audio" : 
+                    "Listening to authentic audio recording"}
                 </span>
                 {/* Skip button for demo purposes (would not exist in real test) */}
                 <Button 
