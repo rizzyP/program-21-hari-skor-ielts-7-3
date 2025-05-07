@@ -7,21 +7,27 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from '@/components/ui/accordion';
-import { 
-  Collapsible, 
-  CollapsibleContent, 
-  CollapsibleTrigger 
-} from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Lock, Check, Video, BookOpen, FileText } from 'lucide-react';
+import { Lock, Check, Video, BookOpen, FileText, TestTube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurriculum } from '@/hooks/useCurriculum';
 
 const Curriculum = () => {
-  const { days, markAsCompleted, isAccessible } = useCurriculum();
+  const { days, markAsCompleted, isAccessible, navigateToMaterial } = useCurriculum();
   const [openDay, setOpenDay] = useState<string | undefined>("day-1");
+
+  // Helper function to get the appropriate icon based on material type
+  const getMaterialIcon = (type: string) => {
+    switch (type) {
+      case 'video': return <Video size={18} className="text-ielts-blue" />;
+      case 'reading': return <BookOpen size={18} className="text-ielts-green" />;
+      case 'exercise': return <FileText size={18} className="text-ielts-red" />;
+      case 'test': return <TestTube size={18} className="text-ielts-purple" />;
+      default: return <FileText size={18} className="text-ielts-blue" />;
+    }
+  };
 
   return (
     <Layout className="max-w-4xl mx-auto">
@@ -79,30 +85,49 @@ const Curriculum = () => {
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
-                                {material.type === 'video' && <Video size={18} className="text-ielts-blue" />}
-                                {material.type === 'reading' && <BookOpen size={18} className="text-ielts-green" />}
-                                {material.type === 'exercise' && <FileText size={18} className="text-ielts-red" />}
+                                {getMaterialIcon(material.type)}
                                 <span className="font-medium">{material.title}</span>
                                 <Badge variant="outline" className="ml-2">
                                   {material.durationMinutes} min
                                 </Badge>
                               </div>
-                              <Button 
-                                variant={material.completed ? "secondary" : "outline"} 
-                                size="sm"
-                                className={cn(
-                                  "gap-1",
-                                  material.completed ? "bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700" : ""
-                                )}
-                                onClick={() => markAsCompleted(dayNumber, mIndex)}
-                              >
-                                {material.completed ? (
-                                  <>
-                                    <Check size={16} />
-                                    <span>Completed</span>
-                                  </>
-                                ) : "Mark as complete"}
-                              </Button>
+                              
+                              {/* Different button for test type vs other types */}
+                              {material.type === 'test' ? (
+                                <Button
+                                  variant={material.completed ? "secondary" : "default"}
+                                  size="sm"
+                                  className={cn(
+                                    "gap-1",
+                                    material.completed ? "bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700" : ""
+                                  )}
+                                  onClick={() => navigateToMaterial(dayNumber, mIndex)}
+                                >
+                                  {material.completed ? (
+                                    <>
+                                      <Check size={16} />
+                                      <span>Retake Test</span>
+                                    </>
+                                  ) : "Take Test"}
+                                </Button>
+                              ) : (
+                                <Button 
+                                  variant={material.completed ? "secondary" : "outline"} 
+                                  size="sm"
+                                  className={cn(
+                                    "gap-1",
+                                    material.completed ? "bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700" : ""
+                                  )}
+                                  onClick={() => markAsCompleted(dayNumber, mIndex)}
+                                >
+                                  {material.completed ? (
+                                    <>
+                                      <Check size={16} />
+                                      <span>Completed</span>
+                                    </>
+                                  ) : "Mark as complete"}
+                                </Button>
+                              )}
                             </div>
                           </div>
                         ))

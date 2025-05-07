@@ -1,13 +1,15 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-type MaterialType = 'video' | 'reading' | 'exercise';
+type MaterialType = 'video' | 'reading' | 'exercise' | 'test';
 
 interface Material {
   title: string;
   type: MaterialType;
   durationMinutes: number;
   completed: boolean;
+  path?: string; // Optional path for navigation
 }
 
 interface Day {
@@ -16,6 +18,7 @@ interface Day {
 }
 
 export function useCurriculum() {
+  const navigate = useNavigate();
   // Get initial curriculum data from localStorage or use default
   const [days, setDays] = useState<Day[]>(() => {
     const savedCurriculum = localStorage.getItem('ielts-curriculum');
@@ -23,10 +26,16 @@ export function useCurriculum() {
       return JSON.parse(savedCurriculum);
     }
     
-    // Default curriculum structure
+    // Default curriculum structure with Day 1 as assessment test
     return [
       {
-        title: "IELTS Overview and Assessment",
+        title: "Assessment Test",
+        materials: [
+          { title: "IELTS Assessment Test", type: "test", durationMinutes: 60, completed: false, path: "/test" }
+        ]
+      },
+      {
+        title: "IELTS Overview and Strategy",
         materials: [
           { title: "Introduction to IELTS", type: "video", durationMinutes: 15, completed: false },
           { title: "Understanding IELTS Scoring", type: "reading", durationMinutes: 20, completed: false },
@@ -226,5 +235,13 @@ export function useCurriculum() {
     return true;
   };
 
-  return { days, markAsCompleted, isAccessible };
+  // Function to navigate to a specific path if provided
+  const navigateToMaterial = (dayNumber: number, materialIndex: number) => {
+    const material = days[dayNumber - 1].materials[materialIndex];
+    if (material.path) {
+      navigate(material.path);
+    }
+  };
+
+  return { days, markAsCompleted, isAccessible, navigateToMaterial };
 }
