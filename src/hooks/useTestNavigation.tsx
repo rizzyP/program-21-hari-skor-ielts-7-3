@@ -53,7 +53,7 @@ export const useTestNavigation = (
   const FIXED_PART1_QUESTIONS = [
     "Do you have any artistic hobbies, such as painting? (Why/Why not?)",
     "What kind of art lessons did you have at school?",
-    "Are these lessons quite traditional or quite new?", // Updated to match the correct question for 1c
+    "Are these lessons quite traditional or quite new?", 
     "How useful do you think it is to study art at school? (Why/Why not?)"
   ];
 
@@ -69,22 +69,22 @@ export const useTestNavigation = (
     setIsStarted(true);
     setCurrentPhase(Phase.SPEAKING_INTRO);
     
-    // Play opening audio sequence
+    // Play opening audio sequence with specific delays as requested
     const openingSequence = [
       { 
         src: AUDIO_FILES.opening[0], 
         message: "Hello, my name is Dr. Sarah Wilson and I'll be your examiner today.",
-        delayAfter: 2000 
+        delayAfter: 1000 // 1 second delay
       },
       { 
         src: AUDIO_FILES.opening[1], 
         message: "Could you tell me your name, please?",
-        delayAfter: 5000 
+        delayAfter: 3000 // 3 seconds delay  
       },
       { 
         src: AUDIO_FILES.opening[2], 
         message: "Can I see your identification, please?",
-        delayAfter: 10000 
+        delayAfter: 4000 // 4 seconds delay
       },
       { 
         src: AUDIO_FILES.opening[3], 
@@ -112,7 +112,7 @@ export const useTestNavigation = (
     // Use the fixed question for part 1 instead of from content
     const firstQuestion = FIXED_PART1_QUESTIONS[0];
     
-    // Play Part 1 first question with callback to start recording after
+    // Play Part 1 first question - when this ends, recording starts automatically
     simulateExaminerSpeaking(
       firstQuestion, 
       AUDIO_FILES.part1[0], 
