@@ -16,7 +16,7 @@ const Layout: React.FC<LayoutProps> = ({
       <header className="bg-white border-b border-slate-200 py-4">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link to="/" className="flex items-center">
-            <img alt="Program 21 Hari Skor IELTS 7.0" className="h-10" src="/lovable-uploads/ed4d6815-81ad-472b-add2-1c7a76391258.png" />
+            <img alt="Program 21 Hari Skor IELTS 7.0" className="h-10" src="/lovable-uploads/19d179ae-72af-42a9-9de5-99d2bba39be7.png" />
           </Link>
           <nav className="flex gap-2">
             <Link to="/">
