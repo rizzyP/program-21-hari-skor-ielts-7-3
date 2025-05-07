@@ -20,7 +20,7 @@ const Layout: React.FC<LayoutProps> = ({ children, className }) => {
             <div className="bg-ielts-blue rounded-lg p-1">
               <span className="font-bold text-white text-2xl">IELTS</span>
             </div>
-            <h1 className="text-lg font-semibold text-slate-800 hidden sm:block">AI Mentor</h1>
+            <h1 className="text-lg font-semibold text-slate-800 hidden sm:block">Program 21 Hari Skor IELTS 7.0</h1>
           </Link>
           <nav className="flex gap-2">
             <Link to="/">
@@ -44,7 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children, className }) => {
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-4 mt-auto">
         <div className="container mx-auto px-4 text-center text-sm text-slate-500">
-          IELTS AI Mentor © {new Date().getFullYear()} - Powered by AI
+          Program 21 Hari Skor IELTS 7.0 © {new Date().getFullYear()} - Powered by AI
         </div>
       </footer>
     </div>

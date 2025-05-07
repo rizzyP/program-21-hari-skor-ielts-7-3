@@ -13,7 +13,7 @@ const Index = () => {
         {/* Hero section */}
         <section className="text-center space-y-6">
           <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl">
-            <span className="text-ielts-blue">IELTS</span> AI Mentor
+            <span className="text-ielts-blue">Program 21 Hari</span> Skor IELTS 7.0
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
             Complete IELTS assessment with AI-powered feedback and analysis to help you achieve your target band score.
