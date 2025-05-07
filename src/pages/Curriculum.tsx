@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { 
@@ -13,13 +12,14 @@ import { Badge } from '@/components/ui/badge';
 import { Lock, Check, Video, BookOpen, FileText, TestTube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurriculum } from '@/hooks/useCurriculum';
+import { MaterialType } from '@/types/curriculum';
 
 const Curriculum = () => {
   const { days, markAsCompleted, isAccessible, navigateToMaterial } = useCurriculum();
   const [openDay, setOpenDay] = useState<string | undefined>("day-1");
 
   // Helper function to get the appropriate icon based on material type
-  const getMaterialIcon = (type: string) => {
+  const getMaterialIcon = (type: MaterialType) => {
     switch (type) {
       case 'video': return <Video size={18} className="text-ielts-blue" />;
       case 'reading': return <BookOpen size={18} className="text-ielts-green" />;
