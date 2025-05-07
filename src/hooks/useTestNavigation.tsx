@@ -16,7 +16,8 @@ export const useTestNavigation = (
   getCurrentPartQuestions: () => string[],
   currentPart: number,
   currentQuestion: number,
-  currentPhase: Phase
+  currentPhase: Phase,
+  setWaitingForRecording: (value: boolean) => void
 ) => {
   const navigate = useNavigate();
   const { submitSection, completeTest, setTimeRemaining } = useTest();
@@ -65,7 +66,7 @@ export const useTestNavigation = (
   ];
 
   // Handle test start with opening audio sequence per exact requirements
-  const handleStart = () => {
+  const handleStart = async () => {
     setIsStarted(true);
     setCurrentPhase(Phase.SPEAKING_INTRO);
     
@@ -96,7 +97,13 @@ export const useTestNavigation = (
       }
     ];
     
-    playExaminerAudioSequence(openingSequence);
+    try {
+      await playExaminerAudioSequence(openingSequence);
+    } catch (error) {
+      console.error("Error playing opening sequence:", error);
+      // Fallback in case of error
+      startPart1();
+    }
     
     toast.info('Speaking test started', {
       description: 'The examiner will guide you through the test.'
@@ -104,39 +111,45 @@ export const useTestNavigation = (
   };
 
   // Start Part 1 with each question following the specified flow
-  const startPart1 = () => {
+  const startPart1 = async () => {
     setCurrentPhase(Phase.SPEAKING_PART1);
     setCurrentPart(1);
     setCurrentQuestion(0);
     
-    // Play the first part 1 audio and then show question
-    simulateExaminerSpeaking(
-      FIXED_PART1_QUESTIONS[0], 
-      AUDIO_FILES.part1[0], 
-      3000, 
-      Phase.SPEAKING_PART1
-    );
-    
-    // Note: At this point, when examiner stops speaking, recording will automatically start
-    // through the useEffect in useSpeakingTest.tsx
+    try {
+      // Play the first part 1 audio
+      await simulateExaminerSpeaking(
+        FIXED_PART1_QUESTIONS[0], 
+        AUDIO_FILES.part1[0], 
+        3000, 
+        Phase.SPEAKING_PART1
+      );
+      
+      // Set flag to start recording after audio completes
+      setWaitingForRecording(true);
+    } catch (error) {
+      console.error("Error starting Part 1:", error);
+      // Fallback in case of error
+      setWaitingForRecording(true);
+    }
   };
 
   // Handle Part 2 preparation - Following specified flow
-  const handlePrepare = () => {
+  const handlePrepare = async () => {
     setCurrentPhase(Phase.SPEAKING_PART2_PREP);
     
     const cueCardTopic = "Describe a teacher who has influenced you in your education.";
     
-    // Play the part 2 introduction audio first
-    simulateExaminerSpeaking(
-      cueCardTopic, 
-      AUDIO_FILES.part2[0], 
-      3000,
-      Phase.SPEAKING_PART2_PREP
-    );
-    
-    // Start the 1-minute preparation timer after audio completes
-    setTimeout(() => {
+    try {
+      // Play the part 2 introduction audio first
+      await simulateExaminerSpeaking(
+        cueCardTopic, 
+        AUDIO_FILES.part2[0], 
+        3000,
+        Phase.SPEAKING_PART2_PREP
+      );
+      
+      // Start the 1-minute preparation timer after audio completes
       setTimeRemaining(60);
       toast.info('Preparation time started', {
         description: 'You have 1 minute to prepare your answer.'
@@ -151,17 +164,25 @@ export const useTestNavigation = (
           AUDIO_FILES.part2[1], 
           3000,
           Phase.SPEAKING_PART2_ANSWER
-        );
+        ).then(() => {
+          // Start recording after audio finishes
+          setWaitingForRecording(true);
+        });
         
         toast.info('Preparation time is over', {
           description: 'Start speaking when the examiner finishes.'
         });
       }, 60 * 1000);
-    }, 3000);
+    } catch (error) {
+      console.error("Error handling Part 2 preparation:", error);
+      // Fallback
+      setCurrentPhase(Phase.SPEAKING_PART2_ANSWER);
+      setWaitingForRecording(true);
+    }
   };
 
   // Handle moving to next question according to the specified flow
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     // Update overall question counter
     setQuestionNumber(prev => prev + 1);
     
@@ -172,50 +193,69 @@ export const useTestNavigation = (
         const nextQuestionIndex = currentQuestion + 1;
         setCurrentQuestion(nextQuestionIndex);
         
-        // Play next question audio with the fixed question
-        simulateExaminerSpeaking(
-          FIXED_PART1_QUESTIONS[nextQuestionIndex], 
-          AUDIO_FILES.part1[nextQuestionIndex], 
-          3000, 
-          Phase.SPEAKING_PART1
-        );
+        try {
+          // Play next question audio with the fixed question
+          await simulateExaminerSpeaking(
+            FIXED_PART1_QUESTIONS[nextQuestionIndex], 
+            AUDIO_FILES.part1[nextQuestionIndex], 
+            3000, 
+            Phase.SPEAKING_PART1
+          );
+          
+          // Set flag to start recording after audio completes
+          setWaitingForRecording(true);
+        } catch (error) {
+          console.error("Error playing next Part 1 question:", error);
+          // Fallback
+          setWaitingForRecording(true);
+        }
       } 
       // End of Part 1
       else {
         setPartCompleted(prev => ({ ...prev, part1: true }));
         
-        // Play end of part 1 audio
-        simulateExaminerSpeaking(
-          "Thank you. Now, let's move on to part 2.", 
-          AUDIO_FILES.part1[4], 
-          3000, 
-          Phase.SPEAKING_PART1
-        );
-        
-        // Move to Part 2
-        setTimeout(() => {
+        try {
+          // Play end of part 1 audio
+          await simulateExaminerSpeaking(
+            "Thank you. Now, let's move on to part 2.", 
+            AUDIO_FILES.part1[4], 
+            3000, 
+            Phase.SPEAKING_PART1
+          );
+          
+          // Move to Part 2
           setCurrentPart(2);
           setCurrentQuestion(0);
           handlePrepare(); // Start Part 2 preparation
-        }, 3000);
+        } catch (error) {
+          console.error("Error ending Part 1:", error);
+          // Fallback
+          setCurrentPart(2);
+          setCurrentQuestion(0);
+          handlePrepare();
+        }
       }
     }
     // Part 2 flow - Handle end of part 2
     else if (currentPart === 2) {
       setPartCompleted(prev => ({ ...prev, part2: true }));
       
-      // Play end of part 2 audio
-      simulateExaminerSpeaking(
-        "Thank you. Let's move on to the final part.", 
-        AUDIO_FILES.part2[2], 
-        3000, 
-        Phase.SPEAKING_PART2_ANSWER
-      );
-      
-      // Move to Part 3
-      setTimeout(() => {
+      try {
+        // Play end of part 2 audio
+        await simulateExaminerSpeaking(
+          "Thank you. Let's move on to the final part.", 
+          AUDIO_FILES.part2[2], 
+          3000, 
+          Phase.SPEAKING_PART2_ANSWER
+        );
+        
+        // Move to Part 3
         startPart3();
-      }, 3000);
+      } catch (error) {
+        console.error("Error ending Part 2:", error);
+        // Fallback
+        startPart3();
+      }
     }
     // Part 3 flow - Handle part 3 questions
     else if (currentPart === 3) {
@@ -223,13 +263,22 @@ export const useTestNavigation = (
         const nextQuestionIndex = currentQuestion + 1;
         setCurrentQuestion(nextQuestionIndex);
         
-        // Play next part 3 question audio with the fixed question
-        simulateExaminerSpeaking(
-          FIXED_PART3_QUESTIONS[nextQuestionIndex], 
-          AUDIO_FILES.part3[nextQuestionIndex], 
-          3000, 
-          Phase.SPEAKING_PART3
-        );
+        try {
+          // Play next part 3 question audio with the fixed question
+          await simulateExaminerSpeaking(
+            FIXED_PART3_QUESTIONS[nextQuestionIndex], 
+            AUDIO_FILES.part3[nextQuestionIndex], 
+            3000, 
+            Phase.SPEAKING_PART3
+          );
+          
+          // Set flag to start recording after audio completes
+          setWaitingForRecording(true);
+        } catch (error) {
+          console.error("Error playing next Part 3 question:", error);
+          // Fallback
+          setWaitingForRecording(true);
+        }
       } 
       // End of Part 3 / End of test
       else {
@@ -240,38 +289,54 @@ export const useTestNavigation = (
   };
   
   // Start Part 3 with its questions according to the flow
-  const startPart3 = () => {
+  const startPart3 = async () => {
     setCurrentPart(3);
     setCurrentQuestion(0);
     setCurrentPhase(Phase.SPEAKING_PART3);
     
-    // Play first part 3 question
-    simulateExaminerSpeaking(
-      FIXED_PART3_QUESTIONS[0], 
-      AUDIO_FILES.part3[0], 
-      3000, 
-      Phase.SPEAKING_PART3
-    );
+    try {
+      // Play first part 3 question
+      await simulateExaminerSpeaking(
+        FIXED_PART3_QUESTIONS[0], 
+        AUDIO_FILES.part3[0], 
+        3000, 
+        Phase.SPEAKING_PART3
+      );
+      
+      // Set flag to start recording after audio completes
+      setWaitingForRecording(true);
+    } catch (error) {
+      console.error("Error starting Part 3:", error);
+      // Fallback
+      setWaitingForRecording(true);
+    }
   };
 
   // Complete the test
-  const handleComplete = () => {
+  const handleComplete = async () => {
     submitSection();
     
-    // Play end of test audio
-    simulateExaminerSpeaking(
-      "That's the end of the speaking test. Thank you for your participation.", 
-      AUDIO_FILES.part3[3], 
-      3000,
-      Phase.COMPLETED
-    );
-    
-    setCurrentPhase(Phase.COMPLETED);
-    completeTest();
-    
-    toast.success('Speaking test completed', {
-      description: 'You have completed the IELTS speaking test!'
-    });
+    try {
+      // Play end of test audio
+      await simulateExaminerSpeaking(
+        "That's the end of the speaking test. Thank you for your participation.", 
+        AUDIO_FILES.part3[3], 
+        3000,
+        Phase.COMPLETED
+      );
+      
+      setCurrentPhase(Phase.COMPLETED);
+      completeTest();
+      
+      toast.success('Speaking test completed', {
+        description: 'You have completed the IELTS speaking test!'
+      });
+    } catch (error) {
+      console.error("Error completing test:", error);
+      // Fallback
+      setCurrentPhase(Phase.COMPLETED);
+      completeTest();
+    }
   };
 
   const handleNavigateResults = () => {

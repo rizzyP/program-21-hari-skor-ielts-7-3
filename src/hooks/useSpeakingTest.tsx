@@ -35,7 +35,9 @@ export const useSpeakingTest = () => {
     questionNumber,
     setQuestionNumber,
     totalQuestions,
-    setTotalQuestions
+    setTotalQuestions,
+    waitingForRecording,
+    setWaitingForRecording
   } = useSpeakingTestState();
 
   const {
@@ -73,7 +75,8 @@ export const useSpeakingTest = () => {
     getCurrentPartQuestions,
     currentPart,
     currentQuestion,
-    currentPhase
+    currentPhase,
+    setWaitingForRecording
   );
 
   // Set up recording controls after navigation is set up
@@ -109,22 +112,24 @@ export const useSpeakingTest = () => {
     }
   }, [currentTest, startSection, setTotalQuestions]);
 
-  // Automatically start recording when examiner stops speaking
+  // Start recording only when examiner is done speaking AND we're waiting for recording
   useEffect(() => {
     if (!examinerSpeaking && 
+        waitingForRecording &&
         (currentPhase === Phase.SPEAKING_PART1 || 
          currentPhase === Phase.SPEAKING_PART2_ANSWER || 
          currentPhase === Phase.SPEAKING_PART3) && 
         !isRecording) {
       
-      // Give a small delay to make it feel natural
+      // Start recording after a small delay for natural feel
       const timer = setTimeout(() => {
         handleStartRecording();
+        setWaitingForRecording(false); // Reset the waiting flag
       }, 500);
       
       return () => clearTimeout(timer);
     }
-  }, [examinerSpeaking, currentPhase, isRecording, handleStartRecording]);
+  }, [examinerSpeaking, waitingForRecording, currentPhase, isRecording, handleStartRecording, setWaitingForRecording]);
 
   // Clean up timeouts when component unmounts
   useEffect(() => {

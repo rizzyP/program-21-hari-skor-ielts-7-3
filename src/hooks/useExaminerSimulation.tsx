@@ -37,29 +37,24 @@ export const useExaminerSimulation = (setIsRecording: (value: boolean) => void) 
     examinerAudioTimeout.current = setTimeout(() => {
       setExaminerSpeaking(false);
       
-      // Auto-start recording when examiner finishes speaking
-      // But don't start recording during preparation time or intro/completed phases
-      if (currentPhase === Phase.SPEAKING_PART1 || 
-          currentPhase === Phase.SPEAKING_PART2_ANSWER ||
-          currentPhase === Phase.SPEAKING_PART3) {
-        setIsRecording(true);
-      }
+      // Don't auto-start recording - let useSpeakingTest handle this
+      // We removed the auto-recording logic from here to fix the timing issues
     }, duration);
   };
 
   // Play a sequence of audio files with delays
-  const playExaminerAudioSequence = (
+  const playExaminerAudioSequence = async (
     audioSequence: {
       src: string, 
       message: string,
       delayAfter?: number,
       onEnd?: () => void
     }[]
-  ) => {
+  ): Promise<void> => {
     // Format the sequence for the audio player
     const formattedSequence = audioSequence.map(item => ({
       src: item.src,
-      delayAfter: item.delayAfter,
+      delayAfter: item.delayAfter || 0,
       onEnd: () => {
         setExaminerMessage(item.message);
         if (item.onEnd) item.onEnd();
@@ -73,10 +68,11 @@ export const useExaminerSimulation = (setIsRecording: (value: boolean) => void) 
       setExaminerMessage(audioSequence[0].message);
     }
     
-    return queueAudioWithDelays(formattedSequence)
-      .finally(() => {
-        setExaminerSpeaking(false);
-      });
+    try {
+      await queueAudioWithDelays(formattedSequence);
+    } finally {
+      setExaminerSpeaking(false);
+    }
   };
 
   // Clean up timeout when component unmounts
