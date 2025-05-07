@@ -56,7 +56,6 @@ export const useSpeakingTest = () => {
   } = useTestContent(currentPart, currentQuestion);
 
   // Create a navigation hook that gets the live state
-  // We need to declare this after test content hook to have access to getCurrentPartQuestions
   const {
     handleStart,
     handlePrepare,
@@ -80,7 +79,6 @@ export const useSpeakingTest = () => {
   );
 
   // Set up recording controls after navigation is set up
-  // because it depends on handleNextQuestion
   const {
     handleStartRecording,
     handleStopRecording,
@@ -120,6 +118,8 @@ export const useSpeakingTest = () => {
          currentPhase === Phase.SPEAKING_PART2_ANSWER || 
          currentPhase === Phase.SPEAKING_PART3) && 
         !isRecording) {
+      
+      console.log("Audio finished, starting recording now...");
       
       // Start recording after a small delay for natural feel
       const timer = setTimeout(() => {

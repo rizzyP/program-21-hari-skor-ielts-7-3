@@ -195,6 +195,7 @@ export const useTestNavigation = (
         
         try {
           // Play next question audio with the fixed question
+          // Fix: Don't use .then() since simulateExaminerSpeaking is an async function
           await simulateExaminerSpeaking(
             FIXED_PART1_QUESTIONS[nextQuestionIndex], 
             AUDIO_FILES.part1[nextQuestionIndex], 

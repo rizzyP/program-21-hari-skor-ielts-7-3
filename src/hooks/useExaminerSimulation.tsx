@@ -28,6 +28,9 @@ export const useExaminerSimulation = (setIsRecording: (value: boolean) => void) 
     if (audioFile) {
       try {
         await playAudio(audioFile);
+        
+        // Add a small delay after audio finishes to make the transition smooth
+        await new Promise(resolve => setTimeout(resolve, 500));
       } catch (error) {
         console.error('Error playing audio file:', error);
       }
@@ -36,9 +39,6 @@ export const useExaminerSimulation = (setIsRecording: (value: boolean) => void) 
     // Set timeout for when examiner finishes speaking
     examinerAudioTimeout.current = setTimeout(() => {
       setExaminerSpeaking(false);
-      
-      // Don't auto-start recording - let useSpeakingTest handle this
-      // We removed the auto-recording logic from here to fix the timing issues
     }, duration);
   };
 
