@@ -33,6 +33,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     );
   }
 
+  // Always allow answering questions during all phases
+  const allowAnswering = true;
+
   return (
     <Card className="bg-white shadow-sm">
       <CardHeader className="pb-2">

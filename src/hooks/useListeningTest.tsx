@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { toast } from 'sonner';
@@ -12,7 +13,7 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
   const [reviewTimeRemaining, setReviewTimeRemaining] = useState<number>(120);
   const [audioProgress, setAudioProgress] = useState<number>(0);
   const [audioMuted, setAudioMuted] = useState<boolean>(false);
-  const [userInteracted, setUserInteracted] = useState<boolean>(false);
+  const [userInteracted, setUserInteracted] = useState<boolean>(true); // Set to true by default to ensure autoplay
   
   // Use the enhanced audio player hook
   const { isPlaying, isReady, playAudio, forcePlayAudio, stopAudio, audioRef } = useAudioPlayer();
@@ -70,22 +71,6 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
     };
   }, [currentPhase, currentSectionIndex]);
   
-  // Effect for document-level interaction detection
-  useEffect(() => {
-    const handleInteraction = () => {
-      setUserInteracted(true);
-    };
-    
-    // Listen for any user interaction with the page
-    document.addEventListener('click', handleInteraction);
-    document.addEventListener('keydown', handleInteraction);
-    
-    return () => {
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('keydown', handleInteraction);
-    };
-  }, []);
-  
   // Load audio source when section changes
   useEffect(() => {
     if (currentPhase === Phase.LISTENING) {
@@ -107,7 +92,7 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
     previewTimerRef.current = setInterval(() => {
       setPreviewTimeRemaining(prev => {
         if (prev <= 1) {
-          clearInterval(previewTimerRef.current!);
+          if (previewTimerRef.current) clearInterval(previewTimerRef.current);
           startAudioPlayback();
           return 0;
         }
@@ -128,7 +113,7 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
     if (audioRef.current) {
       audioRef.current.muted = audioMuted;
       
-      // Try to play the audio
+      // Try to play the audio immediately
       playAudio(audioSource)
         .then(() => {
           toast.info('Audio is now playing', {
@@ -140,7 +125,7 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
           
           // Show a message to the user that they need to interact
           toast.error('Audio failed to play automatically', {
-            description: 'Please click the play button to start the audio.',
+            description: 'Please click anywhere on the page to start the audio.',
             duration: 5000
           });
         });
@@ -152,10 +137,9 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
     startAudioPlayback();
   };
   
-  // Handle play button click (for when autoplay fails)
+  // This function is now only for emergency use or admins
   const handleManualPlay = () => {
     if (audioRef.current) {
-      // Set user as having interacted
       setUserInteracted(true);
       
       if (!isPlaying) {
@@ -171,8 +155,6 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
               description: 'Please check your audio settings and try again.'
             });
           });
-      } else {
-        stopAudio();
       }
     }
   };
@@ -197,7 +179,7 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
     transitionTimerRef.current = setInterval(() => {
       setTransitionTimeRemaining(prev => {
         if (prev <= 1) {
-          clearInterval(transitionTimerRef.current!);
+          if (transitionTimerRef.current) clearInterval(transitionTimerRef.current);
           setCurrentSectionIndex(prev => prev + 1);
           setCurrentPhase(Phase.PREVIEW);
           startPreviewTimer();
@@ -220,7 +202,7 @@ export const useListeningTest = (startSectionFn: (id: string) => void, saveAnswe
     reviewTimerRef.current = setInterval(() => {
       setReviewTimeRemaining(prev => {
         if (prev <= 1) {
-          clearInterval(reviewTimerRef.current!);
+          if (reviewTimerRef.current) clearInterval(reviewTimerRef.current);
           handleCompleteTest();
           return 0;
         }

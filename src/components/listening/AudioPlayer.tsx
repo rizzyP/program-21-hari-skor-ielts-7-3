@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 
@@ -39,14 +39,14 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
       <Progress value={audioProgress} className="h-2 mb-2" />
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
+          {/* Admin play button - hidden from test takers */}
           <Button
             onClick={handleManualPlay}
             variant="outline"
             size="sm"
-            className="flex items-center gap-1 bg-white hover:bg-blue-50"
+            className="hidden"
           >
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            {isPlaying ? "Pause" : "Play"}
+            Admin: Play/Pause
           </Button>
           
           <button
@@ -62,7 +62,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
         </div>
         <span className="text-xs text-slate-500">
           {!userInteracted && !isPlaying ? 
-            "Click Play to start audio" : 
+            "Audio will start automatically" : 
             "Listening to authentic audio recording"}
         </span>
         {/* Skip button for demo purposes (would not exist in real test) */}
