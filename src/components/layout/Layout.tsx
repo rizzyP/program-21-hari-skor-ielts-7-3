@@ -16,11 +16,12 @@ const Layout: React.FC<LayoutProps> = ({ children, className }) => {
       {/* Header */}
       <header className="bg-white border-b border-slate-200 py-4">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="bg-ielts-blue rounded-lg p-1">
-              <span className="font-bold text-white text-2xl">IELTS</span>
-            </div>
-            <h1 className="text-lg font-semibold text-slate-800 hidden sm:block">Program 21 Hari Skor IELTS 7.0</h1>
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/lovable-uploads/afd8cd94-9d4e-4c9b-989c-ba66fd4ba3bc.png" 
+              alt="Program 21 Hari Skor IELTS 7.0" 
+              className="h-10"
+            />
           </Link>
           <nav className="flex gap-2">
             <Link to="/">
