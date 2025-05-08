@@ -158,16 +158,17 @@ export const useTestNavigation = (
       setTimeout(() => {
         setCurrentPhase(Phase.SPEAKING_PART2_ANSWER);
         
-        // Fixed: Store the promise in a variable and then call .then() on it
-        const speakingPromise = simulateExaminerSpeaking(
+        // Call the function and then handle any potential promise returned
+        const speakingResult = simulateExaminerSpeaking(
           cueCardTopic, 
           AUDIO_FILES.part2[1], 
           3000,
           Phase.SPEAKING_PART2_ANSWER
         );
         
-        if (speakingPromise instanceof Promise) {
-          speakingPromise.then(() => {
+        // Check if result is a Promise by checking for .then method existence
+        if (speakingResult && typeof speakingResult.then === 'function') {
+          speakingResult.then(() => {
             // Start recording after audio finishes
             setWaitingForRecording(true);
           });

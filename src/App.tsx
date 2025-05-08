@@ -15,6 +15,7 @@ import WritingTest from "./pages/WritingTest";
 import SpeakingTest from "./pages/SpeakingTest";
 import Results from "./pages/Results";
 import Curriculum from "./pages/Curriculum";
+import ListeningBeginnerGuide from "./pages/ListeningBeginnerGuide";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/test/speaking" element={<SpeakingTest />} />
             <Route path="/results" element={<Results />} />
             <Route path="/curriculum" element={<Curriculum />} />
+            <Route path="/listening-beginner-guide" element={<ListeningBeginnerGuide />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
