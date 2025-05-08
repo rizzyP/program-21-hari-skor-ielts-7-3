@@ -1,30 +1,13 @@
-
 import React from 'react';
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { LearningNavigationButtons } from '@/components/materials/LearningNavigationButtons';
 
 const ListeningBeginnerGuide1_5 = () => {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Chapter 1.5: Mendalami Percakapan Sehari-hari</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link to="/listening-beginner-guide-1-4">
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Previous
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to="/curriculum">
-              <ChevronRight className="ml-2 h-4 w-4" />
-              Back to Curriculum
-            </Link>
-          </Button>
-        </div>
       </div>
 
       <Card className="p-6 mb-8">
@@ -202,20 +185,7 @@ const ListeningBeginnerGuide1_5 = () => {
         </div>
       </Card>
 
-      <div className="flex justify-between mt-8">
-        <Button variant="outline" asChild>
-          <Link to="/listening-beginner-guide-1-4">
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Previous: Note-taking Dasar
-          </Link>
-        </Button>
-        <Button variant="outline" asChild>
-          <Link to="/curriculum">
-            <ChevronRight className="ml-2 h-4 w-4" />
-            Back to Curriculum
-          </Link>
-        </Button>
-      </div>
+      <LearningNavigationButtons dayNumber={3} materialIndex={0} />
     </div>
   );
 };

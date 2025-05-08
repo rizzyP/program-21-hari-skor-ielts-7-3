@@ -3,21 +3,20 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useCurriculum } from "@/hooks/useCurriculum";
 
 const ListeningBeginnerGuide1_2 = () => {
+  const { markAsCompleted } = useCurriculum();
+  const dayNumber = 2; // Day 2 contains this material
+  const materialIndex = 1; // Second material in the day
+  
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Chapter 1.2: Mendengarkan Detail Faktual</h1>
         <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link to="/listening-beginner-guide">
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Previous
-            </Link>
-          </Button>
           <Button variant="outline" asChild>
             <Link to="/curriculum">
               <ChevronRight className="ml-2 h-4 w-4" />
@@ -188,11 +187,12 @@ const ListeningBeginnerGuide1_2 = () => {
       </Card>
 
       <div className="flex justify-between mt-8">
-        <Button variant="outline" asChild>
-          <Link to="/listening-beginner-guide">
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Previous: Format Dasar IELTS Listening
-          </Link>
+        <Button 
+          variant="default" 
+          onClick={() => markAsCompleted(dayNumber, materialIndex)}
+        >
+          <Check className="mr-2 h-4 w-4" />
+          Mark as Completed
         </Button>
         <Button variant="outline" asChild>
           <Link to="/curriculum">

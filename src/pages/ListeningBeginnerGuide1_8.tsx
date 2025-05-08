@@ -1,59 +1,51 @@
-
 import React from 'react';
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { LearningNavigationButtons } from '@/components/materials/LearningNavigationButtons';
 
 const ListeningBeginnerGuide1_8 = () => {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Chapter 1.8: Mengasah Kemampuan Prediksi Konteks dan Jawaban</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link to="/listening-beginner-guide-1-7">
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Previous
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to="/curriculum">
-              <ChevronRight className="ml-2 h-4 w-4" />
-              Back to Curriculum
-            </Link>
-          </Button>
-        </div>
       </div>
 
       <Card className="p-6 mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Bagian 1: Menganalisis Pertanyaan Secara Mendalam Sebelum Mendengar</h2>
+        <div className="prose max-w-none">
+          <p className="mb-4">
+            Selamat datang di Chapter 1.8, sebuah chapter yang akan membekali Anda dengan salah satu mindset dan skill terpenting 
+            untuk sukses di seluruh bagian IELTS Listening: kemampuan prediksi. Prediksi dalam konteks ini bukanlah tebakan asal-asalan, 
+            melainkan proses proaktif menggunakan waktu persiapan singkat sebelum audio diputar untuk menganalisis pertanyaan, 
+            mengantisipasi jenis jawaban yang mungkin muncul, dan bahkan memikirkan kemungkinan sinonim atau parafrase. 
+            Menguasai prediksi akan mengubah Anda dari pendengar pasif menjadi test-taker yang strategis, lebih siap menangkap informasi, 
+            dan lebih efisien dalam menjawab. Skill ini relevan dari Section 1 hingga Section 4. Mari kita pelajari cara melakukannya secara sistematis.
+          </p>
+        </div>
+      </Card>
+
+      <Card className="p-6 mb-8">
+        <h2 className="text-2xl font-semibold mb-4">1. Menganalisis Pertanyaan Secara Mendalam Sebelum Mendengar</h2>
         
         <div className="prose max-w-none">
           <p className="mb-4">
-            Waktu beberapa puluh detik yang diberikan sebelum setiap bagian audio dimulai adalah emas murni. Memanfaatkannya secara maksimal untuk menganalisis pertanyaan adalah fondasi dari prediksi yang efektif.
+            Waktu beberapa puluh detik yang diberikan sebelum setiap bagian audio dimulai adalah emas murni. 
+            Memanfaatkannya secara maksimal untuk menganalisis pertanyaan adalah fondasi dari prediksi yang efektif.
           </p>
           
           <h3 className="text-xl font-medium mb-2 mt-6">Mengapa Analisis Awal Sangat Penting?</h3>
-          
           <ul className="list-disc pl-6 mb-4">
-            <li><strong>Mengurangi Beban Kognitif:</strong> Saat audio mulai, otak Anda sudah 'disetel' untuk mencari informasi spesifik, bukan mencoba memahami pertanyaan dan audio secara bersamaan.</li>
-            <li><strong>Mengarahkan Fokus Pendengaran:</strong> Anda tahu apa yang harus didengarkan, membantu menyaring kebisingan informasi yang tidak relevan.</li>
-            <li><strong>Mengaktifkan Pengetahuan Latar:</strong> Membaca pertanyaan dan konteks dapat mengaktifkan kosakata dan pemahaman Anda tentang topik tersebut.</li>
-            <li><strong>Memungkinkan Prediksi:</strong> Analisis adalah langkah pertama sebelum Anda bisa memprediksi jenis jawaban atau sinonim.</li>
-            <li><strong>Mencegah Kesalahan Konyol:</strong> Memastikan Anda tahu batas kata dan apa yang sebenarnya ditanyakan.</li>
+            <li>Mengurangi Beban Kognitif: Saat audio mulai, otak Anda sudah 'disetel' untuk mencari informasi spesifik, bukan mencoba memahami pertanyaan dan audio secara bersamaan.</li>
+            <li>Mengarahkan Fokus Pendengaran: Anda tahu apa yang harus didengarkan, membantu menyaring kebisingan informasi yang tidak relevan.</li>
+            <li>Mengaktifkan Pengetahuan Latar (Background Knowledge): Membaca pertanyaan dan konteks dapat mengaktifkan kosakata dan pemahaman Anda tentang topik tersebut.</li>
+            <li>Memungkinkan Prediksi: Analisis adalah langkah pertama sebelum Anda bisa memprediksi jenis jawaban atau sinonim.</li>
+            <li>Mencegah Kesalahan Konyol: Memastikan Anda tahu batas kata dan apa yang sebenarnya ditanyakan.</li>
           </ul>
           
           <h3 className="text-xl font-medium mb-2 mt-6">Langkah-langkah Analisis Pertanyaan dalam Waktu Persiapan:</h3>
-          
-          <ol className="list-decimal pl-6 mb-4">
-            <li className="mb-2"><strong>Baca Instruksi UTAMA:</strong> Selalu mulai dari sini! Berapa batas kata/angka? ("NO MORE THAN TWO WORDS AND/OR A NUMBER"). Apa jenis tugasnya secara umum (Choose, Complete, Label?). Lingkari atau garis bawahi instruksi ini. Ini tidak bisa ditawar!</li>
-            
-            <li className="mb-2"><strong>Identifikasi Tipe Pertanyaan Spesifik:</strong> Apakah ini Form Completion? Multiple Choice? Map Labelling? Matching? Short Answer? Mengenali tipe soal mengaktifkan strategi spesifik yang sudah Anda pelajari.</li>
-            
-            <li className="mb-2"><strong>Baca Pertanyaan/Pernyataan/Label SATU PER SATU:</strong>
-              <ul className="list-disc pl-6 mt-2">
+          <ol className="list-decimal pl-6 mb-6">
+            <li><strong>Baca Instruksi UTAMA:</strong> Selalu mulai dari sini! Berapa batas kata/angka? ("NO MORE THAN TWO WORDS AND/OR A NUMBER"). Apa jenis tugasnya secara umum (Choose, Complete, Label?). Lingkari atau garis bawahi instruksi ini. Ini tidak bisa ditawar!</li>
+            <li><strong>Identifikasi Tipe Pertanyaan Spesifik:</strong> Apakah ini Form Completion? Multiple Choice? Map Labelling? Matching? Short Answer? Mengenali tipe soal mengaktifkan strategi spesifik yang sudah Anda pelajari.</li>
+            <li><strong>Baca Pertanyaan/Pernyataan/Label SATU PER SATU:</strong>
+              <ul className="list-disc pl-6 my-2">
                 <li>Untuk Completion Tasks: Baca kata-kata di sekitar setiap gap. Pahami konteks kalimat atau field tersebut.</li>
                 <li>Untuk Multiple Choice: Baca stem (pertanyaan) DAN semua options (A, B, C, ...). Pahami pertanyaan utama dan perbedaan antar opsi.</li>
                 <li>Untuk Map/Plan Labelling: Lihat judul peta, orientasikan diri (pintu masuk, label yang ada), dan baca daftar tempat/area yang perlu diidentifikasi.</li>
@@ -61,23 +53,9 @@ const ListeningBeginnerGuide1_8 = () => {
                 <li>Untuk Short Answer Questions: Baca pertanyaan dengan teliti, identifikasi kata tanya (What, Where, etc.).</li>
               </ul>
             </li>
-            
-            <li className="mb-2"><strong>Garis Bawahi KATA KUNCI (Keywords):</strong> Ini langkah aktif yang krusial! Di setiap pertanyaan/pernyataan/opsi/label, garis bawahi kata-kata yang membawa makna utama:
-              <ul className="list-disc pl-6 mt-2">
-                <li>Kata Benda (Nouns): Terutama yang spesifik.</li>
-                <li>Kata Kerja (Verbs): Terutama yang menunjukkan aksi atau hubungan penting.</li>
-                <li>Kata Sifat (Adjectives) &amp; Keterangan (Adverbs): Yang memberi detail penting atau kualifikasi.</li>
-                <li>Nama Orang, Tempat, Organisasi.</li>
-                <li>Angka, Tanggal, Waktu (jika ada dalam pertanyaan/opsi).</li>
-                <li>Kata Tanya (Who, What, Where, When, Why, How).</li>
-                <li>Kata Negatif atau Pembatas (not, except, only, main, primarily).</li>
-              </ul>
-              <p className="mt-2">Contoh: "What was the <em>main reason</em> for the <em>library closure</em> last <em>Tuesday</em>?" (Keywords digarisbawahi/dicetak miring).</p>
-            </li>
-            
-            <li className="mb-2"><strong>Pahami Konteks Umum (Jika Memungkinkan):</strong> Lihat judul section, judul form/map, atau kalimat pengantar jika ada. Ini memberi gambaran topik.</li>
-            
-            <li><strong>Perhatikan Urutan Pertanyaan:</strong> Sebagian besar tipe soal (Completion, MCQ, SAQ, Map) mengikuti urutan informasi dalam audio. Kecuali untuk beberapa jenis Matching, Anda bisa mengandalkan ini untuk mengikuti alur.</li>
+            <li><strong>Garis Bawahi KATA KUNCI (Keywords):</strong> Ini langkah aktif yang krusial! Di setiap pertanyaan/pernyataan/opsi/label, garis bawahi kata-kata yang membawa makna utama.</li>
+            <li><strong>Pahami Konteks Umum:</strong> Lihat judul section, judul form/map, atau kalimat pengantar jika ada.</li>
+            <li><strong>Perhatikan Urutan Pertanyaan:</strong> Sebagian besar tipe soal mengikuti urutan informasi dalam audio.</li>
           </ol>
 
           <Separator className="my-6" />
@@ -103,7 +81,7 @@ const ListeningBeginnerGuide1_8 = () => {
       </Card>
 
       <Card className="p-6 mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Bagian 2: Memprediksi Kata-kata dan Frasa Kunci Jawaban</h2>
+        <h2 className="text-2xl font-semibold mb-4">2. Memprediksi Kata-kata dan Frasa Kunci Jawaban</h2>
         
         <div className="prose max-w-none">
           <p className="mb-4">
@@ -130,7 +108,7 @@ const ListeningBeginnerGuide1_8 = () => {
           <h4 className="text-lg font-medium mb-2 mt-4">Berdasarkan Konteks Field (Form/Table):</h4>
           <ul className="list-disc pl-6 mb-4">
             <li>Field "Occupation:" → Prediksi: Jenis pekerjaan (Noun, e.g., teacher, engineer, student).</li>
-            <li>Field "Duration of stay:" → Prediksi: Angka + satuan waktu (e.g., 3 nights, 2 weeks, 6 months).</li>
+            <li>Field "Duration of stay:" → Predikik: Angka + satuan waktu (e.g., 3 nights, 2 weeks, 6 months).</li>
             <li>Kolom Tabel "Advantages:" → Prediksi: Frasa benda atau kata sifat positif.</li>
           </ul>
           
@@ -159,7 +137,7 @@ const ListeningBeginnerGuide1_8 = () => {
       </Card>
 
       <Card className="p-6 mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Bagian 3: Mengantisipasi Sinonim dan Parafrase</h2>
+        <h2 className="text-2xl font-semibold mb-4">3. Mengantisipasi Sinonim dan Parafrase</h2>
         
         <div className="prose max-w-none">
           <p className="mb-4">
@@ -227,39 +205,22 @@ const ListeningBeginnerGuide1_8 = () => {
         
         <div className="prose max-w-none">
           <p className="mb-4">
-            Prediksi adalah skill proaktif yang memberdayakan Anda dalam tes IELTS Listening. Dengan secara sistematis:
-          </p>
-          
-          <ul className="list-disc pl-6 mb-4">
-            <li><strong>Menganalisis pertanyaan</strong> selama waktu persiapan (memahami instruksi, tipe soal, kata kunci)</li>
-            <li><strong>Memprediksi jenis dan konten jawaban</strong> yang mungkin (terutama untuk completion tasks)</li>
-            <li><strong>Secara aktif mengantisipasi sinonim dan parafrase</strong> dari kata kunci</li>
-          </ul>
-          
-          <p className="mb-4">
-            Anda secara signifikan meningkatkan peluang untuk fokus pada informasi yang tepat, mengenali jawaban meskipun diungkapkan secara berbeda, dan menjawab dengan lebih akurat dan efisien.
+            Prediksi adalah skill proaktif yang memberdayakan Anda dalam tes IELTS Listening. Dengan secara sistematis menganalisis 
+            pertanyaan selama waktu persiapan (memahami instruksi, tipe soal, kata kunci), memprediksi jenis dan konten jawaban yang 
+            mungkin (terutama untuk completion tasks), dan secara aktif mengantisipasi sinonim dan parafrase dari kata kunci, Anda 
+            secara signifikan meningkatkan peluang untuk fokus pada informasi yang tepat, mengenali jawaban meskipun diungkapkan secara 
+            berbeda, dan menjawab dengan lebih akurat dan efisien.
           </p>
           
           <p className="mb-4">
-            Keterampilan ini tidak datang secara instan; ia membutuhkan latihan yang sadar dan konsisten. Jadikan analisis dan prediksi sebagai bagian integral dari setiap sesi latihan Listening Anda, dan Anda akan melihat dampaknya pada pemahaman dan skor Anda di semua bagian tes.
+            Keterampilan ini tidak datang secara instan; ia membutuhkan latihan yang sadar dan konsisten. Jadikan analisis dan 
+            prediksi sebagai bagian integral dari setiap sesi latihan Listening Anda, dan Anda akan melihat dampaknya pada 
+            pemahaman dan skor Anda di semua bagian tes.
           </p>
         </div>
       </Card>
 
-      <div className="flex justify-between mt-8">
-        <Button variant="outline" asChild>
-          <Link to="/listening-beginner-guide-1-7">
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Previous: Strategi Jitu Section 2
-          </Link>
-        </Button>
-        <Button variant="outline" asChild>
-          <Link to="/curriculum">
-            <ChevronRight className="ml-2 h-4 w-4" />
-            Back to Curriculum
-          </Link>
-        </Button>
-      </div>
+      <LearningNavigationButtons dayNumber={3} materialIndex={3} />
     </div>
   );
 };
