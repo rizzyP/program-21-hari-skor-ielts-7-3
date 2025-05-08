@@ -16,11 +16,21 @@ export const LearningNavigationButtons = ({
 }: LearningNavigationButtonsProps) => {
   const { markAsCompleted } = useCurriculum();
   
+  const handleMarkAsCompleted = () => {
+    // Ensure these are valid numbers
+    if (typeof dayNumber !== 'number' || typeof materialIndex !== 'number') {
+      console.error('Invalid dayNumber or materialIndex', { dayNumber, materialIndex });
+      return;
+    }
+    
+    markAsCompleted(dayNumber, materialIndex);
+  };
+  
   return (
     <div className="flex justify-between mt-8">
       <Button 
         variant="default" 
-        onClick={() => markAsCompleted(dayNumber, materialIndex)}
+        onClick={handleMarkAsCompleted}
       >
         <Check className="mr-2 h-4 w-4" />
         Mark as Completed
