@@ -18,7 +18,9 @@ export const LearningNavigationButtons = ({
   
   const handleMarkAsCompleted = () => {
     // Ensure these are valid numbers
-    if (typeof dayNumber !== 'number' || typeof materialIndex !== 'number') {
+    if (typeof dayNumber !== 'number' || typeof materialIndex !== 'number' || 
+        isNaN(dayNumber) || isNaN(materialIndex) || 
+        dayNumber < 1 || materialIndex < 0) {
       console.error('Invalid dayNumber or materialIndex', { dayNumber, materialIndex });
       return;
     }

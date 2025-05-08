@@ -9,9 +9,16 @@ export function useCurriculum() {
 
   // Function to mark a material as completed
   const markAsCompleted = (dayNumber: number, materialIndex: number) => {
+    if (!days || !Array.isArray(days)) {
+      console.error('Days data is not available or not in the correct format');
+      return;
+    }
+
     setDays(currentDays => {
       // Validate day number and material index to prevent errors
       if (
+        !currentDays ||
+        !Array.isArray(currentDays) ||
         dayNumber < 1 || 
         dayNumber > currentDays.length || 
         materialIndex < 0 || 
@@ -19,7 +26,7 @@ export function useCurriculum() {
         materialIndex >= currentDays[dayNumber - 1].materials.length
       ) {
         console.error(`Invalid day number (${dayNumber}) or material index (${materialIndex})`);
-        return currentDays; // Return unchanged days if invalid
+        return currentDays || []; // Return unchanged days if invalid or empty array if currentDays is falsy
       }
 
       const newDays = [...currentDays];
@@ -32,12 +39,15 @@ export function useCurriculum() {
 
   // Function to check if a day is accessible
   const isAccessible = (dayNumber: number) => {
+    if (!days || !Array.isArray(days)) return dayNumber === 1; // Always allow day 1
+    
     // Day 1 is always accessible
     if (dayNumber === 1) return true;
     
     // For other days, check if all materials in all previous days are completed
     for (let i = 0; i < dayNumber - 1; i++) {
-      const allCompleted = days[i]?.materials?.every(material => material.completed) ?? false;
+      if (!days[i] || !days[i].materials) return false;
+      const allCompleted = days[i].materials.every(material => material.completed);
       if (!allCompleted) return false;
     }
     
@@ -46,6 +56,11 @@ export function useCurriculum() {
 
   // Function to navigate to a specific path if provided
   const navigateToMaterial = (dayNumber: number, materialIndex: number) => {
+    if (!days || !Array.isArray(days)) {
+      console.error('Days data is not available or not in the correct format');
+      return;
+    }
+    
     // Validate day number and material index
     if (
       dayNumber < 1 || 
