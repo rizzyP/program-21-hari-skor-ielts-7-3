@@ -16,6 +16,7 @@ import SpeakingTest from "./pages/SpeakingTest";
 import Results from "./pages/Results";
 import Curriculum from "./pages/Curriculum";
 import ListeningBeginnerGuide from "./pages/ListeningBeginnerGuide";
+import ListeningBeginnerGuide1_2 from "./pages/ListeningBeginnerGuide1_2";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/results" element={<Results />} />
             <Route path="/curriculum" element={<Curriculum />} />
             <Route path="/listening-beginner-guide" element={<ListeningBeginnerGuide />} />
+            <Route path="/listening-beginner-guide-1-2" element={<ListeningBeginnerGuide1_2 />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

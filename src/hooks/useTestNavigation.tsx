@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { useTest } from '@/context/TestContext';
 import { toast } from 'sonner';
@@ -10,7 +11,7 @@ export const useTestNavigation = (
   setCurrentQuestion: (value: number) => void,
   setPartCompleted: (value: React.SetStateAction<Record<string, boolean>>) => void,
   setQuestionNumber: (value: React.SetStateAction<number>) => void,
-  simulateExaminerSpeaking: (message: string, audioFile: string | null, duration: number, currentPhase: Phase) => void,
+  simulateExaminerSpeaking: (message: string, audioFile: string | null, duration: number, currentPhase: Phase) => Promise<void> | void,
   playExaminerAudioSequence: (audioSequence: {src: string, message: string, delayAfter?: number, onEnd?: () => void}[]) => Promise<void>,
   getCurrentPartQuestions: () => string[],
   currentPart: number,
@@ -158,24 +159,25 @@ export const useTestNavigation = (
       setTimeout(() => {
         setCurrentPhase(Phase.SPEAKING_PART2_ANSWER);
         
-        // Call the function and then handle any potential promise returned
-        const speakingResult = simulateExaminerSpeaking(
-          cueCardTopic, 
-          AUDIO_FILES.part2[1], 
-          3000,
-          Phase.SPEAKING_PART2_ANSWER
-        );
-        
-        // Check if result is a Promise by checking for .then method existence
-        if (speakingResult && typeof speakingResult.then === 'function') {
-          speakingResult.then(() => {
+        // Call simulateExaminerSpeaking as async function
+        const performSpeaking = async () => {
+          try {
+            await simulateExaminerSpeaking(
+              cueCardTopic, 
+              AUDIO_FILES.part2[1], 
+              3000,
+              Phase.SPEAKING_PART2_ANSWER
+            );
             // Start recording after audio finishes
             setWaitingForRecording(true);
-          });
-        } else {
-          // If it's not a promise, just set waiting for recording directly
-          setWaitingForRecording(true);
-        }
+          } catch (error) {
+            console.error("Error in examiner speaking:", error);
+            setWaitingForRecording(true);
+          }
+        };
+        
+        // Execute the async function
+        performSpeaking();
         
         toast.info('Preparation time is over', {
           description: 'Start speaking when the examiner finishes.'

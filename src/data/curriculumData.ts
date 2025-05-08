@@ -1,3 +1,4 @@
+
 import { Day } from '../types/curriculum';
 
 export const getDefaultCurriculum = (): Day[] => [
@@ -16,8 +17,8 @@ export const getDefaultCurriculum = (): Day[] => [
   {
     title: "Listening Fundamentals",
     materials: [
-      { title: "Listening Strategies", type: "video", durationMinutes: 22, completed: false },
-      { title: "Note-Taking Techniques", type: "video", durationMinutes: 18, completed: false },
+      { title: "Format Dasar IELTS Listening", type: "reading", durationMinutes: 22, completed: false, path: "/listening-beginner-guide" },
+      { title: "Mendengarkan Detail Faktual", type: "reading", durationMinutes: 18, completed: false, path: "/listening-beginner-guide-1-2" },
       { title: "Listening Practice - Basic", type: "exercise", durationMinutes: 25, completed: false }
     ]
   },
