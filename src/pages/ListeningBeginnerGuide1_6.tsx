@@ -52,7 +52,7 @@ const ListeningBeginnerGuide1_6 = () => {
             <li><strong>PREDIKSI Jenis Jawaban:</strong> Ini langkah paling penting! Untuk setiap gap, prediksi:
               <ul className="list-disc pl-6 mt-2">
                 <li>Apakah butuh Angka? (e.g., setelah "Phone:", "Postcode:", "Age:", "Price: $", "Number of nights:")</li>
-                <li>Apakah butuh Nama/Tempat? (e.g., setelah "Name:", "Street:", "Town/City:", "Contact Person:") -> Kemungkinan dieja!</li>
+                <li>Apakah butuh Nama/Tempat? (e.g., setelah "Name:", "Street:", "Town/City:", "Contact Person:") {'->'} Kemungkinan dieja!</li>
                 <li>Apakah butuh Tanggal/Waktu? (e.g., setelah "Date of Birth:", "Arrival Date:", "Time:")</li>
                 <li>Apakah butuh Kata Benda (Noun)? (e.g., setelah "Type of Room:", "Subject:", "Reason for calling:")</li>
                 <li>Apakah butuh Kata Sifat (Adjective)? (e.g., sebelum noun: "... insurance type", "Level of difficulty: ...")</li>
