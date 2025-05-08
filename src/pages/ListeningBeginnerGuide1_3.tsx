@@ -90,19 +90,19 @@ const ListeningBeginnerGuide1_3 = () => {
           
           <h4 className="text-lg font-medium mb-2 mt-4">American English:</h4>
           <ul className="list-disc pl-6 mb-4">
-            <li><strong>Flap T/Tapped T:</strong> Ketika 't' (atau 'tt') berada di antara dua bunyi vokal (atau setelah 'r' dan sebelum vokal), seringkali diucapkan seperti bunyi /d/ yang sangat cepat. Contoh: water terdengar seperti "wadder", city -{">"} "ciddy", better -{">"} "bedder", party -{">"} "pardy".</li>
-            <li><strong>Glottal Stop:</strong> Kadang 't' sebelum bunyi 'n' di akhir kata atau suku kata tidak tertekan menjadi glottal stop (udara berhenti di tenggorokan). Contoh: button terdengar seperti "buh-uhn", mountain -{">"} "moun-uhn", important -{">"} "impor-unt".</li>
+            <li><strong>Flap T/Tapped T:</strong> Ketika 't' (atau 'tt') berada di antara dua bunyi vokal (atau setelah 'r' dan sebelum vokal), seringkali diucapkan seperti bunyi /d/ yang sangat cepat. Contoh: water terdengar seperti "wadder", city {'>'} "ciddy", better {'>'} "bedder", party {'>'} "pardy".</li>
+            <li><strong>Glottal Stop:</strong> Kadang 't' sebelum bunyi 'n' di akhir kata atau suku kata tidak tertekan menjadi glottal stop (udara berhenti di tenggorokan). Contoh: button terdengar seperti "buh-uhn", mountain {'>'} "moun-uhn", important {'>'} "impor-unt".</li>
           </ul>
 
           <h4 className="text-lg font-medium mb-2 mt-4">British English (RP/Standard):</h4>
           <ul className="list-disc pl-6 mb-4">
             <li>Cenderung mengucapkan 't' dengan jelas /t/ di sebagian besar posisi.</li>
-            <li><strong>Glottal Stop:</strong> Bisa muncul di akhir kata (e.g., what? -{">"} /wɒʔ/) atau kadang di tengah kata dalam beberapa aksen regional (misal Cockney: butter -{">"} "buh-uh"). Dalam IELTS, Anda lebih mungkin mendengar RP atau aksen regional yang lebih 'standar' di mana 't' lebih jelas.</li>
+            <li><strong>Glottal Stop:</strong> Bisa muncul di akhir kata (e.g., what? {'>'} /wɒʔ/) atau kadang di tengah kata dalam beberapa aksen regional (misal Cockney: butter {'>'} "buh-uh"). Dalam IELTS, Anda lebih mungkin mendengar RP atau aksen regional yang lebih 'standar' di mana 't' lebih jelas.</li>
           </ul>
 
           <h4 className="text-lg font-medium mb-2 mt-4">Australian English:</h4>
           <ul className="list-disc pl-6 mb-4">
-            <li>Sering menggunakan Flap T mirip American English (e.g., water -{">"} "wadder", better -{">"} "bedder").</li>
+            <li>Sering menggunakan Flap T mirip American English (e.g., water {'>'} "wadder", better {'>'} "bedder").</li>
             <li>Glottal stop juga bisa muncul, terutama di akhir kata.</li>
           </ul>
           <p className="mb-4"><strong>Implikasi:</strong> Kata seperti later bisa terdengar "lay-ter" (BrE) atau "lay-der" (AmE/AusE). Biasakan telinga Anda dengan variasi ini.</p>
@@ -188,10 +188,10 @@ const ListeningBeginnerGuide1_3 = () => {
           <h3 className="text-xl font-medium mb-2 mt-6">E. Fenomena Ujaran Bersambung (Connected Speech)</h3>
           <p className="mb-2">Dalam percakapan alami, kata-kata tidak diucapkan satu per satu dengan jeda. Mereka mengalir bersama, dan bunyinya sering berubah:</p>
           <ul className="list-disc pl-6 mb-4">
-            <li><strong>Linking:</strong> Bunyi konsonan di akhir kata sering terhubung dengan bunyi vokal di awal kata berikutnya. Contoh: an apple -{">"} /ən_ˈæpəl/ (n terhubung ke a), look out -{">"} /lʊk_aʊt/.</li>
-            <li><strong>Assimilation:</strong> Bunyi konsonan berubah karena pengaruh bunyi di sebelahnya. Contoh: handbag sering terdengar seperti "hambag" (/n/ menjadi /m/ sebelum /b/), good boy -{">"} "goob boy" (/d/ menjadi /b/ sebelum /b/).</li>
-            <li><strong>Elision:</strong> Penghilangan bunyi (seringkali konsonan /t/ atau /d/) di antara konsonan lain atau dalam suku kata tak bertekanan. Contoh: next door -{">"} "neks door" (/t/ hilang), mostly -{">"} "mosly" (/t/ hilang), camera -{">"} "camra" (/ə/ hilang).</li>
-            <li><strong>Intrusion:</strong> Munculnya bunyi ekstra (/r/, /w/, /j/) untuk memperlancar transisi antar vokal. Contoh: law and order -{">"} "law-r-and order", go away -{">"} "go-w-away", I agree -{">"} "I-y-agree".</li>
+            <li><strong>Linking:</strong> Bunyi konsonan di akhir kata sering terhubung dengan bunyi vokal di awal kata berikutnya. Contoh: an apple {'>'} /ən_ˈæpəl/ (n terhubung ke a), look out {'>'} /lʊk_aʊt/.</li>
+            <li><strong>Assimilation:</strong> Bunyi konsonan berubah karena pengaruh bunyi di sebelahnya. Contoh: handbag sering terdengar seperti "hambag" (/n/ menjadi /m/ sebelum /b/), good boy {'>'} "goob boy" (/d/ menjadi /b/ sebelum /b/).</li>
+            <li><strong>Elision:</strong> Penghilangan bunyi (seringkali konsonan /t/ atau /d/) di antara konsonan lain atau dalam suku kata tak bertekanan. Contoh: next door {'>'} "neks door" (/t/ hilang), mostly {'>'} "mosly" (/t/ hilang), camera {'>'} "camra" (/ə/ hilang).</li>
+            <li><strong>Intrusion:</strong> Munculnya bunyi ekstra (/r/, /w/, /j/) untuk memperlancar transisi antar vokal. Contoh: law and order {'>'} "law-r-and order", go away {'>'} "go-w-away", I agree {'>'} "I-y-agree".</li>
             <li><strong>Bentuk Lemah (Weak Forms):</strong> Kata-kata fungsional (preposisi, artikel, konjungsi, kata kerja bantu) sering diucapkan dengan sangat cepat dan vokalnya menjadi schwa /ə/. Contoh: 'for' bisa /fɔːr/ (kuat) atau /fər/ (lemah), 'can' bisa /kæn/ (kuat) atau /kən/ (lemah), 'a' hampir selalu /ə/, 'the' bisa /ðə/ atau /ðiː/.</li>
           </ul>
           <p className="mb-4"><strong>Implikasi:</strong> Ini membuat bahasa Inggris lisan terdengar sangat berbeda dari tulisan. Anda harus terbiasa dengan connected speech untuk memahami kecepatan alami. Jangan berharap mendengar setiap kata diucapkan dengan sempurna dan terpisah.</p>
