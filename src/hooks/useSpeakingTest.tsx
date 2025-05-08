@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useTest } from '@/context/TestContext';
 import { useSpeakingTestState } from './useSpeakingTestState';
@@ -120,6 +119,7 @@ export const useSpeakingTest = () => {
         !isRecording) {
       
       console.log("Audio finished, starting recording now...");
+      console.log("Current part:", currentPart, "Current question:", currentQuestion);
       
       // Start recording after a small delay for natural feel
       const timer = setTimeout(() => {
@@ -129,7 +129,7 @@ export const useSpeakingTest = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [examinerSpeaking, waitingForRecording, currentPhase, isRecording, handleStartRecording, setWaitingForRecording]);
+  }, [examinerSpeaking, waitingForRecording, currentPhase, isRecording, handleStartRecording, setWaitingForRecording, currentPart, currentQuestion]);
 
   // Clean up timeouts when component unmounts
   useEffect(() => {
