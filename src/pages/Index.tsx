@@ -14,50 +14,50 @@ const Index = () => {
             <span className="text-ielts-blue">Program 21 Hari</span> Skor IELTS 7.0
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Complete IELTS assessment with AI-powered feedback and analysis to help you achieve your target band score.
+            Asesmen IELTS lengkap dengan umpan balik berbasis AI dan analisis untuk membantu Anda mencapai skor band target.
           </p>
           <div className="flex justify-center gap-4">
             <Link to="/test">
-              <Button size="lg" className="bg-ielts-blue hover:bg-ielts-lightblue">Start Assessment Test</Button>
+              <Button size="lg" className="bg-ielts-blue hover:bg-ielts-lightblue">Mulai Tes Asesmen</Button>
             </Link>
             <Link to="/curriculum">
-              <Button variant="outline" size="lg">Start Program</Button>
+              <Button variant="outline" size="lg">Mulai Program</Button>
             </Link>
           </div>
         </section>
 
         {/* Test modules section */}
         <section className="space-y-6">
-          <h2 className="text-2xl font-semibold text-center">IELTS Test Components</h2>
+          <h2 className="text-2xl font-semibold text-center">Komponen Tes IELTS</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[{
             title: "Listening",
-            description: "Audio-based test with various question types",
+            description: "Tes berbasis audio dengan berbagai jenis pertanyaan",
             icon: <Headphones className="h-8 w-8 text-ielts-blue" />,
             color: "bg-blue-50",
-            time: "15 minutes",
-            questions: "2 sections"
+            time: "15 menit",
+            questions: "2 bagian"
           }, {
             title: "Reading",
-            description: "Comprehension test with academic passages",
+            description: "Tes pemahaman dengan teks akademis",
             icon: <BookOpen className="h-8 w-8 text-ielts-green" />,
             color: "bg-green-50",
-            time: "15 minutes",
-            questions: "10 questions"
+            time: "15 menit",
+            questions: "10 pertanyaan"
           }, {
             title: "Writing",
-            description: "Essay writing and data interpretation",
+            description: "Penulisan esai dan interpretasi data",
             icon: <FileText className="h-8 w-8 text-ielts-lightblue" />,
             color: "bg-cyan-50",
-            time: "20 minutes",
-            questions: "1 task"
+            time: "20 menit",
+            questions: "1 tugas"
           }, {
             title: "Speaking",
-            description: "Recorded responses to interview questions",
+            description: "Respons terekam untuk pertanyaan wawancara",
             icon: <Mic className="h-8 w-8 text-ielts-red" />,
             color: "bg-red-50",
-            time: "11-14 minutes",
-            questions: "3 parts"
+            time: "11-14 menit",
+            questions: "3 bagian"
           }].map((module, idx) => <Card key={idx} className={`${module.color} border-none shadow-sm hover:shadow transition-shadow`}>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg font-semibold">{module.title}</CardTitle>
@@ -73,7 +73,7 @@ const Index = () => {
                 <CardFooter>
                   <Link to={`/test/${module.title.toLowerCase()}`} className="w-full">
                     <Button variant="outline" className="w-full">
-                      Practice {module.title}
+                      Latihan {module.title}
                     </Button>
                   </Link>
                 </CardFooter>
@@ -83,19 +83,19 @@ const Index = () => {
 
         {/* Features section */}
         <section className="space-y-6">
-          <h2 className="text-2xl font-semibold text-center">Key Features</h2>
+          <h2 className="text-2xl font-semibold text-center">Fitur Utama</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[{
-            title: "AI Assessment",
-            description: "Get detailed feedback and scores analyzed by AI based on official IELTS criteria",
+            title: "Penilaian AI",
+            description: "Dapatkan umpan balik dan skor terperinci yang dianalisis oleh AI berdasarkan kriteria resmi IELTS",
             icon: <BarChart className="h-6 w-6 text-ielts-blue" />
           }, {
-            title: "Complete Test Simulation",
-            description: "Experience all four IELTS test components with authentic questions and timing",
+            title: "Simulasi Tes Lengkap",
+            description: "Rasakan semua empat komponen tes IELTS dengan pertanyaan dan waktu autentik",
             icon: <BookOpen className="h-6 w-6 text-ielts-blue" />
           }, {
-            title: "Detailed Analytics",
-            description: "Review strengths, weaknesses, and get personalized recommendations for improvement",
+            title: "Analisis Terperinci",
+            description: "Tinjau kekuatan, kelemahan, dan dapatkan rekomendasi personal untuk peningkatan",
             icon: <BarChart className="h-6 w-6 text-ielts-blue" />
           }].map((feature, idx) => <div key={idx} className="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
                 <div className="bg-blue-100 p-3 rounded-full w-fit mb-4">
@@ -109,11 +109,11 @@ const Index = () => {
 
         {/* CTA section */}
         <section className="bg-gradient-to-r from-ielts-blue to-ielts-lightblue text-white rounded-xl p-8 text-center shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">Ready to assess your IELTS skills?</h2>
-          <p className="mb-6">Take a complete IELTS test and get detailed AI feedback to improve your band score.</p>
+          <h2 className="text-2xl font-bold mb-4">Siap untuk menilai kemampuan IELTS Anda?</h2>
+          <p className="mb-6">Ikuti tes IELTS lengkap dan dapatkan umpan balik AI terperinci untuk meningkatkan skor band Anda.</p>
           <Link to="/test">
             <Button size="lg" variant="secondary">
-              Start Full Test Now
+              Mulai Tes Lengkap Sekarang
             </Button>
           </Link>
         </section>

@@ -23,16 +23,16 @@ const Layout: React.FC<LayoutProps> = ({
           </Link>
           <nav className="flex gap-2">
             <Link to="/">
-              <Button variant="ghost" size="sm">Home</Button>
+              <Button variant="ghost" size="sm">Beranda</Button>
             </Link>
             <Link to="/curriculum">
-              <Button variant="ghost" size="sm">Curriculum</Button>
+              <Button variant="ghost" size="sm">Kurikulum</Button>
             </Link>
             <Link to="/test">
-              <Button variant="ghost" size="sm">Take Test</Button>
+              <Button variant="ghost" size="sm">Tes</Button>
             </Link>
             <Link to="/results">
-              <Button variant="ghost" size="sm">Results</Button>
+              <Button variant="ghost" size="sm">Hasil</Button>
             </Link>
           </nav>
         </div>
@@ -46,7 +46,7 @@ const Layout: React.FC<LayoutProps> = ({
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-4 mt-auto">
         <div className="container mx-auto px-4 text-center text-sm text-slate-500">
-          Program 21 Hari Skor IELTS 7.0 © {new Date().getFullYear()} - Powered by AI
+          Program 21 Hari Skor IELTS 7.0 © {new Date().getFullYear()} - Didukung oleh Kecerdasan Buatan
         </div>
       </footer>
     </div>;

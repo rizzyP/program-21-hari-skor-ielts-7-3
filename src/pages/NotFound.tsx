@@ -21,19 +21,19 @@ const NotFound = () => {
         <div className="space-y-8">
           <div className="space-y-4">
             <h1 className="text-6xl font-bold text-ielts-blue">404</h1>
-            <h2 className="text-3xl font-semibold text-gray-800">Page Not Found</h2>
+            <h2 className="text-3xl font-semibold text-gray-800">Halaman Tidak Ditemukan</h2>
             <p className="text-gray-600 max-w-md mx-auto">
-              The page you are looking for might have been removed, had its name changed, 
-              or is temporarily unavailable.
+              Halaman yang Anda cari mungkin telah dihapus, namanya berubah, 
+              atau untuk sementara tidak tersedia.
             </p>
           </div>
           <div className="space-y-3">
             <Button asChild className="bg-ielts-blue hover:bg-ielts-lightblue">
-              <Link to="/">Return to Home</Link>
+              <Link to="/">Kembali ke Beranda</Link>
             </Button>
             <div className="pt-2">
               <Link to="/test" className="text-ielts-blue hover:underline">
-                Go to Test Selection
+                Pergi ke Pemilihan Tes
               </Link>
             </div>
           </div>

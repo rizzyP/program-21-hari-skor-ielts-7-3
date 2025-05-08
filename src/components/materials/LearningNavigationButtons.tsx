@@ -35,12 +35,12 @@ export const LearningNavigationButtons = ({
         onClick={handleMarkAsCompleted}
       >
         <Check className="mr-2 h-4 w-4" />
-        Mark as Completed
+        Tandai Selesai
       </Button>
       <Button variant="outline" asChild>
         <Link to="/curriculum">
           <ChevronRight className="ml-2 h-4 w-4" />
-          Back to Curriculum
+          Kembali ke Kurikulum
         </Link>
       </Button>
     </div>
