@@ -1,5 +1,7 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { LearningNavigationButtons } from '@/components/materials/LearningNavigationButtons';
 
 const ListeningBeginnerGuide1_8 = () => {
