@@ -158,15 +158,23 @@ export const useTestNavigation = (
       setTimeout(() => {
         setCurrentPhase(Phase.SPEAKING_PART2_ANSWER);
         
-        simulateExaminerSpeaking(
+        // Fixed: Store the promise in a variable and then call .then() on it
+        const speakingPromise = simulateExaminerSpeaking(
           cueCardTopic, 
           AUDIO_FILES.part2[1], 
           3000,
           Phase.SPEAKING_PART2_ANSWER
-        ).then(() => {
-          // Start recording after audio finishes
+        );
+        
+        if (speakingPromise instanceof Promise) {
+          speakingPromise.then(() => {
+            // Start recording after audio finishes
+            setWaitingForRecording(true);
+          });
+        } else {
+          // If it's not a promise, just set waiting for recording directly
           setWaitingForRecording(true);
-        });
+        }
         
         toast.info('Preparation time is over', {
           description: 'Start speaking when the examiner finishes.'
