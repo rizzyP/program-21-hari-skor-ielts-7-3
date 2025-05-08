@@ -19,7 +19,8 @@ export const getDefaultCurriculum = (): Day[] => [
       { title: "Format Dasar IELTS Listening", type: "reading", durationMinutes: 22, completed: false, path: "/listening-beginner-guide" },
       { title: "Mendengarkan Detail Faktual", type: "reading", durationMinutes: 18, completed: false, path: "/listening-beginner-guide-1-2" },
       { title: "Aksen dan Pengucapan", type: "reading", durationMinutes: 20, completed: false, path: "/listening-beginner-guide-1-3" },
-      { title: "Listening Practice - Basic", type: "exercise", durationMinutes: 25, completed: false }
+      { title: "Note-taking Dasar", type: "reading", durationMinutes: 25, completed: false, path: "/listening-beginner-guide-1-4" },
+      { title: "Mendalami Percakapan Sehari-hari", type: "reading", durationMinutes: 30, completed: false, path: "/listening-beginner-guide-1-5" }
     ]
   },
   {
