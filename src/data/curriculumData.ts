@@ -20,7 +20,8 @@ export const getDefaultCurriculum = (): Day[] => [
       { title: "Mendengarkan Detail Faktual", type: "reading", durationMinutes: 18, completed: false, path: "/listening-beginner-guide-1-2" },
       { title: "Aksen dan Pengucapan", type: "reading", durationMinutes: 20, completed: false, path: "/listening-beginner-guide-1-3" },
       { title: "Note-taking Dasar", type: "reading", durationMinutes: 25, completed: false, path: "/listening-beginner-guide-1-4" },
-      { title: "Mendalami Percakapan Sehari-hari", type: "reading", durationMinutes: 30, completed: false, path: "/listening-beginner-guide-1-5" }
+      { title: "Mendalami Percakapan Sehari-hari", type: "reading", durationMinutes: 30, completed: false, path: "/listening-beginner-guide-1-5" },
+      { title: "Strategi Jitu Section 1", type: "reading", durationMinutes: 28, completed: false, path: "/listening-beginner-guide-1-6" }
     ]
   },
   {
