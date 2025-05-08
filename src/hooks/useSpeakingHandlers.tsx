@@ -35,12 +35,12 @@ export const useSpeakingHandlers = (
       { 
         src: AUDIO_FILES.opening[1], 
         message: "Could you tell me your name, please?",
-        delayAfter: 3000 // 3 seconds delay  
+        delayAfter: 2500 // 2.5 seconds delay  
       },
       { 
         src: AUDIO_FILES.opening[2], 
         message: "Can I see your identification, please?",
-        delayAfter: 4000 // 4 seconds delay
+        delayAfter: 3000 // 3 seconds delay
       },
       { 
         src: AUDIO_FILES.opening[3], 
