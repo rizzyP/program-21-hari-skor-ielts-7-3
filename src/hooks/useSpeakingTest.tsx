@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useTest } from '@/context/TestContext';
 import { useSpeakingTestState } from './useSpeakingTestState';
@@ -6,7 +7,6 @@ import { useRecordingControls } from './useRecordingControls';
 import { useTestContent } from './useTestContent';
 import { useTestNavigation } from './useTestNavigation';
 import { SpeakingContent } from '@/types/test';
-import { Phase } from '@/components/test/TestPhases';
 
 export const useSpeakingTest = () => {
   const { 
@@ -34,9 +34,7 @@ export const useSpeakingTest = () => {
     questionNumber,
     setQuestionNumber,
     totalQuestions,
-    setTotalQuestions,
-    waitingForRecording,
-    setWaitingForRecording
+    setTotalQuestions
   } = useSpeakingTestState();
 
   const {
@@ -55,6 +53,7 @@ export const useSpeakingTest = () => {
   } = useTestContent(currentPart, currentQuestion);
 
   // Create a navigation hook that gets the live state
+  // We need to declare this after test content hook to have access to getCurrentPartQuestions
   const {
     handleStart,
     handlePrepare,
@@ -73,11 +72,11 @@ export const useSpeakingTest = () => {
     getCurrentPartQuestions,
     currentPart,
     currentQuestion,
-    currentPhase,
-    setWaitingForRecording
+    currentPhase
   );
 
   // Set up recording controls after navigation is set up
+  // because it depends on handleNextQuestion
   const {
     handleStartRecording,
     handleStopRecording,
@@ -109,35 +108,13 @@ export const useSpeakingTest = () => {
     }
   }, [currentTest, startSection, setTotalQuestions]);
 
-  // Start recording only when examiner is done speaking AND we're waiting for recording
-  useEffect(() => {
-    if (!examinerSpeaking && 
-        waitingForRecording &&
-        (currentPhase === Phase.SPEAKING_PART1 || 
-         currentPhase === Phase.SPEAKING_PART2_ANSWER || 
-         currentPhase === Phase.SPEAKING_PART3) && 
-        !isRecording) {
-      
-      console.log("Audio finished, starting recording now...");
-      console.log("Current part:", currentPart, "Current question:", currentQuestion);
-      
-      // Start recording after a small delay for natural feel
-      const timer = setTimeout(() => {
-        handleStartRecording();
-        setWaitingForRecording(false); // Reset the waiting flag
-      }, 500);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [examinerSpeaking, waitingForRecording, currentPhase, isRecording, handleStartRecording, setWaitingForRecording, currentPart, currentQuestion]);
-
   // Clean up timeouts when component unmounts
   useEffect(() => {
     return () => {
       cleanupExaminerTimeout();
       cleanupRecordingTimeout();
     };
-  }, [cleanupExaminerTimeout, cleanupRecordingTimeout]);
+  }, []);
 
   return {
     currentPhase,

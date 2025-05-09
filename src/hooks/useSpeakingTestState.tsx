@@ -18,9 +18,6 @@ export const useSpeakingTestState = () => {
     part3: false
   });
   
-  // New state to track when we should begin recording after audio finishes
-  const [waitingForRecording, setWaitingForRecording] = useState(false);
-  
   // Animation states
   const [fadeIn, setFadeIn] = useState(false);
 
@@ -53,8 +50,6 @@ export const useSpeakingTestState = () => {
     questionNumber,
     setQuestionNumber,
     totalQuestions,
-    setTotalQuestions,
-    waitingForRecording,
-    setWaitingForRecording
+    setTotalQuestions
   };
 };

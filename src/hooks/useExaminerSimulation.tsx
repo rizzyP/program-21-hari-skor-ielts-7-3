@@ -28,9 +28,6 @@ export const useExaminerSimulation = (setIsRecording: (value: boolean) => void) 
     if (audioFile) {
       try {
         await playAudio(audioFile);
-        
-        // Add a small delay after audio finishes to make the transition smooth
-        await new Promise(resolve => setTimeout(resolve, 500));
       } catch (error) {
         console.error('Error playing audio file:', error);
       }
@@ -39,22 +36,30 @@ export const useExaminerSimulation = (setIsRecording: (value: boolean) => void) 
     // Set timeout for when examiner finishes speaking
     examinerAudioTimeout.current = setTimeout(() => {
       setExaminerSpeaking(false);
+      
+      // Auto-start recording when examiner finishes speaking
+      // But don't start recording during preparation time or intro/completed phases
+      if (currentPhase === Phase.SPEAKING_PART1 || 
+          currentPhase === Phase.SPEAKING_PART2_ANSWER ||
+          currentPhase === Phase.SPEAKING_PART3) {
+        setIsRecording(true);
+      }
     }, duration);
   };
 
   // Play a sequence of audio files with delays
-  const playExaminerAudioSequence = async (
+  const playExaminerAudioSequence = (
     audioSequence: {
       src: string, 
       message: string,
       delayAfter?: number,
       onEnd?: () => void
     }[]
-  ): Promise<void> => {
+  ) => {
     // Format the sequence for the audio player
     const formattedSequence = audioSequence.map(item => ({
       src: item.src,
-      delayAfter: item.delayAfter || 0,
+      delayAfter: item.delayAfter,
       onEnd: () => {
         setExaminerMessage(item.message);
         if (item.onEnd) item.onEnd();
@@ -68,11 +73,10 @@ export const useExaminerSimulation = (setIsRecording: (value: boolean) => void) 
       setExaminerMessage(audioSequence[0].message);
     }
     
-    try {
-      await queueAudioWithDelays(formattedSequence);
-    } finally {
-      setExaminerSpeaking(false);
-    }
+    return queueAudioWithDelays(formattedSequence)
+      .finally(() => {
+        setExaminerSpeaking(false);
+      });
   };
 
   // Clean up timeout when component unmounts
