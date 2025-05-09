@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -12,9 +13,6 @@ export enum Phase {
   // Speaking test specific phases
   SPEAKING_INTRO,
   SPEAKING_PART1,
-  SPEAKING_PART2_PREP,
-  SPEAKING_PART2_ANSWER,
-  SPEAKING_PART3,
 }
 
 interface TestPhasesProps {
@@ -39,9 +37,6 @@ const TestPhases: React.FC<TestPhasesProps> = ({
       // Speaking test specific phases
       case Phase.SPEAKING_INTRO: return 'Meeting Your Examiner';
       case Phase.SPEAKING_PART1: return 'Speaking Part 1';
-      case Phase.SPEAKING_PART2_PREP: return 'Speaking Part 2 - Preparation';
-      case Phase.SPEAKING_PART2_ANSWER: return 'Speaking Part 2 - Response';
-      case Phase.SPEAKING_PART3: return 'Speaking Part 3';
       default: return 'Unknown Phase';
     }
   };
@@ -56,9 +51,6 @@ const TestPhases: React.FC<TestPhasesProps> = ({
       // Speaking test specific phases
       case Phase.SPEAKING_INTRO: return 'bg-blue-400';
       case Phase.SPEAKING_PART1: return 'bg-green-400';
-      case Phase.SPEAKING_PART2_PREP: return 'bg-yellow-400';
-      case Phase.SPEAKING_PART2_ANSWER: return 'bg-orange-400';
-      case Phase.SPEAKING_PART3: return 'bg-red-400';
       default: return 'bg-slate-500';
     }
   };
@@ -73,10 +65,7 @@ const TestPhases: React.FC<TestPhasesProps> = ({
       {currentPhase !== Phase.INSTRUCTIONS && 
        currentPhase !== Phase.COMPLETED && 
        currentPhase !== Phase.SPEAKING_INTRO && 
-       currentPhase !== Phase.SPEAKING_PART1 &&
-       currentPhase !== Phase.SPEAKING_PART2_PREP &&
-       currentPhase !== Phase.SPEAKING_PART2_ANSWER &&
-       currentPhase !== Phase.SPEAKING_PART3 && (
+       currentPhase !== Phase.SPEAKING_PART1 && (
         <span className="text-xs text-slate-500">
           ({currentPhase === Phase.FINAL_REVIEW ? 'All Sections' : `${currentSection}/${totalSections}`})
         </span>

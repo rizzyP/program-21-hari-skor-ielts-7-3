@@ -18,19 +18,7 @@ export const useAudioPlayer = () => {
   const ensureAudioElement = useCallback(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
-      
-      audioRef.current.addEventListener('canplaythrough', () => setIsReady(true));
-      audioRef.current.addEventListener('play', () => setIsPlaying(true));
-      audioRef.current.addEventListener('pause', () => setIsPlaying(false));
-      audioRef.current.addEventListener('ended', () => {
-        setIsPlaying(false);
-        processNextInQueue();
-      });
-      audioRef.current.addEventListener('error', (e) => {
-        console.error('Audio playback error:', e);
-        setIsPlaying(false);
-        processNextInQueue();
-      });
+      audioRef.current.volume = 1.0; // Ensure volume is at maximum
     }
     return audioRef.current;
   }, []);
@@ -76,14 +64,34 @@ export const useAudioPlayer = () => {
   const playNextAudio = useCallback((src: string) => {
     try {
       const audio = ensureAudioElement();
+      
+      // Reset audio element before setting new source
+      audio.pause();
+      audio.currentTime = 0;
+      
+      // Set source and load
       audio.src = src;
       audio.load();
       
-      // Use a promise to handle play() better
-      audio.play().catch(e => {
-        console.error('Failed to play audio:', e);
-        processNextInQueue(); // Continue to next audio even if this one fails
-      });
+      // Create a promise to better handle the play() method
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch(e => {
+            console.error('Failed to play audio:', e);
+            // Try to play one more time after a short delay
+            setTimeout(() => {
+              audio.play().catch(error => {
+                console.error('Retry failed:', error);
+                processNextInQueue(); // Continue to next audio if this one fails
+              });
+            }, 300);
+          });
+      }
     } catch (error) {
       console.error('Error in playNextAudio:', error);
       processNextInQueue(); // Continue to next audio even if this one fails
@@ -105,14 +113,35 @@ export const useAudioPlayer = () => {
       if (firstAudio) {
         try {
           const audio = ensureAudioElement();
+          
+          // Reset audio element
+          audio.pause();
+          audio.currentTime = 0;
+          
+          // Set source and load
           audio.src = firstAudio.src;
           audio.load();
           
-          audio.play().catch(e => {
-            console.error('Failed to start audio sequence:', e);
-            isProcessingQueueRef.current = false;
-            processNextInQueue(); // Try next audio in queue
-          });
+          // Create a promise to better handle the play() method
+          const playPromise = audio.play();
+          
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                setIsPlaying(true);
+              })
+              .catch(e => {
+                console.error('Failed to start audio sequence:', e);
+                // Try to play one more time after a short delay
+                setTimeout(() => {
+                  audio.play().catch(error => {
+                    console.error('Retry failed:', error);
+                    isProcessingQueueRef.current = false;
+                    processNextInQueue(); // Try next audio in queue
+                  });
+                }, 300);
+              });
+          }
         } catch (error) {
           console.error('Error starting audio sequence:', error);
           isProcessingQueueRef.current = false;
@@ -138,6 +167,11 @@ export const useAudioPlayer = () => {
       const audio = ensureAudioElement();
       
       if (src) {
+        // Reset audio element
+        audio.pause();
+        audio.currentTime = 0;
+        
+        // Set source and load
         audio.src = src;
         audio.load();
       }
@@ -146,13 +180,16 @@ export const useAudioPlayer = () => {
         return false; // No source to play
       }
       
-      await audio.play().catch(error => {
-        console.error('Play audio failed:', error);
-        throw error; // Re-throw to be caught by the outer try/catch
-      });
+      // Create a promise to better handle the play() method
+      const playPromise = audio.play();
       
-      setIsPlaying(true);
-      return true;
+      if (playPromise !== undefined) {
+        await playPromise;
+        setIsPlaying(true);
+        return true;
+      }
+      
+      return false;
     } catch (error) {
       console.error('Failed to play audio:', error);
       setIsPlaying(false);
@@ -160,59 +197,16 @@ export const useAudioPlayer = () => {
     }
   }, [ensureAudioElement]);
 
-  // Force play after user interaction
-  const forcePlayAudio = useCallback(async () => {
-    try {
-      const audio = ensureAudioElement();
-      if (!audio.src) return false;
-      
-      await audio.play();
-      setIsPlaying(true);
-      return true;
-    } catch (error) {
-      console.error('Forced play failed:', error);
-      setIsPlaying(false);
-      return false;
-    }
-  }, [ensureAudioElement]);
-
-  // Stop audio
-  const stopAudio = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-    }
-  }, []);
-
-  // Pause audio
-  const pauseAudio = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  }, []);
-
-  // Clear queue and stop playing
-  const clearAudioQueue = useCallback(() => {
+  // Clean up all audio resources
+  const cleanupAudio = useCallback(() => {
     audioQueueRef.current = [];
     isProcessingQueueRef.current = false;
     if (audioRef.current) {
       audioRef.current.pause();
+      audioRef.current.src = '';
       setIsPlaying(false);
     }
   }, []);
-
-  // Clean up all audio resources
-  const cleanupAudio = useCallback(() => {
-    clearAudioQueue();
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = '';
-      audioRef.current.load(); // Load empty source
-      setIsPlaying(false);
-    }
-  }, [clearAudioQueue]);
 
   // Initialize event listeners
   useEffect(() => {
@@ -248,22 +242,24 @@ export const useAudioPlayer = () => {
         audioRef.current.removeEventListener('error', onError);
         audioRef.current.pause();
         audioRef.current.src = '';
-        audioRef.current.load(); // Load empty source
       }
-      clearAudioQueue();
+      audioQueueRef.current = [];
+      isProcessingQueueRef.current = false;
     };
-  }, [ensureAudioElement, processNextInQueue, clearAudioQueue]);
+  }, [ensureAudioElement, processNextInQueue]);
 
   return {
-    audioRef,
     isPlaying,
     isReady,
     playAudio,
     queueAudioWithDelays,
-    forcePlayAudio,
-    stopAudio,
-    pauseAudio,
-    clearAudioQueue,
+    stopAudio: cleanupAudio,
+    pauseAudio: () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    },
     cleanupAudio
   };
 };

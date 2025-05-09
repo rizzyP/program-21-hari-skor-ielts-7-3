@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { useTest } from '@/context/TestContext';
 import { Phase } from '@/components/test/TestPhases';
-import { SpeakingContent } from '@/types/test';
 
 export const useSpeakingTestState = () => {
   // Test flow states

@@ -45,13 +45,8 @@ export const useExaminerSimulation = (
                   // and enable recording if needed
                   setExaminerSpeaking(false);
 
-                  // If in Part 1 or 3 of speaking, enable recording
-                  if (
-                    currentPhase === Phase.SPEAKING_PART1 ||
-                    currentPhase === Phase.SPEAKING_PART2_PREP ||
-                    currentPhase === Phase.SPEAKING_PART2_ANSWER ||
-                    currentPhase === Phase.SPEAKING_PART3
-                  ) {
+                  // If in Part 1 of speaking, enable recording
+                  if (currentPhase === Phase.SPEAKING_PART1) {
                     // Don't auto-enable recording for first question
                     setIsRecording(true);
                   }
@@ -65,12 +60,7 @@ export const useExaminerSimulation = (
               setExaminerSpeaking(false);
               
               // Enable recording if in speaking part
-              if (
-                currentPhase === Phase.SPEAKING_PART1 ||
-                currentPhase === Phase.SPEAKING_PART2_PREP || 
-                currentPhase === Phase.SPEAKING_PART2_ANSWER ||
-                currentPhase === Phase.SPEAKING_PART3
-              ) {
+              if (currentPhase === Phase.SPEAKING_PART1) {
                 setIsRecording(true);
               }
             }, duration);
@@ -81,12 +71,7 @@ export const useExaminerSimulation = (
             setExaminerSpeaking(false);
             
             // Enable recording if in speaking part
-            if (
-              currentPhase === Phase.SPEAKING_PART1 ||
-              currentPhase === Phase.SPEAKING_PART2_PREP ||
-              currentPhase === Phase.SPEAKING_PART2_ANSWER ||
-              currentPhase === Phase.SPEAKING_PART3
-            ) {
+            if (currentPhase === Phase.SPEAKING_PART1) {
               setIsRecording(true);
             }
           }, duration);

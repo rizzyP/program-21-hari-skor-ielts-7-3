@@ -19,7 +19,7 @@ export const useTestNavigation = (
   currentPhase: Phase
 ) => {
   const navigate = useNavigate();
-  const { submitSection, completeTest, setTimeRemaining } = useTest();
+  const { submitSection, completeTest } = useTest();
 
   // Audio file paths
   const AUDIO_FILES = {
