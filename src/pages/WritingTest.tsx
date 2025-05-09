@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -63,7 +64,8 @@ const WritingTest = () => {
     });
   };
 
-  const handleSubmit = () => {
+  // Fix: Make this function async since we're using await
+  const handleSubmit = async () => {
     setIsSubmitting(true);
     
     try {
