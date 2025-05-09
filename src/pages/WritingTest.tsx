@@ -23,7 +23,8 @@ const WritingTest = () => {
     timeRemaining,
     testType,
     isTestActive,
-    setTimeRemaining
+    setTimeRemaining,
+    evaluateAllSections
   } = useTest();
   
   const [isStarted, setIsStarted] = useState(false);
@@ -67,24 +68,27 @@ const WritingTest = () => {
     setIsSubmitting(true);
     
     try {
-      // In a real app, this would send the answers to an API for AI assessment
+      // Submit the section to mark it complete
+      submitSection();
+      
       toast.info('Analyzing your writing...', {
         description: 'Our AI is evaluating your response against IELTS criteria.'
       });
       
-      // Submit the section to mark it complete
-      submitSection();
+      // Evaluate all sections and redirect to results
+      await evaluateAllSections();
       
-      // In a production app, we would use real AI assessment here
       toast.success('Writing test completed', {
         description: 'Your answer has been submitted for evaluation.'
       });
       
-      navigate('/test/speaking');
+      // Redirect to results page
+      navigate('/results');
     } catch (error) {
       toast.error('Error submitting answer', {
         description: 'Please try again.'
       });
+      console.error('Error during submission:', error);
     } finally {
       setIsSubmitting(false);
     }
