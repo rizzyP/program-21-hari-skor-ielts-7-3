@@ -43,15 +43,15 @@ const CurriculumPage = () => {
     },
     { 
       day: 2, 
-      title: "Materi Listening: Note Taking", 
+      title: "Materi Listening: Beginner Level", 
       duration: "85 min", 
       progress: "0/4",
       locked: false,
       items: [
-        { title: "Note-taking Techniques", duration: "30 min" },
-        { title: "Practice Exercise 1", duration: "20 min" },
-        { title: "Practice Exercise 2", duration: "20 min" },
-        { title: "Assessment Quiz", duration: "15 min" }
+        { title: "Chapter 1.5: Mendalami Percakapan Sehari-hari (Everyday Conversations)", duration: "25 min" },
+        { title: "Chapter 1.6: Strategi Jitu Section 1 (Percakapan Sehari-hari)", duration: "20 min" },
+        { title: "Chapter 1.7: Strategi Jitu Section 2 (Monolog Situasional)", duration: "20 min" },
+        { title: "Chapter 1.8: Mengasah Kemampuan Prediksi Konteks dan Jawaban", duration: "20 min" }
       ]
     },
     { 

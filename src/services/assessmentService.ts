@@ -18,13 +18,14 @@ export const saveAssessmentResult = async (result: AssessmentResult) => {
       .insert([{
         test_type: result.test_type,
         score: result.score,
-        answers: result.answers,
+        answers: result.answers as any, // Cast to any to handle type mismatch
       }])
       .select();
     
     if (error) throw error;
     
-    return data[0] as AssessmentResult;
+    // Cast the returned data to match our type
+    return data[0] as unknown as AssessmentResult;
   } catch (error) {
     console.error('Error saving assessment result:', error);
     throw error;
@@ -40,7 +41,8 @@ export const getAssessmentResults = async () => {
     
     if (error) throw error;
     
-    return data as AssessmentResult[];
+    // Cast the returned data to match our type
+    return data as unknown as AssessmentResult[];
   } catch (error) {
     console.error('Error retrieving assessment results:', error);
     throw error;
@@ -59,7 +61,8 @@ export const getLatestAssessmentResult = async (testType: string) => {
     
     if (error) throw error;
     
-    return data as AssessmentResult | null;
+    // Cast the returned data to match our type
+    return data as unknown as AssessmentResult | null;
   } catch (error) {
     console.error(`Error retrieving latest ${testType} assessment result:`, error);
     throw error;

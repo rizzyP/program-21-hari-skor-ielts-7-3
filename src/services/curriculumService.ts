@@ -38,12 +38,12 @@ export const markSectionCompleted = async (day: number, section: string) => {
       // Create new entry
       const { data, error } = await supabase
         .from('curriculum_progress')
-        .insert([{
+        .insert({
           day,
           section,
           completed: true,
           completed_at: new Date().toISOString(),
-        }])
+        })
         .select();
       
       if (error) throw error;
