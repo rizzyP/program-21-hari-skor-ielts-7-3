@@ -14,6 +14,7 @@ import TestSelection from "./pages/TestSelection";
 import ListeningTest from "./pages/ListeningTest";
 import ReadingTest from "./pages/ReadingTest";
 import WritingTest from "./pages/WritingTest";
+import SpeakingTest from "./pages/SpeakingTest";
 import Results from "./pages/Results";
 import Curriculum from "./pages/Curriculum";
 import CurriculumDay1 from "./pages/CurriculumDay1";
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/test/listening" element={<ListeningTest />} />
                 <Route path="/test/reading" element={<ReadingTest />} />
                 <Route path="/test/writing" element={<WritingTest />} />
+                <Route path="/test/speaking" element={<SpeakingTest />} />
                 <Route path="/results" element={<Results />} />
                 <Route path="/curriculum" element={<Curriculum />} />
                 <Route path="/curriculum/day1" element={<CurriculumDay1 />} />

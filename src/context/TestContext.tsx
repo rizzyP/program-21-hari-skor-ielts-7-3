@@ -131,6 +131,14 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       });
 
+      // Get speaking answers
+      const speakingAnswers: Record<string, string> = {};
+      Object.entries(answersMap).forEach(([key, value]) => {
+        if (key.startsWith('p')) {
+          speakingAnswers[key] = value;
+        }
+      });
+
       // Evaluate each section
       const listeningFeedback = evaluateListeningAnswers(listeningAnswers, listeningCorrectAnswers);
       const readingFeedback = evaluateReadingAnswers(readingAnswers, readingCorrectAnswers);
@@ -138,28 +146,29 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // These would be AI-based evaluations in a real app
       const writingFeedback = await evaluateWritingResponse(writingAnswers);
       
-      // For speaking, we'll generate a placeholder feedback since we've disabled it
-      const speakingFeedback = {
-        overallScore: 0,
-        criteria: [],
-        strengths: ["Speaking test disabled"],
-        weaknesses: ["Speaking test disabled"]
-      };
+      // For speaking, generate actual feedback if we have responses
+      const speakingFeedback = Object.keys(speakingAnswers).length > 0
+        ? await evaluateSpeakingResponse(speakingAnswers)
+        : {
+            overallScore: 0,
+            criteria: [],
+            strengths: ["No speaking responses available"],
+            weaknesses: ["No speaking responses available"]
+          };
 
-      // Calculate overall score (excluding speaking)
+      // Calculate overall score including speaking if available
+      const speakingScore = Object.keys(speakingAnswers).length > 0 ? speakingFeedback.overallScore : 0;
+      
       const sectionScores = {
         listening: listeningFeedback.overallScore,
         reading: readingFeedback.overallScore,
         writing: writingFeedback.overallScore,
-        speaking: 0 // Set to 0 since speaking test is disabled
+        speaking: speakingScore
       };
 
       // Generate overall analysis
       console.log('Generating overall analysis...', sectionScores);
-      const overallAnalysis = await generateOverallAnalysis({
-        ...sectionScores,
-        speaking: 0 // Ensure speaking is 0
-      });
+      const overallAnalysis = await generateOverallAnalysis(sectionScores);
 
       // Create test result
       const result: TestResult = {
@@ -215,12 +224,12 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           },
           {
             sectionType: 'speaking',
-            bandScore: 0, // Set to 0 since speaking test is disabled
-            userAnswers: [],
+            bandScore: speakingScore,
+            userAnswers: userAnswers.filter(a => a.questionId.startsWith('p')),
             details: {
-              criteria: [],
-              strengths: ["Speaking section has been disabled in this version."],
-              weaknesses: ["Speaking section has been disabled in this version."]
+              criteria: speakingFeedback.criteria || [],
+              strengths: speakingFeedback.strengths || ["Speaking evaluation completed"],
+              weaknesses: speakingFeedback.weaknesses || ["Check your speaking responses for areas to improve"]
             }
           }
         ],

@@ -21,7 +21,7 @@ export const useTestNavigation = (
   const navigate = useNavigate();
   const { submitSection, completeTest } = useTest();
 
-  // Audio file paths
+  // Audio file paths with public URL prefix to ensure they're found
   const AUDIO_FILES = {
     opening: [
       '/media/assessment/speaking-section-opening-1.wav',
@@ -78,7 +78,12 @@ export const useTestNavigation = (
       }
     ];
     
-    playExaminerAudioSequence(openingSequence);
+    playExaminerAudioSequence(openingSequence)
+      .catch(error => {
+        console.error('Failed to play opening sequence:', error);
+        // Continue to Part 1 even if audio fails
+        setTimeout(startPart1, 5000);
+      });
     
     toast.info('Speaking test started', {
       description: 'The examiner will guide you through the test.'
