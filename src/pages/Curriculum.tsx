@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ChevronDown, Lock, Unlock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { 
   Accordion,
@@ -21,6 +22,7 @@ interface CurriculumDay {
     title: string;
     duration: string;
   }[];
+  route?: string;
 }
 
 const CurriculumPage = () => {
@@ -31,8 +33,12 @@ const CurriculumPage = () => {
       duration: "60 min", 
       progress: "0/1",
       locked: false,
+      route: "/curriculum/day1",
       items: [
-        { title: "Understanding Different Accents", duration: "60 min" }
+        { title: "Chapter 1.1: Format Dasar IELTS Listening", duration: "15 min" },
+        { title: "Chapter 1.2: Mendengarkan Detail Faktual", duration: "15 min" },
+        { title: "Chapter 1.3: Aksen dan Pengucapan", duration: "15 min" },
+        { title: "Chapter 1.4: Note-taking Dasar", duration: "15 min" }
       ]
     },
     { 
@@ -248,6 +254,13 @@ const CurriculumPage = () => {
                           </div>
                         </div>
                       ))}
+                      {day.route && (
+                        <div className="mt-4">
+                          <Link to={day.route}>
+                            <Button variant="default" className="w-full">View Content</Button>
+                          </Link>
+                        </div>
+                      )}
                     </Card>
                   ) : day.day === 4 || day.day === 9 || day.day === 14 || day.day === 19 || day.day === 20 || day.day === 21 ? (
                     <div className="flex items-center justify-between">

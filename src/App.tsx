@@ -14,6 +14,7 @@ import ReadingTest from "./pages/ReadingTest";
 import WritingTest from "./pages/WritingTest";
 import Results from "./pages/Results";
 import Curriculum from "./pages/Curriculum";
+import CurriculumDay1 from "./pages/CurriculumDay1";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/test/writing" element={<WritingTest />} />
             <Route path="/results" element={<Results />} />
             <Route path="/curriculum" element={<Curriculum />} />
+            <Route path="/curriculum/day1" element={<CurriculumDay1 />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
