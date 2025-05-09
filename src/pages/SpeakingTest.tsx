@@ -13,6 +13,7 @@ const SpeakingTest = () => {
     currentPhase,
     isStarted,
     isRecording,
+    isTranscribing,
     currentQuestion,
     currentPart,
     transcripts,
@@ -26,6 +27,7 @@ const SpeakingTest = () => {
     questionNumber,
     getCurrentPartQuestions,
     handleStart,
+    handleStartRecording,
     handleStopRecording,
     handleNavigateResults
   } = useSpeakingTest();
@@ -66,6 +68,8 @@ const SpeakingTest = () => {
               examinerSpeaking={examinerSpeaking}
               examinerMessage={examinerMessage}
               isRecording={isRecording}
+              isTranscribing={isTranscribing}
+              onStartRecording={handleStartRecording}
               onStopRecording={handleStopRecording}
               handleNavigateResults={handleNavigateResults}
               fadeIn={fadeIn}

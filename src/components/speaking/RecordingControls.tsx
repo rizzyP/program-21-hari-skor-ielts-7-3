@@ -1,17 +1,21 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, StopCircle } from 'lucide-react';
+import { Mic, StopCircle, Loader2 } from 'lucide-react';
 
 interface RecordingControlsProps {
   isRecording: boolean;
+  isTranscribing?: boolean;
   examinerSpeaking: boolean;
+  onStartRecording: () => void;
   onStopRecording: () => void;
 }
 
 const RecordingControls: React.FC<RecordingControlsProps> = ({
   isRecording,
+  isTranscribing = false,
   examinerSpeaking,
+  onStartRecording,
   onStopRecording,
 }) => {
   if (isRecording) {
@@ -25,6 +29,19 @@ const RecordingControls: React.FC<RecordingControlsProps> = ({
           <StopCircle className="h-4 w-4" />
           Stop Recording
         </Button>
+      </div>
+    );
+  }
+
+  if (isTranscribing) {
+    return (
+      <div className="flex justify-center mt-4">
+        <div className="px-3 py-2 rounded-md bg-blue-100 text-blue-700">
+          <span className="flex items-center">
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Transcribing your answer...
+          </span>
+        </div>
       </div>
     );
   }
@@ -45,12 +62,12 @@ const RecordingControls: React.FC<RecordingControlsProps> = ({
   return (
     <div className="flex justify-center mt-4">
       <Button 
-        disabled
-        variant="outline" 
-        className="flex items-center gap-2 opacity-50"
+        onClick={onStartRecording}
+        variant="default" 
+        className="flex items-center gap-2 bg-red-600 hover:bg-red-700"
       >
         <Mic className="h-4 w-4" />
-        Recording will start automatically
+        Start Recording
       </Button>
     </div>
   );

@@ -14,6 +14,8 @@ interface ExaminationPanelProps {
   examinerSpeaking: boolean;
   examinerMessage: string;
   isRecording: boolean;
+  isTranscribing?: boolean;
+  onStartRecording: () => void;
   onStopRecording: () => void;
   handleNavigateResults: () => void;
   fadeIn: boolean;
@@ -27,6 +29,8 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
   examinerSpeaking,
   examinerMessage,
   isRecording,
+  isTranscribing = false,
+  onStartRecording,
   onStopRecording,
   handleNavigateResults,
   fadeIn,
@@ -96,7 +100,9 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
         {/* Recording status and controls */}
         <RecordingControls 
           isRecording={isRecording}
+          isTranscribing={isTranscribing}
           examinerSpeaking={examinerSpeaking}
+          onStartRecording={onStartRecording}
           onStopRecording={onStopRecording}
         />
       </CardContent>

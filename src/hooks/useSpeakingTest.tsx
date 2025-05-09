@@ -12,6 +12,7 @@ export const useSpeakingTest = () => {
   const { 
     currentTest, 
     startSection,
+    saveAnswer,
   } = useTest();
   
   // Compose all the hooks
@@ -77,6 +78,9 @@ export const useSpeakingTest = () => {
   // Set up recording controls after navigation is set up
   // because it depends on handleNextQuestion
   const {
+    isRecording: voiceRecordingActive,
+    isTranscribing,
+    audioURL,
     handleStartRecording,
     handleStopRecording,
     cleanupRecordingTimeout
@@ -101,18 +105,26 @@ export const useSpeakingTest = () => {
     }
   }, [currentTest, startSection, setTotalQuestions]);
 
+  // Save transcripts to test context when they change
+  useEffect(() => {
+    Object.entries(transcripts).forEach(([key, value]) => {
+      saveAnswer(key, value);
+    });
+  }, [transcripts, saveAnswer]);
+
   // Clean up timeouts when component unmounts
   useEffect(() => {
     return () => {
       cleanupExaminerTimeout();
       cleanupRecordingTimeout();
     };
-  }, []);
+  }, [cleanupExaminerTimeout, cleanupRecordingTimeout]);
 
   return {
     currentPhase,
     isStarted,
     isRecording,
+    isTranscribing,
     currentQuestion,
     currentPart,
     transcripts,
@@ -127,6 +139,7 @@ export const useSpeakingTest = () => {
     getCurrentPartQuestions,
     getCurrentQuestion,
     handleStart,
+    handleStartRecording,
     handleStopRecording,
     handleNavigateResults
   };
