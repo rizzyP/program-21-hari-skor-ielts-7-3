@@ -22,6 +22,7 @@ export const useSpeakingTestState = () => {
   const [questionNumber, setQuestionNumber] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(0);
 
+  // Fade in effect when changing questions/parts
   useEffect(() => {
     setFadeIn(true);
     const timer = setTimeout(() => setFadeIn(false), 300);
