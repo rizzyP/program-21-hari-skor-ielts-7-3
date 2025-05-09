@@ -56,7 +56,6 @@ export const useSpeakingTest = () => {
   // We need to declare this after test content hook to have access to getCurrentPartQuestions
   const {
     handleStart,
-    handlePrepare,
     handleNextQuestion,
     handleComplete,
     handleNavigateResults
@@ -96,14 +95,8 @@ export const useSpeakingTest = () => {
       if (speakingSection) {
         startSection(speakingSection.id);
         
-        // Calculate total questions across all parts - with proper type casting
-        const speakingContent = speakingSection.content as SpeakingContent;
-        if (speakingContent && speakingContent.parts) {
-          const total = speakingContent.parts.reduce((sum, part) => {
-            return sum + (part.questions ? part.questions.length : 0);
-          }, 0);
-          setTotalQuestions(total);
-        }
+        // Set total questions - since we're only doing part 1, hardcode to 4
+        setTotalQuestions(4);
       }
     }
   }, [currentTest, startSection, setTotalQuestions]);

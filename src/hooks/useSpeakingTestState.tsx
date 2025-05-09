@@ -13,9 +13,7 @@ export const useSpeakingTestState = () => {
   const [currentPart, setCurrentPart] = useState<number>(1);
   const [transcripts, setTranscripts] = useState<Record<string, string>>({});
   const [partCompleted, setPartCompleted] = useState<Record<string, boolean>>({
-    part1: false,
-    part2: false,
-    part3: false
+    part1: false
   });
   
   // Animation states

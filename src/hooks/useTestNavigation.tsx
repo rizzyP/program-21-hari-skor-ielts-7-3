@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { useTest } from '@/context/TestContext';
 import { toast } from 'sonner';
@@ -34,17 +35,6 @@ export const useTestNavigation = (
       '/media/assessment/speaking-section-1c.wav',
       '/media/assessment/speaking-section-1d.wav',
       '/media/assessment/speaking-section-1-end.wav'
-    ],
-    part2: [
-      '/media/assessment/speaking-section-2.wav',
-      '/media/assessment/speaking-section-2-mid.wav',
-      '/media/assessment/speaking-section-2-end.wav'
-    ],
-    part3: [
-      '/media/assessment/speaking-section-3a.wav',
-      '/media/assessment/speaking-section-3b.wav',
-      '/media/assessment/speaking-section-3c.wav',
-      '/media/assessment/speaking-section-3-end.wav'
     ]
   };
 
@@ -52,15 +42,8 @@ export const useTestNavigation = (
   const FIXED_PART1_QUESTIONS = [
     "Do you have any artistic hobbies, such as painting? (Why/Why not?)",
     "What kind of art lessons did you have at school?",
-    "Are these lessons quite traditional or quite new?", // Updated to match the correct question for 1c
+    "Are these lessons quite traditional or quite new?",
     "How useful do you think it is to study art at school? (Why/Why not?)"
-  ];
-
-  // Fixed part 3 questions that correspond to audio files
-  const FIXED_PART3_QUESTIONS = [
-    "What qualities do you think are important for a good teacher?",
-    "How has education changed in your country in the last few decades?",
-    "Do you think technology will eventually replace teachers in the classroom?"
   ];
 
   // Handle test start with opening audio sequence
@@ -120,147 +103,48 @@ export const useTestNavigation = (
     );
   };
 
-  // Handle Part 2 preparation
-  const handlePrepare = () => {
-    setCurrentPhase(Phase.SPEAKING_PART2_PREP);
-    setTimeRemaining(60);
-    
-    const cueCardTopic = getCurrentPartQuestions()[0] || 
-      "Describe a teacher who has influenced you in your education.";
-    
-    simulateExaminerSpeaking(
-      cueCardTopic, 
-      AUDIO_FILES.part2[0], 
-      5000,
-      Phase.SPEAKING_PART2_PREP
-    );
-    
-    toast.info('Preparation time started', {
-      description: 'You have 1 minute to prepare your answer.'
-    });
-    
-    // After preparation time is up, start Part 2 answer phase
-    setTimeout(() => {
-      setCurrentPhase(Phase.SPEAKING_PART2_ANSWER);
-      simulateExaminerSpeaking(
-        cueCardTopic, 
-        AUDIO_FILES.part2[1], 
-        3000,
-        Phase.SPEAKING_PART2_ANSWER
-      );
-      
-      toast.info('Preparation time is over', {
-        description: 'Start speaking when the examiner finishes.'
-      });
-    }, 60 * 1000);
-  };
-
   // Handle moving to next question
   const handleNextQuestion = () => {
     // Update overall question counter
     setQuestionNumber(prev => prev + 1);
     
-    // If there are more questions in this part
-    if (currentPart === 1) {
-      // Handle Part 1 questions
-      if (currentQuestion < 3) {  // We have 4 questions (0-3) in part 1
-        setCurrentQuestion(currentQuestion + 1);
-        
-        // Simulate examiner asking the next question with audio
-        // Use fixed part 1 questions that match the audio files
-        const nextQuestion = FIXED_PART1_QUESTIONS[currentQuestion + 1];
-        
-        simulateExaminerSpeaking(
-          nextQuestion, 
-          AUDIO_FILES.part1[currentQuestion + 1], 
-          3000, 
-          Phase.SPEAKING_PART1
-        );
-      } 
-      // End of Part 1
-      else {
-        setPartCompleted(prev => ({ ...prev, part1: true }));
-        
-        // Play end of part 1 audio
-        simulateExaminerSpeaking(
-          "Thank you. Now, let's move on to part 2.", 
-          AUDIO_FILES.part1[4], 
-          3000, 
-          Phase.SPEAKING_PART1
-        );
-        
-        // Move to Part 2
-        setTimeout(() => {
-          setCurrentPart(2);
-          setCurrentQuestion(0);
-          handlePrepare(); // Start Part 2 preparation (60 seconds)
-        }, 3000);
-      }
-    }
-    // If this is the end of part 2
-    else if (currentPart === 2) {
-      setPartCompleted(prev => ({ ...prev, part2: true }));
+    // If there are more questions in part 1
+    if (currentQuestion < 3) {  // We have 4 questions (0-3) in part 1
+      setCurrentQuestion(currentQuestion + 1);
       
-      // Play end of part 2 audio
+      // Simulate examiner asking the next question with audio
+      // Use fixed part 1 questions that match the audio files
+      const nextQuestion = FIXED_PART1_QUESTIONS[currentQuestion + 1];
+      
       simulateExaminerSpeaking(
-        "Thank you. Let's move on to the final part.", 
-        AUDIO_FILES.part2[2], 
+        nextQuestion, 
+        AUDIO_FILES.part1[currentQuestion + 1], 
         3000, 
-        Phase.SPEAKING_PART2_ANSWER
+        Phase.SPEAKING_PART1
+      );
+    } 
+    // End of Part 1 (and end of test since we're removing Parts 2 and 3)
+    else {
+      setPartCompleted(prev => ({ ...prev, part1: true }));
+      
+      // Play end of part 1 audio
+      simulateExaminerSpeaking(
+        "Thank you. That's the end of the speaking test.", 
+        AUDIO_FILES.part1[4], 
+        3000, 
+        Phase.SPEAKING_PART1
       );
       
-      // Move to Part 3
+      // End the test after a short delay
       setTimeout(() => {
-        setCurrentPart(3);
-        setCurrentQuestion(0);
-        setCurrentPhase(Phase.SPEAKING_PART3);
-        
-        // Play first part 3 question using our fixed questions
-        const firstPart3Question = FIXED_PART3_QUESTIONS[0];
-        
-        simulateExaminerSpeaking(
-          firstPart3Question, 
-          AUDIO_FILES.part3[0], 
-          3000, 
-          Phase.SPEAKING_PART3
-        );
-      }, 3000);
-    }
-    // Handle Part 3 questions
-    else if (currentPart === 3) {
-      if (currentQuestion < 2) { // We have 3 questions (0-2) in part 3
-        setCurrentQuestion(currentQuestion + 1);
-        
-        // Simulate examiner asking the next question with audio using our fixed questions
-        const nextQuestion = FIXED_PART3_QUESTIONS[currentQuestion + 1];
-        
-        simulateExaminerSpeaking(
-          nextQuestion, 
-          AUDIO_FILES.part3[currentQuestion + 1], 
-          3000, 
-          Phase.SPEAKING_PART3
-        );
-      } 
-      // End of Part 3 / End of test
-      else {
-        setPartCompleted(prev => ({ ...prev, part3: true }));
         handleComplete();
-      }
+      }, 3000);
     }
   };
 
   // Complete the test
   const handleComplete = () => {
     submitSection();
-    
-    // Play end of test audio
-    simulateExaminerSpeaking(
-      "That's the end of the speaking test. Thank you for your participation.", 
-      AUDIO_FILES.part3[3], 
-      3000,
-      Phase.COMPLETED
-    );
-    
     setCurrentPhase(Phase.COMPLETED);
     completeTest();
     
@@ -275,7 +159,6 @@ export const useTestNavigation = (
 
   return {
     handleStart,
-    handlePrepare,
     handleNextQuestion,
     handleComplete,
     handleNavigateResults

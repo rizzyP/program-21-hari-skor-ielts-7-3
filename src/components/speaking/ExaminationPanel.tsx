@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 import { Phase } from '@/components/test/TestPhases';
 import ExaminerAvatar from './ExaminerAvatar';
-import CueCard from './CueCard';
 import RecordingControls from './RecordingControls';
 import Timer from '../test/Timer';
 
@@ -37,11 +36,9 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
 }) => {
   const [recordingTime, setRecordingTime] = useState<number>(0);
   
-  // Set recording time based on current part
+  // Set recording time based on current part (only part 1 now)
   useEffect(() => {
     if (currentPart === 1) setRecordingTime(20);
-    else if (currentPart === 2) setRecordingTime(120);
-    else if (currentPart === 3) setRecordingTime(40);
   }, [currentPart]);
 
   return (
@@ -65,20 +62,12 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
               className="bg-red-50 border-red-200 text-red-700" 
             />
           )}
-          {currentPhase === Phase.SPEAKING_PART2_PREP && (
-            <Timer 
-              seconds={60}
-              className="bg-yellow-50 border-yellow-200 text-yellow-700"
-            />
-          )}
         </div>
       </CardHeader>
       
       <CardContent className="pt-6 pb-4">
         {/* Current question displayed prominently in the center */}
-        {(currentPhase === Phase.SPEAKING_PART1 || 
-          currentPhase === Phase.SPEAKING_PART2_ANSWER || 
-          currentPhase === Phase.SPEAKING_PART3) && !examinerSpeaking && (
+        {currentPhase === Phase.SPEAKING_PART1 && !examinerSpeaking && (
           <div className="text-center my-8 max-w-2xl mx-auto">
             <h2 className="text-2xl font-medium text-slate-800">{examinerMessage}</h2>
           </div>
@@ -93,9 +82,6 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
               examinerSpeaking ? "border-l-4 border-green-500" : ""
             )}>
               {examinerMessage}
-              
-              {/* Show cue card in Part 2 */}
-              {currentPhase === Phase.SPEAKING_PART2_PREP && <CueCard topic={examinerMessage} />}
             </div>
           </div>
         )}
