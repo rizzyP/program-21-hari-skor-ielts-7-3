@@ -60,7 +60,7 @@ export const useAudioPlayer = () => {
     }
   }, []);
 
-  // Play next audio in queue
+  // Play next audio in queue with proper promise handling
   const playNextAudio = useCallback((src: string) => {
     try {
       const audio = ensureAudioElement();
@@ -83,13 +83,8 @@ export const useAudioPlayer = () => {
           })
           .catch(e => {
             console.error('Failed to play audio:', e);
-            // Try to play one more time after a short delay
-            setTimeout(() => {
-              audio.play().catch(error => {
-                console.error('Retry failed:', error);
-                processNextInQueue(); // Continue to next audio if this one fails
-              });
-            }, 300);
+            // Continue to next audio if this one fails
+            processNextInQueue();
           });
       }
     } catch (error) {
@@ -122,46 +117,35 @@ export const useAudioPlayer = () => {
           audio.src = firstAudio.src;
           audio.load();
           
-          // Create a promise to better handle the play() method
+          // Create a promise to handle playback properly
           const playPromise = audio.play();
           
           if (playPromise !== undefined) {
-            playPromise
+            return playPromise
               .then(() => {
                 setIsPlaying(true);
+                return Promise.resolve();
               })
               .catch(e => {
                 console.error('Failed to start audio sequence:', e);
-                // Try to play one more time after a short delay
-                setTimeout(() => {
-                  audio.play().catch(error => {
-                    console.error('Retry failed:', error);
-                    isProcessingQueueRef.current = false;
-                    processNextInQueue(); // Try next audio in queue
-                  });
-                }, 300);
+                isProcessingQueueRef.current = false;
+                processNextInQueue();
+                return Promise.reject(e);
               });
           }
         } catch (error) {
           console.error('Error starting audio sequence:', error);
           isProcessingQueueRef.current = false;
           processNextInQueue();
+          return Promise.reject(error);
         }
       }
     }
     
-    // Return a promise that resolves when the queue is empty
-    return new Promise<void>((resolve) => {
-      const checkQueueInterval = setInterval(() => {
-        if (!isProcessingQueueRef.current) {
-          clearInterval(checkQueueInterval);
-          resolve();
-        }
-      }, 200);
-    });
+    return Promise.resolve();
   }, [ensureAudioElement, processNextInQueue]);
 
-  // Regular play function with better error handling
+  // Regular play function with proper promise handling
   const playAudio = useCallback(async (src?: string) => {
     try {
       const audio = ensureAudioElement();
@@ -177,23 +161,30 @@ export const useAudioPlayer = () => {
       }
       
       if (!audio.src) {
-        return false; // No source to play
+        return Promise.reject(new Error("No audio source set"));
       }
       
-      // Create a promise to better handle the play() method
+      // Use play() with promise handling as shown in the example
       const playPromise = audio.play();
       
       if (playPromise !== undefined) {
-        await playPromise;
-        setIsPlaying(true);
-        return true;
+        return playPromise
+          .then(() => {
+            setIsPlaying(true);
+            return true;
+          })
+          .catch(error => {
+            console.error('Failed to play audio:', error);
+            setIsPlaying(false);
+            return Promise.reject(error);
+          });
       }
       
-      return false;
+      return Promise.resolve(true);
     } catch (error) {
-      console.error('Failed to play audio:', error);
+      console.error('Error in playAudio:', error);
       setIsPlaying(false);
-      return false;
+      return Promise.reject(error);
     }
   }, [ensureAudioElement]);
 

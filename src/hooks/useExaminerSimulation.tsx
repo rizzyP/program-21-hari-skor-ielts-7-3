@@ -36,7 +36,7 @@ export const useExaminerSimulation = (
         // If audio file provided, play it
         if (audioFile) {
           try {
-            // Queue the audio
+            // Queue the audio with proper promise handling
             queueAudioWithDelays([
               {
                 src: audioFile,
@@ -52,7 +52,16 @@ export const useExaminerSimulation = (
                   }
                 },
               },
-            ]);
+            ]).catch(error => {
+              console.error('Audio playback error:', error);
+              // Still continue with the simulation even if audio fails
+              setExaminerSpeaking(false);
+              
+              // Enable recording if in speaking part
+              if (currentPhase === Phase.SPEAKING_PART1) {
+                setIsRecording(true);
+              }
+            });
           } catch (error) {
             console.error('Error playing examiner audio:', error);
             // Still continue with the simulation even if audio fails
