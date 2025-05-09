@@ -3,9 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Home, BookOpen, CheckSquare, BarChart, LogOut, User } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Home, BookOpen, CheckSquare, BarChart } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,14 +11,6 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, className }) => {
-  const { user, signOut } = useAuth();
-
-  // Get initials from user email for avatar fallback
-  const getInitials = () => {
-    if (!user?.email) return '?';
-    return user.email.charAt(0).toUpperCase();
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
@@ -33,7 +23,7 @@ const Layout: React.FC<LayoutProps> = ({ children, className }) => {
               className="h-8 sm:h-10" 
             />
           </Link>
-          <nav className="flex gap-2 items-center">
+          <nav className="flex gap-2">
             <Link to="/">
               <Button variant="ghost" size="sm">Home</Button>
             </Link>
@@ -46,26 +36,6 @@ const Layout: React.FC<LayoutProps> = ({ children, className }) => {
             <Link to="/results">
               <Button variant="ghost" size="sm">Results</Button>
             </Link>
-            
-            {user ? (
-              <div className="flex items-center gap-2 ml-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.user_metadata?.avatar_url} />
-                  <AvatarFallback>{getInitials()}</AvatarFallback>
-                </Avatar>
-                <Button variant="ghost" size="sm" onClick={() => signOut()}>
-                  <LogOut className="h-4 w-4 mr-1" />
-                  Logout
-                </Button>
-              </div>
-            ) : (
-              <Link to="/auth">
-                <Button variant="outline" size="sm">
-                  <User className="h-4 w-4 mr-1" />
-                  Login
-                </Button>
-              </Link>
-            )}
           </nav>
         </div>
       </header>
