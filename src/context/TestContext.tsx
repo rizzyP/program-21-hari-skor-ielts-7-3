@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { IELTSTest, TestSection, UserAnswer, TestResult } from '@/types/test';
 import { sampleTest } from '@/data/sampleTest';
@@ -132,33 +131,35 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       });
 
-      // Get speaking answers
-      const speakingAnswers: Record<string, string> = {};
-      Object.entries(answersMap).forEach(([key, value]) => {
-        if (key.startsWith('p')) {
-          speakingAnswers[key] = value;
-        }
-      });
-
       // Evaluate each section
       const listeningFeedback = evaluateListeningAnswers(listeningAnswers, listeningCorrectAnswers);
       const readingFeedback = evaluateReadingAnswers(readingAnswers, readingCorrectAnswers);
       
       // These would be AI-based evaluations in a real app
       const writingFeedback = await evaluateWritingResponse(writingAnswers);
-      const speakingFeedback = await evaluateSpeakingResponse(speakingAnswers);
+      
+      // For speaking, we'll generate a placeholder feedback since we've disabled it
+      const speakingFeedback = {
+        overallScore: 0,
+        criteria: [],
+        strengths: ["Speaking test disabled"],
+        weaknesses: ["Speaking test disabled"]
+      };
 
-      // Calculate overall score
+      // Calculate overall score (excluding speaking)
       const sectionScores = {
         listening: listeningFeedback.overallScore,
         reading: readingFeedback.overallScore,
         writing: writingFeedback.overallScore,
-        speaking: speakingFeedback.overallScore
+        speaking: 0 // Set to 0 since speaking test is disabled
       };
 
       // Generate overall analysis
       console.log('Generating overall analysis...', sectionScores);
-      const overallAnalysis = await generateOverallAnalysis(sectionScores);
+      const overallAnalysis = await generateOverallAnalysis({
+        ...sectionScores,
+        speaking: 0 // Ensure speaking is 0
+      });
 
       // Create test result
       const result: TestResult = {
@@ -175,7 +176,7 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               totalQuestions: Object.keys(listeningAnswers).length,
               accuracy: `${((Object.keys(listeningAnswers).reduce((count, key) => 
                 listeningCorrectAnswers[key]?.toLowerCase() === listeningAnswers[key]?.toLowerCase() ? count + 1 : count, 0) / 
-                Object.keys(listeningAnswers).length) * 100).toFixed(0)}%`,
+                Math.max(Object.keys(listeningAnswers).length, 1)) * 100).toFixed(0)}%`,
               strengths: listeningFeedback.strengths,
               weaknesses: listeningFeedback.weaknesses
             }
@@ -190,7 +191,7 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               totalQuestions: Object.keys(readingAnswers).length,
               accuracy: `${((Object.keys(readingAnswers).reduce((count, key) => 
                 readingCorrectAnswers[key]?.toLowerCase() === readingAnswers[key]?.toLowerCase() ? count + 1 : count, 0) / 
-                Object.keys(readingAnswers).length) * 100).toFixed(0)}%`,
+                Math.max(Object.keys(readingAnswers).length, 1)) * 100).toFixed(0)}%`,
               strengths: readingFeedback.strengths,
               weaknesses: readingFeedback.weaknesses
             }
@@ -214,12 +215,12 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           },
           {
             sectionType: 'speaking',
-            bandScore: speakingFeedback.overallScore,
-            userAnswers: userAnswers.filter(a => a.questionId.startsWith('p')),
+            bandScore: 0, // Set to 0 since speaking test is disabled
+            userAnswers: [],
             details: {
-              criteria: speakingFeedback.criteria,
-              strengths: speakingFeedback.strengths,
-              weaknesses: speakingFeedback.weaknesses
+              criteria: [],
+              strengths: ["Speaking section has been disabled in this version."],
+              weaknesses: ["Speaking section has been disabled in this version."]
             }
           }
         ],

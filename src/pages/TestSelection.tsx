@@ -1,194 +1,197 @@
 
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useTest } from '@/context/TestContext';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, FileText, Headphones, Mic } from 'lucide-react';
+import { useTest } from '@/context/TestContext';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const TestSelection = () => {
-  const { loadTest } = useTest();
   const navigate = useNavigate();
+  const { loadTest, currentTest, testType, evaluateAllSections } = useTest();
 
-  const startFullTest = (testType: 'academic' | 'general') => {
-    loadTest('sample', testType);
-    toast.success('Test loaded successfully', {
-      description: `You are now ready to start the IELTS ${testType === 'academic' ? 'Academic' : 'General Training'} test.`
-    });
-    navigate('/test/listening');
+  useEffect(() => {
+    // Pre-load the sample test
+    if (!currentTest) {
+      loadTest('sample');
+    }
+  }, [currentTest, loadTest]);
+
+  const handleNavigateTest = (testType: string) => {
+    switch (testType) {
+      case 'listening':
+        navigate('/test/listening');
+        break;
+      case 'reading':
+        navigate('/test/reading');
+        break;
+      case 'writing':
+        navigate('/test/writing');
+        break;
+      // Removed speaking case
+      default:
+        toast.error('Test type not available');
+    }
   };
 
-  const testModules = [
-    {
-      id: 'listening',
-      title: 'Listening',
-      description: 'Audio-based test with various question types',
-      icon: <Headphones className="h-8 w-8 text-ielts-blue" />,
-      color: 'bg-blue-50',
-      time: '10 minutes',
-      questions: '2 sections',
-      path: '/test/listening'
-    },
-    {
-      id: 'reading',
-      title: 'Reading',
-      description: 'Comprehension test with academic passages',
-      icon: <BookOpen className="h-8 w-8 text-ielts-green" />,
-      color: 'bg-green-50',
-      time: '15 minutes',
-      questions: '10 questions',
-      path: '/test/reading'
-    },
-    {
-      id: 'writing',
-      title: 'Writing',
-      description: 'Essay writing and data interpretation',
-      icon: <FileText className="h-8 w-8 text-ielts-lightblue" />,
-      color: 'bg-cyan-50',
-      time: '20 minutes',
-      questions: '1 task',
-      path: '/test/writing'
-    },
-    {
-      id: 'speaking',
-      title: 'Speaking',
-      description: 'Recorded responses to interview questions',
-      icon: <Mic className="h-8 w-8 text-ielts-red" />,
-      color: 'bg-red-50',
-      time: '15 minutes',
-      questions: '3 parts',
-      path: '/test/speaking'
+  const handleTestTypeChange = (value: string) => {
+    if (value === 'academic' || value === 'general') {
+      loadTest('sample', value);
+      toast.info(`Loaded ${value} test`);
     }
-  ];
+  };
+
+  const handleStartFullTest = () => {
+    navigate('/test/listening');
+    toast.info('Starting full IELTS test');
+  };
+
+  const handleShowResults = async () => {
+    try {
+      await evaluateAllSections();
+      navigate('/results');
+    } catch (error) {
+      console.error('Error evaluating test results:', error);
+      toast.error('Failed to generate results');
+    }
+  };
 
   return (
     <Layout>
-      <div className="space-y-8 py-6">
-        <section className="text-center space-y-4">
-          <h1 className="text-3xl font-bold">IELTS Test Selection</h1>
-          <p className="text-slate-600 max-w-2xl mx-auto">
-            Choose to take the complete IELTS test or practice individual sections to prepare for your official exam.
-          </p>
-        </section>
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <div className="space-y-8">
+          <div className="text-center space-y-3">
+            <h1 className="text-3xl font-bold">IELTS Test Selection</h1>
+            <p className="text-lg text-muted-foreground">Choose which test sections you want to practice or start the full test</p>
+          </div>
 
-        <Tabs defaultValue="academic" className="space-y-6">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-            <TabsTrigger value="academic">Academic</TabsTrigger>
-            <TabsTrigger value="general">General Training</TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="academic" className="space-y-6" onValueChange={handleTestTypeChange}>
+            <div className="flex justify-center">
+              <TabsList className="grid grid-cols-2 w-[400px]">
+                <TabsTrigger value="academic">Academic</TabsTrigger>
+                <TabsTrigger value="general">General Training</TabsTrigger>
+              </TabsList>
+            </div>
 
-          <TabsContent value="academic" className="space-y-6">
-            <section className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-semibold">Complete IELTS Academic Test</h2>
-                  <p className="text-slate-600">
-                    Take all four test sections in sequence and receive a comprehensive assessment with an overall band score prediction.
-                  </p>
-                  <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
-                    <li>Duration: Approximately 60 minutes</li>
-                    <li>AI-powered assessment and feedback</li>
-                    <li>Detailed score breakdown and recommendations</li>
-                  </ul>
-                </div>
-                <Button 
-                  onClick={() => startFullTest('academic')} 
-                  size="lg" 
-                  className="bg-ielts-blue hover:bg-ielts-lightblue"
-                >
-                  Start Academic Test
-                </Button>
+            <TabsContent value="academic" className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <TestCard
+                  title="Listening"
+                  description="30 minutes + 10 minutes transfer time"
+                  details="Four recorded conversations and monologues"
+                  onClick={() => handleNavigateTest('listening')}
+                  icon="🎧"
+                />
+                <TestCard
+                  title="Reading (Academic)"
+                  description="60 minutes"
+                  details="Three reading passages with a total of 40 questions"
+                  onClick={() => handleNavigateTest('reading')}
+                  icon="📚"
+                />
+                <TestCard
+                  title="Writing (Academic)"
+                  description="60 minutes"
+                  details="Two tasks: describing visual information and essay"
+                  onClick={() => handleNavigateTest('writing')}
+                  icon="✏️"
+                />
+                {/* Removed Speaking TestCard */}
               </div>
-            </section>
 
-            <section className="space-y-4">
-              <h2 className="text-2xl font-semibold">Practice Individual Sections</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {testModules.map((module) => (
-                  <Card key={module.id} className={`${module.color} border-none shadow-sm hover:shadow transition-shadow`}>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                      <CardTitle className="text-lg font-semibold">{module.title}</CardTitle>
-                      {module.icon}
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-slate-700 mb-4">{module.description}</CardDescription>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-slate-600">⏱️ {module.time}</span>
-                        <span className="text-slate-600">📝 {module.questions}</span>
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Link to={module.path} className="w-full">
-                        <Button variant="outline" className="w-full" onClick={() => loadTest('sample', 'academic')}>
-                          Start {module.title} Test
-                        </Button>
-                      </Link>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          </TabsContent>
+              <Card className="border-2 border-dashed">
+                <CardHeader className="text-center">
+                  <CardTitle className="text-xl">Full IELTS Academic Test</CardTitle>
+                  <CardDescription>
+                    Take the complete test in the correct order: Listening, Reading and Writing
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex justify-center">
+                  <Button size="lg" onClick={handleStartFullTest} className="bg-ielts-blue hover:bg-ielts-lightblue">
+                    Start Full Test
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
 
-          <TabsContent value="general" className="space-y-6">
-            <section className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-semibold">Complete IELTS General Training Test</h2>
-                  <p className="text-slate-600">
-                    Take all four test sections in sequence and receive a comprehensive assessment with an overall band score prediction.
-                  </p>
-                  <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
-                    <li>Duration: Approximately 60 minutes</li>
-                    <li>AI-powered assessment and feedback</li>
-                    <li>Detailed score breakdown and recommendations</li>
-                  </ul>
-                </div>
-                <Button 
-                  onClick={() => startFullTest('general')} 
-                  size="lg" 
-                  className="bg-ielts-blue hover:bg-ielts-lightblue"
-                >
-                  Start General Training Test
-                </Button>
+            <TabsContent value="general" className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <TestCard
+                  title="Listening"
+                  description="30 minutes + 10 minutes transfer time"
+                  details="Four recorded conversations and monologues"
+                  onClick={() => handleNavigateTest('listening')}
+                  icon="🎧"
+                />
+                <TestCard
+                  title="Reading (General)"
+                  description="60 minutes"
+                  details="Three sections of increasing difficulty with 40 questions"
+                  onClick={() => handleNavigateTest('reading')}
+                  icon="📚"
+                />
+                <TestCard
+                  title="Writing (General)"
+                  description="60 minutes"
+                  details="Two tasks: letter writing and essay"
+                  onClick={() => handleNavigateTest('writing')}
+                  icon="✏️"
+                />
+                {/* Removed Speaking TestCard */}
               </div>
-            </section>
 
-            <section className="space-y-4">
-              <h2 className="text-2xl font-semibold">Practice Individual Sections</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {testModules.map((module) => (
-                  <Card key={`general-${module.id}`} className={`${module.color} border-none shadow-sm hover:shadow transition-shadow`}>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                      <CardTitle className="text-lg font-semibold">{module.title}</CardTitle>
-                      {module.icon}
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-slate-700 mb-4">{module.description}</CardDescription>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-slate-600">⏱️ {module.time}</span>
-                        <span className="text-slate-600">📝 {module.questions}</span>
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Link to={module.path} className="w-full">
-                        <Button variant="outline" className="w-full" onClick={() => loadTest('sample', 'general')}>
-                          Start {module.title} Test
-                        </Button>
-                      </Link>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          </TabsContent>
-        </Tabs>
+              <Card className="border-2 border-dashed">
+                <CardHeader className="text-center">
+                  <CardTitle className="text-xl">Full IELTS General Training Test</CardTitle>
+                  <CardDescription>
+                    Take the complete test in the correct order: Listening, Reading and Writing
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex justify-center">
+                  <Button size="lg" onClick={handleStartFullTest} className="bg-ielts-blue hover:bg-ielts-lightblue">
+                    Start Full Test
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          </Tabs>
+
+          <div className="flex justify-center">
+            <Button variant="outline" onClick={handleShowResults} className="mt-2">
+              View Mock Results
+            </Button>
+          </div>
+        </div>
       </div>
     </Layout>
   );
 };
+
+// Individual test card component
+const TestCard = ({ title, description, details, onClick, icon }: {
+  title: string;
+  description: string;
+  details: string;
+  onClick: () => void;
+  icon: string;
+}) => (
+  <Card className="hover:shadow-md transition-shadow">
+    <CardHeader>
+      <div className="flex items-center gap-3">
+        <div className="text-3xl">{icon}</div>
+        <CardTitle>{title}</CardTitle>
+      </div>
+      <CardDescription>{description}</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <p className="text-sm">{details}</p>
+    </CardContent>
+    <CardFooter>
+      <Button onClick={onClick} className="w-full">Start Practice</Button>
+    </CardFooter>
+  </Card>
+);
 
 export default TestSelection;

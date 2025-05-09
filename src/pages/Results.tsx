@@ -1,422 +1,337 @@
 
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { TestResult } from '@/types/test';
-import { toast } from 'sonner';
 import { useTest } from '@/context/TestContext';
-import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Sparkles, Award, BarChart3, BookOpen, Headphones, FileEdit, Clock } from 'lucide-react';
+import { TestResult } from '@/types/test';
 
 const Results = () => {
   const navigate = useNavigate();
-  const { testResults, userAnswers, evaluateAllSections } = useTest();
-  const [isLoading, setIsLoading] = useState(true);
-  const [results, setResults] = useState<TestResult | null>(null);
-
+  const { testResults, evaluateAllSections } = useTest();
+  const [loading, setLoading] = useState(false);
+  
   useEffect(() => {
     const loadResults = async () => {
-      setIsLoading(true);
-      try {
-        // Check if we already have results
-        if (testResults) {
-          setResults(testResults);
-          return;
+      if (!testResults) {
+        setLoading(true);
+        try {
+          await evaluateAllSections();
+          toast.success('Test results generated');
+        } catch (error) {
+          console.error('Error loading results:', error);
+          toast.error('Failed to load results');
+          navigate('/test');
+        } finally {
+          setLoading(false);
         }
-
-        // If no results yet but we have answers, evaluate them
-        if (userAnswers.length > 0) {
-          const evaluationResults = await evaluateAllSections();
-          setResults(evaluationResults);
-          toast.success('Results analysis complete', {
-            description: 'View your detailed IELTS assessment below.'
-          });
-        } else {
-          // No answers to evaluate, redirect to home
-          toast.error('No test data found', {
-            description: 'Please complete a test first.'
-          });
-          navigate('/');
-        }
-      } catch (error) {
-        toast.error('Failed to load results', {
-          description: 'Please try again or contact support if the problem persists.'
-        });
-      } finally {
-        setIsLoading(false);
       }
     };
     
     loadResults();
-  }, [testResults, userAnswers, evaluateAllSections, navigate]);
-
-  const getBandScoreColor = (score: number) => {
-    if (score >= 8) return 'text-green-600';
-    if (score >= 7) return 'text-emerald-600';
-    if (score >= 6) return 'text-blue-600';
-    if (score >= 5) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
-  const getBandScoreProgressColor = (score: number) => {
-    if (score >= 8) return 'bg-green-600';
-    if (score >= 7) return 'bg-emerald-600';
-    if (score >= 6) return 'bg-blue-600';
-    if (score >= 5) return 'bg-yellow-600';
-    return 'bg-red-600';
-  };
-
-  if (isLoading) {
+  }, [testResults, evaluateAllSections, navigate]);
+  
+  if (loading) {
     return (
       <Layout>
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-ielts-blue" />
-          <p className="text-slate-600">Analyzing your test results...</p>
+        <div className="flex justify-center items-center h-96">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-ielts-blue mb-4"></div>
+            <p>Generating test results...</p>
+          </div>
         </div>
       </Layout>
     );
   }
-
-  if (!results) {
+  
+  if (!testResults) {
     return (
       <Layout>
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
-          <p className="text-red-600">Failed to load results</p>
-          <Button asChild>
-            <Link to="/">Return Home</Link>
-          </Button>
+        <div className="flex justify-center items-center h-96">
+          <div className="text-center">
+            <p className="mb-4">No test results available</p>
+            <Button onClick={() => navigate('/test')}>Go to Test Selection</Button>
+          </div>
         </div>
       </Layout>
     );
   }
-
+  
   return (
-    <Layout>
-      <div className="max-w-5xl mx-auto space-y-10 py-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Your IELTS Test Results</h1>
-          <p className="text-slate-600">
-            Analysis and feedback based on your performance
+    <Layout className="pb-16">
+      <div className="max-w-6xl mx-auto space-y-8 px-4 md:px-6 py-6 md:py-10">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl font-bold flex justify-center items-center gap-2">
+            Your IELTS Results <Sparkles className="text-yellow-500" />
+          </h1>
+          <p className="text-muted-foreground">
+            Test date: {new Date(testResults.date).toLocaleDateString()}
           </p>
         </div>
-
-        {/* Overall Score Card */}
-        <Card className="bg-white shadow-md">
-          <CardHeader className="border-b pb-3 flex flex-row justify-between items-center">
-            <CardTitle className="text-xl">Overall IELTS Band Score</CardTitle>
-            <div className={`text-3xl font-bold ${getBandScoreColor(results.overallBandScore)}`}>
-              {results.overallBandScore.toFixed(1)}
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4 space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {results.sections.map((section) => (
-                <div key={section.sectionType} className="text-center space-y-2">
-                  <h3 className="font-medium capitalize">{section.sectionType}</h3>
-                  <div className={`text-2xl font-bold ${getBandScoreColor(section.bandScore)}`}>
-                    {section.bandScore.toFixed(1)}
-                  </div>
-                  <Progress 
-                    value={section.bandScore * 11.11} 
-                    className={`h-2 ${getBandScoreProgressColor(section.bandScore)}`}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-              <div>
-                <h3 className="font-medium mb-2 text-green-700 flex items-center gap-1">
-                  <span className="bg-green-100 p-1 rounded-full">✓</span> Strengths
-                </h3>
-                <ul className="list-disc list-inside space-y-1 text-slate-700">
-                  {results.strengths.map((strength, index) => (
-                    <li key={index}>{strength}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-medium mb-2 text-red-700 flex items-center gap-1">
-                  <span className="bg-red-100 p-1 rounded-full">!</span> Areas to Improve
-                </h3>
-                <ul className="list-disc list-inside space-y-1 text-slate-700">
-                  {results.weaknesses.map((weakness, index) => (
-                    <li key={index}>{weakness}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <h3 className="font-medium mb-2">Recommendations:</h3>
-              <p className="text-slate-700">{results.recommendations}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Section Details */}
-        <Tabs defaultValue="listening" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-4">
-            <TabsTrigger value="listening">Listening</TabsTrigger>
-            <TabsTrigger value="reading">Reading</TabsTrigger>
-            <TabsTrigger value="writing">Writing</TabsTrigger>
-            <TabsTrigger value="speaking">Speaking</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="listening">
-            <Card>
-              <CardHeader>
-                <CardTitle>Listening Assessment</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-blue-50 p-4 rounded-lg text-center">
-                    <h4 className="text-sm font-medium text-slate-600">Correct Answers</h4>
-                    <p className="text-2xl font-bold text-blue-700">
-                      {results.sections[0].details.correctAnswers}/{results.sections[0].details.totalQuestions}
-                    </p>
-                  </div>
-                  <div className="bg-blue-50 p-4 rounded-lg text-center">
-                    <h4 className="text-sm font-medium text-slate-600">Accuracy</h4>
-                    <p className="text-2xl font-bold text-blue-700">
-                      {results.sections[0].details.accuracy}
-                    </p>
-                  </div>
-                  <div className="bg-blue-50 p-4 rounded-lg text-center">
-                    <h4 className="text-sm font-medium text-slate-600">Band Score</h4>
-                    <p className={`text-2xl font-bold ${getBandScoreColor(results.sections[0].bandScore)}`}>
-                      {results.sections[0].bandScore.toFixed(1)}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-medium mb-2 text-green-700">Strengths:</h3>
-                    <ul className="list-disc list-inside space-y-1 text-slate-700">
-                      {results.sections[0].details.strengths.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="font-medium mb-2 text-red-700">Areas to Improve:</h3>
-                    <ul className="list-disc list-inside space-y-1 text-slate-700">
-                      {results.sections[0].details.weaknesses.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="reading">
-            <Card>
-              <CardHeader>
-                <CardTitle>Reading Assessment</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-green-50 p-4 rounded-lg text-center">
-                    <h4 className="text-sm font-medium text-slate-600">Correct Answers</h4>
-                    <p className="text-2xl font-bold text-green-700">
-                      {results.sections[1].details.correctAnswers}/{results.sections[1].details.totalQuestions}
-                    </p>
-                  </div>
-                  <div className="bg-green-50 p-4 rounded-lg text-center">
-                    <h4 className="text-sm font-medium text-slate-600">Accuracy</h4>
-                    <p className="text-2xl font-bold text-green-700">
-                      {results.sections[1].details.accuracy}
-                    </p>
-                  </div>
-                  <div className="bg-green-50 p-4 rounded-lg text-center">
-                    <h4 className="text-sm font-medium text-slate-600">Band Score</h4>
-                    <p className={`text-2xl font-bold ${getBandScoreColor(results.sections[1].bandScore)}`}>
-                      {results.sections[1].bandScore.toFixed(1)}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-medium mb-2 text-green-700">Strengths:</h3>
-                    <ul className="list-disc list-inside space-y-1 text-slate-700">
-                      {results.sections[1].details.strengths.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="font-medium mb-2 text-red-700">Areas to Improve:</h3>
-                    <ul className="list-disc list-inside space-y-1 text-slate-700">
-                      {results.sections[1].details.weaknesses.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="writing">
-            <Card>
-              <CardHeader>
-                <CardTitle>Writing Assessment</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="text-center">
-                  <h3 className="font-medium mb-2">Overall Writing Band Score</h3>
-                  <div className={`text-3xl font-bold ${getBandScoreColor(results.sections[2].bandScore)}`}>
-                    {results.sections[2].bandScore.toFixed(1)}
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Task 1 Assessment</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-3">
-                        <h4 className="font-medium">Criteria Scores:</h4>
-                        {results.sections[2].details.task1.criteria.map((criterion, index) => (
-                          <div key={index} className="flex justify-between items-center">
-                            <span className="text-sm text-slate-700">{criterion.name}</span>
-                            <span className={`font-medium ${getBandScoreColor(criterion.score)}`}>
-                              {criterion.score.toFixed(1)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2 text-green-700">Strengths:</h4>
-                        <ul className="list-disc list-inside space-y-1 text-slate-700 text-sm">
-                          {results.sections[2].details.task1.strengths.map((item, index) => (
-                            <li key={index}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2 text-red-700">Areas to Improve:</h4>
-                        <ul className="list-disc list-inside space-y-1 text-slate-700 text-sm">
-                          {results.sections[2].details.task1.weaknesses.map((item, index) => (
-                            <li key={index}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <div className="flex items-center justify-center p-6 bg-slate-50 rounded-lg">
-                    <div className="text-center">
-                      <p className="text-slate-500 mb-3">
-                        In this test version, only Task 1 was evaluated.
-                      </p>
-                      <p className="text-sm text-slate-400">
-                        A complete IELTS Writing test includes two tasks.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="speaking">
-            <Card>
-              <CardHeader>
-                <CardTitle>Speaking Assessment</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="text-center">
-                  <h3 className="font-medium mb-2">Speaking Band Score</h3>
-                  <div className={`text-3xl font-bold ${getBandScoreColor(results.sections[3].bandScore)}`}>
-                    {results.sections[3].bandScore.toFixed(1)}
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-medium mb-3">Criteria Breakdown:</h3>
-                    <div className="space-y-4">
-                      {results.sections[3].details.criteria.map((criterion, index) => (
-                        <div key={index}>
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-sm font-medium text-slate-700">{criterion.name}</span>
-                            <span className={`font-medium ${getBandScoreColor(criterion.score)}`}>
-                              {criterion.score.toFixed(1)}
-                            </span>
-                          </div>
-                          <Progress 
-                            value={criterion.score * 11.11} 
-                            className={`h-2 ${getBandScoreProgressColor(criterion.score)}`}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="font-medium mb-2 text-green-700">Strengths:</h3>
-                      <ul className="list-disc list-inside space-y-1 text-slate-700">
-                        {results.sections[3].details.strengths.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div>
-                      <h3 className="font-medium mb-2 text-red-700">Areas to Improve:</h3>
-                      <ul className="list-disc list-inside space-y-1 text-slate-700">
-                        {results.sections[3].details.weaknesses.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <h3 className="font-medium mb-2">Your Recorded Responses:</h3>
-                  <div className="space-y-2">
-                    {results.sections[3].userAnswers.map((answer, index) => (
-                      <div key={index} className="bg-white p-3 rounded border">
-                        <p className="text-sm font-medium">Question {index + 1}:</p>
-                        <p className="text-slate-700 mt-1">"{answer.userResponse}"</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
         
-        {/* Next Steps */}
-        <section className="bg-gradient-to-r from-ielts-blue to-ielts-lightblue text-white rounded-xl p-8 text-center shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">Ready to Improve Your Score?</h2>
-          <p className="mb-6">Take another practice test or focus on specific sections to improve your band score.</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button variant="secondary" asChild>
-              <Link to="/test">Take Another Test</Link>
-            </Button>
-            <Button variant="outline" className="border-white text-white hover:bg-white/20" asChild>
-              <Link to="/">Return Home</Link>
-            </Button>
-          </div>
-        </section>
+        <OverallScore score={testResults.overallBandScore} />
+        
+        <SectionScores testResults={testResults} />
+        
+        <StrengthsWeaknesses testResults={testResults} />
+        
+        <DetailedResults testResults={testResults} />
+        
+        <div className="flex justify-center mt-8">
+          <Button onClick={() => navigate('/test')} size="lg">
+            Return to Test Selection
+          </Button>
+        </div>
       </div>
     </Layout>
   );
 };
+
+const OverallScore = ({ score }: { score: number }) => (
+  <Card className="border-2 border-ielts-lightblue bg-gradient-to-br from-white to-blue-50">
+    <CardHeader className="text-center pb-2">
+      <CardTitle className="text-xl text-ielts-blue">Overall Band Score</CardTitle>
+    </CardHeader>
+    <CardContent className="flex flex-col items-center">
+      <div className="flex items-center justify-center w-24 h-24 rounded-full bg-ielts-blue text-white text-4xl font-bold">
+        {score}
+      </div>
+      <p className="mt-4 text-center text-sm md:text-base">
+        {score >= 8 ? (
+          <span className="font-medium text-green-600">Expert level (Very Good to Expert)</span>
+        ) : score >= 6.5 ? (
+          <span className="font-medium text-blue-600">Competent to Good</span>
+        ) : score >= 5 ? (
+          <span className="font-medium text-yellow-600">Modest to Competent</span>
+        ) : (
+          <span className="font-medium text-red-600">Limited to Modest</span>
+        )}
+      </p>
+    </CardContent>
+  </Card>
+);
+
+const SectionScores = ({ testResults }: { testResults: TestResult }) => (
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <ScoreCard title="Listening" score={testResults.sections[0].bandScore} icon={<Headphones className="w-6 h-6" />} />
+    <ScoreCard title="Reading" score={testResults.sections[1].bandScore} icon={<BookOpen className="w-6 h-6" />} />
+    <ScoreCard title="Writing" score={testResults.sections[2].bandScore} icon={<FileEdit className="w-6 h-6" />} />
+    {/* Removed Speaking ScoreCard */}
+  </div>
+);
+
+const ScoreCard = ({ title, score, icon }: { title: string; score: number; icon: React.ReactNode }) => (
+  <Card>
+    <CardHeader className="pb-2">
+      <CardTitle className="text-lg flex items-center gap-2">
+        {icon} {title}
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="flex items-center justify-between">
+        <div className="text-3xl font-bold">{score}</div>
+        <div className="text-sm px-2 py-1 rounded bg-gray-100">
+          {score >= 8 ? (
+            <span className="text-green-600">Expert</span>
+          ) : score >= 7 ? (
+            <span className="text-blue-600">Good</span>
+          ) : score >= 6 ? (
+            <span className="text-yellow-600">Competent</span>
+          ) : score >= 5 ? (
+            <span className="text-orange-600">Modest</span>
+          ) : (
+            <span className="text-red-600">Limited</span>
+          )}
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const StrengthsWeaknesses = ({ testResults }: { testResults: TestResult }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Award className="w-5 h-5 text-green-500" /> Strengths
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="list-disc list-inside space-y-2">
+          {testResults.strengths.map((strength, index) => (
+            <li key={index} className="text-sm">{strength}</li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 text-amber-500" /> Areas for Improvement
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="list-disc list-inside space-y-2">
+          {testResults.weaknesses.map((weakness, index) => (
+            <li key={index} className="text-sm">{weakness}</li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+const DetailedResults = ({ testResults }: { testResults: TestResult }) => (
+  <Card>
+    <CardHeader className="pb-2">
+      <CardTitle>Detailed Results</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <Tabs defaultValue="listening" className="w-full">
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="listening">Listening</TabsTrigger>
+          <TabsTrigger value="reading">Reading</TabsTrigger>
+          <TabsTrigger value="writing">Writing</TabsTrigger>
+          {/* Removed Speaking tab */}
+        </TabsList>
+        
+        <TabsContent value="listening">
+          <SectionDetail
+            section={testResults.sections[0]}
+            accuracyData={{
+              correct: testResults.sections[0].details.correctAnswers,
+              total: testResults.sections[0].details.totalQuestions,
+            }}
+          />
+        </TabsContent>
+        
+        <TabsContent value="reading">
+          <SectionDetail
+            section={testResults.sections[1]}
+            accuracyData={{
+              correct: testResults.sections[1].details.correctAnswers,
+              total: testResults.sections[1].details.totalQuestions,
+            }}
+          />
+        </TabsContent>
+        
+        <TabsContent value="writing">
+          <div className="space-y-4">
+            <h3 className="text-md font-medium">Task 1 Assessment</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-medium mb-2">Strengths</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  {testResults.sections[2].details.task1.strengths.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium mb-2">Areas for Improvement</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  {testResults.sections[2].details.task1.weaknesses.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            
+            <h4 className="text-sm font-medium mt-4 mb-2">Assessment Criteria</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {testResults.sections[2].details.task1.criteria.map((criterion, i) => (
+                <Card key={i} className="bg-gray-50">
+                  <CardContent className="p-4">
+                    <div className="font-medium text-xs mb-1">{criterion.name}</div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-semibold">{criterion.score}</span>
+                      <span className="text-xs text-gray-500">(out of {criterion.maxScore})</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+        
+        {/* Removed Speaking TabsContent */}
+      </Tabs>
+    </CardContent>
+  </Card>
+);
+
+interface AccuracyData {
+  correct: number;
+  total: number;
+}
+
+const SectionDetail = ({ section, accuracyData }: { section: any; accuracyData: AccuracyData }) => (
+  <div className="space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Card className="bg-gray-50">
+        <CardContent className="p-4 flex items-center gap-3">
+          <div className="bg-blue-100 p-2 rounded-full">
+            <Award className="w-6 h-6 text-blue-700" />
+          </div>
+          <div>
+            <div className="text-sm text-gray-500">Band Score</div>
+            <div className="text-xl font-bold">{section.bandScore}</div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="bg-gray-50">
+        <CardContent className="p-4 flex items-center gap-3">
+          <div className="bg-green-100 p-2 rounded-full">
+            <BarChart3 className="w-6 h-6 text-green-700" />
+          </div>
+          <div>
+            <div className="text-sm text-gray-500">Accuracy</div>
+            <div className="text-xl font-bold">
+              {section.details.accuracy || `${Math.round((accuracyData.correct / Math.max(accuracyData.total, 1)) * 100)}%`}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="bg-gray-50">
+        <CardContent className="p-4 flex items-center gap-3">
+          <div className="bg-amber-100 p-2 rounded-full">
+            <Clock className="w-6 h-6 text-amber-700" />
+          </div>
+          <div>
+            <div className="text-sm text-gray-500">Questions</div>
+            <div className="text-xl font-bold">{accuracyData.correct}/{accuracyData.total}</div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+    
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div>
+        <h4 className="text-sm font-medium mb-3">Strengths</h4>
+        <ul className="list-disc list-inside space-y-1 text-sm">
+          {section.details.strengths?.map((strength: string, i: number) => (
+            <li key={i}>{strength}</li>
+          ))}
+        </ul>
+      </div>
+      
+      <div>
+        <h4 className="text-sm font-medium mb-3">Areas for Improvement</h4>
+        <ul className="list-disc list-inside space-y-1 text-sm">
+          {section.details.weaknesses?.map((weakness: string, i: number) => (
+            <li key={i}>{weakness}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+);
 
 export default Results;

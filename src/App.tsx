@@ -12,7 +12,7 @@ import TestSelection from "./pages/TestSelection";
 import ListeningTest from "./pages/ListeningTest";
 import ReadingTest from "./pages/ReadingTest";
 import WritingTest from "./pages/WritingTest";
-import SpeakingTest from "./pages/SpeakingTest";
+// Removed SpeakingTest import
 import Results from "./pages/Results";
 
 const queryClient = new QueryClient();
@@ -30,7 +30,7 @@ const App = () => (
             <Route path="/test/listening" element={<ListeningTest />} />
             <Route path="/test/reading" element={<ReadingTest />} />
             <Route path="/test/writing" element={<WritingTest />} />
-            <Route path="/test/speaking" element={<SpeakingTest />} />
+            {/* Removed route for speaking test */}
             <Route path="/results" element={<Results />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
