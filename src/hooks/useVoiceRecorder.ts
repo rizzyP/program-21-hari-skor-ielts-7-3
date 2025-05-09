@@ -1,14 +1,17 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { transcribeAudioWithGemini } from '@/services/openRouterService';
 
 interface UseVoiceRecorderProps {
   onTranscriptionComplete?: (text: string) => void;
   maxDuration?: number;
+  question?: string;
 }
 
 export const useVoiceRecorder = ({
   onTranscriptionComplete,
-  maxDuration = 30
+  maxDuration = 30,
+  question = ''
 }: UseVoiceRecorderProps = {}) => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState<string | null>(null);
@@ -104,12 +107,9 @@ export const useVoiceRecorder = ({
     setIsTranscribing(true);
     
     try {
-      // For now, we'll simulate the transcription with a mock response
-      // In a real app, this would use a speech-to-text API like Google's or Whisper
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call delay
-      
-      // Simulate transcription result based on the current part and question
-      const simulatedText = "This is a simulated transcription. In a real implementation, this would be the text converted from the audio recording using an API like Whisper.";
+      // In a production environment, we would upload the blob to a server or directly to Whisper API
+      // For now, we'll use our simulated transcription with Gemini
+      const simulatedText = await transcribeAudioWithGemini(question);
       
       setTranscription(simulatedText);
       

@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { useVoiceRecorder } from './useVoiceRecorder';
 
@@ -6,7 +7,8 @@ export const useRecordingControls = (
   currentQuestion: number,
   setIsRecording: (isRecording: boolean) => void,
   setTranscripts: (value: React.SetStateAction<Record<string, string>>) => void,
-  handleNextQuestion: () => void
+  handleNextQuestion: () => void,
+  currentQuestionText?: string
 ) => {
   const { 
     isRecording,
@@ -17,6 +19,7 @@ export const useRecordingControls = (
     stopRecording: stopVoiceRecording
   } = useVoiceRecorder({
     maxDuration: 30, // 30 seconds max recording time
+    question: currentQuestionText || '',
     onTranscriptionComplete: (text) => {
       // Save the transcription and move to next question
       setTranscripts(prev => ({

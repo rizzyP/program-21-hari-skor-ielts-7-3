@@ -40,9 +40,9 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
 }) => {
   const [recordingTime, setRecordingTime] = useState<number>(0);
   
-  // Set recording time based on current part (only part 1 now)
+  // Set recording time based on current part
   useEffect(() => {
-    if (currentPart === 1) setRecordingTime(20);
+    if (currentPart === 1) setRecordingTime(30);
   }, [currentPart]);
 
   return (

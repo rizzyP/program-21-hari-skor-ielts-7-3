@@ -75,6 +75,9 @@ export const useSpeakingTest = () => {
     currentPhase
   );
 
+  // Get the current question text for transcription
+  const currentQuestionText = examinerMessage || '';
+
   // Set up recording controls after navigation is set up
   // because it depends on handleNextQuestion
   const {
@@ -89,7 +92,8 @@ export const useSpeakingTest = () => {
     currentQuestion,
     setIsRecording,
     setTranscripts,
-    handleNextQuestion
+    handleNextQuestion,
+    currentQuestionText
   );
 
   // Initialize the test when component mounts

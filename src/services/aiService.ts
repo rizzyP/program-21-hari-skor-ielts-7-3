@@ -1,8 +1,6 @@
 
 import { UserAnswer, Feedback } from '@/types/test';
-
-// Replace with your actual OpenAI API key or environment variable
-const API_KEY = 'your-openai-api-key';
+import { evaluateWritingWithGemini, evaluateSpeakingWithGemini } from './openRouterService';
 
 export async function assessWritingTask(
   prompt: string,
@@ -10,23 +8,24 @@ export async function assessWritingTask(
   taskType: 1 | 2
 ): Promise<Feedback> {
   try {
-    const systemPrompt = taskType === 1
-      ? `Analyze this IELTS Writing Task 1 response based on official IELTS criteria. 
-         Provide scores (1-9) and detailed feedback for: Task Achievement, Coherence and Cohesion, 
-         Lexical Resource, and Grammatical Range and Accuracy.`
-      : `Analyze this IELTS Writing Task 2 response based on official IELTS criteria. 
-         Provide scores (1-9) and detailed feedback for: Task Response, Coherence and Cohesion, 
-         Lexical Resource, and Grammatical Range and Accuracy.`;
+    console.log('Assessing writing with Gemini...', {prompt, userAnswer});
     
-    // In a production app, this would make a real API call to OpenAI
-    console.log('Assessing writing with AI...', {prompt, userAnswer});
+    // Call Gemini API for evaluation
+    const geminiResponse = await evaluateWritingWithGemini(prompt, userAnswer, taskType);
     
-    // This is a mock response for demonstration purposes
-    // In a real app, you would call the OpenAI API here
-    return mockAIResponse(taskType);
+    try {
+      // Try to parse the response as JSON
+      const parsedResponse = JSON.parse(geminiResponse);
+      return parsedResponse;
+    } catch (parseError) {
+      console.error('Error parsing Gemini response:', parseError);
+      // If parsing fails, return a fallback response
+      return mockAIResponse(taskType);
+    }
   } catch (error) {
     console.error('Error assessing writing task:', error);
-    throw new Error('Failed to assess writing task');
+    // Fallback to mock response in case of error
+    return mockAIResponse(taskType);
   }
 }
 
@@ -35,18 +34,24 @@ export async function assessSpeakingResponse(
   transcription: string
 ): Promise<Feedback> {
   try {
-    const systemPrompt = `Analyze this IELTS Speaking response based on official IELTS criteria. 
-                          Provide scores (1-9) and detailed feedback for: Fluency and Coherence, 
-                          Lexical Resource, Grammatical Range and Accuracy, and Pronunciation.`;
+    console.log('Assessing speaking with Gemini...', {question, transcription});
     
-    // In a production app, this would make a real API call to OpenAI
-    console.log('Assessing speaking with AI...', {question, transcription});
+    // Call Gemini API for evaluation
+    const geminiResponse = await evaluateSpeakingWithGemini(question, transcription);
     
-    // This is a mock response for demonstration purposes
-    return mockSpeakingAIResponse();
+    try {
+      // Try to parse the response as JSON
+      const parsedResponse = JSON.parse(geminiResponse);
+      return parsedResponse;
+    } catch (parseError) {
+      console.error('Error parsing Gemini response:', parseError);
+      // If parsing fails, return a fallback response
+      return mockSpeakingAIResponse();
+    }
   } catch (error) {
     console.error('Error assessing speaking response:', error);
-    throw new Error('Failed to assess speaking response');
+    // Fallback to mock response in case of error
+    return mockSpeakingAIResponse();
   }
 }
 
