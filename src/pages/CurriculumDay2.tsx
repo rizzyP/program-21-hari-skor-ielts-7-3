@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import MaterialContent from '@/components/curriculum/MaterialContent';
@@ -255,12 +254,130 @@ const CurriculumDay2 = () => {
       title: "Mengasah Kemampuan Prediksi Konteks dan Jawaban",
       content: (
         <div className="space-y-4">
-          <p>Materi untuk Chapter 1.8 ini akan segera ditambahkan. Chapter ini akan membahas teknik-teknik untuk mengasah kemampuan Anda dalam memprediksi konteks dan jawaban yang mungkin muncul di IELTS Listening, terutama untuk Section 1 dan Section 2.</p>
-          <div className="flex justify-center">
-            <div className="p-8 border rounded-lg bg-slate-50 w-full max-w-md text-center">
-              <h4 className="text-lg font-semibold">Coming Soon</h4>
-              <p className="text-gray-600">Materi sedang dalam pengembangan</p>
-            </div>
+          <p>Selamat datang di Chapter 1.8, sebuah chapter yang akan membekali Anda dengan salah satu mindset dan skill terpenting untuk sukses di seluruh bagian IELTS Listening: kemampuan prediksi. Prediksi dalam konteks ini bukanlah tebakan asal-asalan, melainkan proses proaktif menggunakan waktu persiapan singkat sebelum audio diputar untuk menganalisis pertanyaan, mengantisipasi jenis jawaban yang mungkin muncul, dan bahkan memikirkan kemungkinan sinonim atau parafrase. Menguasai prediksi akan mengubah Anda dari pendengar pasif menjadi test-taker yang strategis, lebih siap menangkap informasi, dan lebih efisien dalam menjawab. Skill ini relevan dari Section 1 hingga Section 4.</p>
+
+          <h3 className="text-xl font-bold mt-6">1. Menganalisis Pertanyaan Secara Mendalam Sebelum Mendengar</h3>
+          <p>Waktu beberapa puluh detik yang diberikan sebelum setiap bagian audio dimulai adalah emas murni. Memanfaatkannya secara maksimal untuk menganalisis pertanyaan adalah fondasi dari prediksi yang efektif.</p>
+          
+          <h4 className="text-lg font-semibold">Mengapa Analisis Awal Sangat Penting?</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Mengurangi Beban Kognitif: Saat audio mulai, otak Anda sudah 'disetel' untuk mencari informasi spesifik, bukan mencoba memahami pertanyaan dan audio secara bersamaan.</li>
+            <li>Mengarahkan Fokus Pendengaran: Anda tahu apa yang harus didengarkan, membantu menyaring kebisingan informasi yang tidak relevan.</li>
+            <li>Mengaktifkan Pengetahuan Latar (Background Knowledge): Membaca pertanyaan dan konteks dapat mengaktifkan kosakata dan pemahaman Anda tentang topik tersebut.</li>
+            <li>Memungkinkan Prediksi: Analisis adalah langkah pertama sebelum Anda bisa memprediksi jenis jawaban atau sinonim.</li>
+            <li>Mencegah Kesalahan Konyol: Memastikan Anda tahu batas kata dan apa yang sebenarnya ditanyakan.</li>
+          </ul>
+
+          <h4 className="text-lg font-semibold">Langkah-langkah Analisis Pertanyaan dalam Waktu Persiapan:</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            <li className="font-medium">Baca Instruksi UTAMA: Selalu mulai dari sini! Berapa batas kata/angka? ("NO MORE THAN TWO WORDS AND/OR A NUMBER"). Apa jenis tugasnya secara umum (Choose, Complete, Label?). Lingkari atau garis bawahi instruksi ini. Ini tidak bisa ditawar!</li>
+            <li>Identifikasi Tipe Pertanyaan Spesifik: Apakah ini Form Completion? Multiple Choice? Map Labelling? Matching? Short Answer?</li>
+            <li>Baca Pertanyaan/Pernyataan/Label SATU PER SATU:
+              <ul className="list-disc pl-6 mt-1">
+                <li>Untuk Completion Tasks: Baca kata-kata di sekitar setiap gap. Pahami konteks kalimat atau field tersebut.</li>
+                <li>Untuk Multiple Choice: Baca stem (pertanyaan) DAN semua options (A, B, C, ...). Pahami pertanyaan utama dan perbedaan antar opsi.</li>
+                <li>Untuk Map/Plan Labelling: Lihat judul peta, orientasikan diri (pintu masuk, label yang ada).</li>
+                <li>Untuk Matching: Baca kedua daftar (misal, daftar pembicara dan daftar opini).</li>
+                <li>Untuk Short Answer Questions: Baca pertanyaan dengan teliti, identifikasi kata tanya (What, Where, etc.).</li>
+              </ul>
+            </li>
+            <li className="font-medium">Garis Bawahi KATA KUNCI (Keywords): Di setiap pertanyaan/pernyataan/opsi/label, garis bawahi kata-kata yang membawa makna utama:
+              <ul className="list-disc pl-6 mt-1">
+                <li>Kata Benda (Nouns): Terutama yang spesifik.</li>
+                <li>Kata Kerja (Verbs): Terutama yang menunjukkan aksi atau hubungan penting.</li>
+                <li>Kata Sifat (Adjectives) & Keterangan (Adverbs): Yang memberi detail penting.</li>
+                <li>Nama Orang, Tempat, Organisasi.</li>
+                <li>Angka, Tanggal, Waktu (jika ada dalam pertanyaan/opsi).</li>
+                <li>Kata Tanya (Who, What, Where, When, Why, How).</li>
+                <li>Kata Negatif atau Pembatas (not, except, only, main, primarily).</li>
+              </ul>
+            </li>
+            <li>Pahami Konteks Umum (Jika Memungkinkan): Lihat judul section, judul form/map, atau kalimat pengantar jika ada.</li>
+            <li>Perhatikan Urutan Pertanyaan: Sebagian besar tipe soal mengikuti urutan informasi dalam audio.</li>
+          </ul>
+
+          <h3 className="text-xl font-bold mt-6">2. Memprediksi Kata-kata dan Frasa Kunci Jawaban</h3>
+          <p>Setelah menganalisis pertanyaan, langkah berikutnya adalah mencoba memprediksi jenis kata atau bahkan kata/frasa spesifik yang mungkin menjadi jawaban, terutama untuk completion tasks.</p>
+
+          <h4 className="text-lg font-semibold">Level Prediksi:</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Prediksi Tipe Kata (Word Type Prediction): Paling dasar dan sangat berguna. Apakah gap ini membutuhkan Noun, Verb, Adjective, Adverb, Number, Name, Date?</li>
+            <li>Prediksi Konten (Content Prediction): Berdasarkan konteks, bisakah kita memperkirakan topik atau kategori jawabannya?</li>
+            <li>Prediksi Kata Spesifik (Specific Word Prediction): Kadang mungkin, tapi jangan terlalu terpaku pada ini.</li>
+          </ul>
+
+          <h4 className="text-lg font-semibold">Cara Melakukan Prediksi:</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Berdasarkan Tata Bahasa (Grammar):
+              <ul className="list-disc pl-6 mt-1">
+                <li>Lihat kata sebelum dan sesudah gap. Struktur kalimat seringkali menentukan tipe kata yang dibutuhkan.</li>
+                <li>Contoh (Sentence Completion): "Students need to submit their ____ by Friday." (Kata setelah 'their' hampir pasti Noun).</li>
+              </ul>
+            </li>
+            <li>Berdasarkan Konteks Field (Form/Table):
+              <ul className="list-disc pl-6 mt-1">
+                <li>Field "Occupation:" → Prediksi: Jenis pekerjaan (Noun, e.g., teacher, engineer, student).</li>
+                <li>Field "Duration of stay:" → Prediksi: Angka + satuan waktu (e.g., 3 nights, 2 weeks).</li>
+              </ul>
+            </li>
+            <li>Berdasarkan Konteks Topik:
+              <ul className="list-disc pl-6 mt-1">
+                <li>Jika topik diskusi adalah "masalah lingkungan", prediksi jawaban mungkin melibatkan kata-kata seperti pollution, deforestation, recycling.</li>
+                <li>Jika konteksnya adalah "pendaftaran universitas", prediksi kata seperti application, deadline, fees, courses.</li>
+              </ul>
+            </li>
+            <li>Berdasarkan Pertanyaan Short Answer:
+              <ul className="list-disc pl-6 mt-1">
+                <li>"Why did the company relocate?" → Prediksi: Alasan (frasa dimulai dengan because, atau noun phrase seperti lower costs).</li>
+                <li>"What equipment is needed?" → Prediksi: Daftar kata benda (e.g., ropes, helmets, boots).</li>
+              </ul>
+            </li>
+          </ul>
+
+          <h3 className="text-xl font-bold mt-6">3. Mengantisipasi Sinonim dan Parafrase</h3>
+          <p>Ini adalah puncak dari skill prediksi dan kunci mutlak untuk sukses di IELTS Listening. IELTS sengaja menggunakan kata-kata berbeda dalam audio dibandingkan dalam pertanyaan untuk menguji pemahaman makna, bukan sekadar pencocokan kata.</p>
+
+          <h4 className="text-lg font-semibold">Mengapa IELTS Melakukan Ini?</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Menguji pemahaman kosa kata yang luas.</li>
+            <li>Menguji kemampuan memahami ide bukan hanya kata individual.</li>
+            <li>Merefleksikan komunikasi nyata di mana orang sering mengungkapkan ide yang sama dengan cara berbeda.</li>
+          </ul>
+
+          <h4 className="text-lg font-semibold">Bagaimana Cara Mengantisipasi Sinonim/Parafrase?</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Saat Menganalisis Pertanyaan (Waktu Persiapan):
+              <ul className="list-disc pl-6 mt-1">
+                <li>Setelah menggarisbawahi kata kunci di pertanyaan/opsi, luangkan beberapa detik untuk berpikir: "Bagaimana lagi cara mengatakan ini?"</li>
+                <li>Fokus pada kata kunci utama (nouns, verbs, adjectives, adverbs).</li>
+                <li>Contoh:
+                  <ul className="list-disc pl-6 mt-1">
+                    <li>Keyword di soal: difficulty → Pikirkan: problem, challenge, hard part, issue.</li>
+                    <li>Keyword di soal: benefits → Pikirkan: advantages, positive aspects, upsides, good points.</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>Saat Mendengarkan:
+              <ul className="list-disc pl-6 mt-1">
+                <li>Jangan hanya 'menunggu' kata kunci persis dari pertanyaan. Dengarkan makna dan konsepnya.</li>
+                <li>Bersiaplah mendengar ide yang sama diungkapkan dengan struktur kalimat yang berbeda atau kosakata yang berbeda.</li>
+              </ul>
+            </li>
+          </ul>
+
+          <h4 className="text-lg font-semibold">Membangun Kemampuan Mengenali Sinonim/Parafrase:</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Belajar Kosakata Secara Aktif: Jangan hanya menghafal kata baru, tapi pelajari juga sinonim, antonim, dan contoh penggunaannya.</li>
+            <li>Perhatikan Saat Latihan: Setiap kali Anda menemukan jawaban yang merupakan parafrase, catat!</li>
+            <li>Baca Secara Luas: Membaca artikel, berita, atau buku dalam bahasa Inggris akan memaparkan Anda pada berbagai cara untuk mengungkapkan ide yang sama.</li>
+            <li>Gunakan Thesaurus (dengan Hati-Hati): Thesaurus bisa membantu mencari sinonim, tapi pastikan sinonim tersebut cocok dengan konteks kalimat.</li>
+            <li>Fokus pada Kata Kerja & Kata Sifat: Ini seringkali menjadi kunci parafrase ide.</li>
+          </ul>
+
+          <div className="bg-slate-100 p-4 rounded-lg mt-6">
+            <h4 className="font-semibold">Kesimpulan:</h4>
+            <p>Prediksi adalah skill proaktif yang memberdayakan Anda dalam tes IELTS Listening. Dengan secara sistematis menganalisis pertanyaan selama waktu persiapan, memprediksi jenis dan konten jawaban yang mungkin, dan secara aktif mengantisipasi sinonim dan parafrase dari kata kunci, Anda secara signifikan meningkatkan peluang untuk fokus pada informasi yang tepat, mengenali jawaban meskipun diungkapkan secara berbeda, dan menjawab dengan lebih akurat dan efisien. Keterampilan ini membutuhkan latihan yang sadar dan konsisten.</p>
           </div>
         </div>
       )
