@@ -4,9 +4,12 @@ import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, CheckSquare, BarChart } from 'lucide-react';
+import { BookOpen, CheckSquare, BarChart, Mail, User } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 const Index = () => {
+  const { user } = useAuth();
+
   return (
     <Layout>
       <div className="max-w-6xl mx-auto">
@@ -17,9 +20,17 @@ const Index = () => {
             Master all IELTS sections with personalized practice, instant feedback, and proven strategies.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
+            {!user && (
+              <Link to="/auth">
+                <Button size="lg" className="gap-2">
+                  <Mail className="h-5 w-5" />
+                  Sign in with Magic Link
+                </Button>
+              </Link>
+            )}
             <Link to="/test">
-              <Button size="lg" className="gap-2">
-                <CheckSquare className="h-5 w-5" />
+              <Button size="lg" className={!user ? "variant-outline" : ""}>
+                <CheckSquare className="h-5 w-5 mr-2" />
                 Take Assessment Test
               </Button>
             </Link>
