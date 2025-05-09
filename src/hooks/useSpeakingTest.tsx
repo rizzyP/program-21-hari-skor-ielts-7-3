@@ -1,60 +1,74 @@
-
-import { useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTest } from '@/context/TestContext';
-import { useSpeakingTestState } from './useSpeakingTestState';
+import { Phase } from '@/components/test/TestPhases';
 import { useExaminerSimulation } from './useExaminerSimulation';
-import { useRecordingControls } from './useRecordingControls';
+import { useVoiceRecorder } from './useVoiceRecorder';
 import { useTestContent } from './useTestContent';
 import { useTestNavigation } from './useTestNavigation';
-import { SpeakingContent } from '@/types/test';
+import { useSpeakingTestState } from './useSpeakingTestState';
 
 export const useSpeakingTest = () => {
-  const { 
-    currentTest, 
-    startSection,
-    saveAnswer,
-  } = useTest();
+  // Re-use all of the existing functionality
+  const { currentTest, testType } = useTest();
+  const { speakingSection, speakingContent } = useTestContent();
   
-  // Compose all the hooks
+  // State management
   const {
     currentPhase,
-    setCurrentPhase,
-    isStarted,
+    setCurrentPhase, 
+    isStarted, 
     setIsStarted,
     isRecording,
     setIsRecording,
-    currentQuestion,
-    setCurrentQuestion,
-    currentPart,
+    isTranscribing,
+    setIsTranscribing,
+    currentPart, 
     setCurrentPart,
+    currentQuestion, 
+    setCurrentQuestion,
     transcripts,
     setTranscripts,
-    partCompleted,
+    partCompleted, 
     setPartCompleted,
-    fadeIn,
     questionNumber,
-    setQuestionNumber,
-    totalQuestions,
-    setTotalQuestions
+    setQuestionNumber
   } = useSpeakingTestState();
 
+  // Voice recording functionality
+  const {
+    startRecording,
+    stopRecording
+  } = useVoiceRecorder(setIsRecording, setIsTranscribing, (transcript: string) => {
+    // Handle transcription with existing code...
+    const questionId = `p${currentPart}q${currentQuestion}`;
+    setTranscripts(prev => ({
+      ...prev,
+      [questionId]: transcript
+    }));
+    setIsTranscribing(false);
+  });
+
+  // Examiner simulation with audio capabilities
   const {
     examinerSpeaking,
     examinerMessage,
+    fadeIn,
     simulateExaminerSpeaking,
     playExaminerAudioSequence,
-    cleanupExaminerTimeout
+    cleanupExaminerTimeout,
+    hasUserInteracted,
+    audioError,
+    simulateUserInteraction
   } = useExaminerSimulation(setIsRecording);
 
-  const {
-    speakingSection,
-    speakingContent,
-    getCurrentPartQuestions,
-    getCurrentQuestion
-  } = useTestContent(currentPart, currentQuestion);
+  // Get the available questions for the current part
+  const getCurrentPartQuestions = useCallback(() => {
+    // This function likely exists in your codebase - keep its implementation
+    if (!speakingContent) return [];
+    return speakingContent.questions.filter((q: any) => q.part === currentPart).map((q: any) => q.text);
+  }, [speakingContent, currentPart]);
 
-  // Create a navigation hook that gets the live state
-  // We need to declare this after test content hook to have access to getCurrentPartQuestions
+  // Setup test navigation
   const {
     handleStart,
     handleNextQuestion,
@@ -75,54 +89,32 @@ export const useSpeakingTest = () => {
     currentPhase
   );
 
-  // Get the current question text for transcription
-  const currentQuestionText = examinerMessage || '';
+  // Handle start recording
+  const handleStartRecording = useCallback(() => {
+    startRecording();
+  }, [startRecording]);
 
-  // Set up recording controls after navigation is set up
-  // because it depends on handleNextQuestion
-  const {
-    isRecording: voiceRecordingActive,
-    isTranscribing,
-    audioURL,
-    handleStartRecording,
-    handleStopRecording,
-    cleanupRecordingTimeout
-  } = useRecordingControls(
-    currentPart,
-    currentQuestion,
-    setIsRecording,
-    setTranscripts,
-    handleNextQuestion,
-    currentQuestionText
-  );
+  // Handle stop recording
+  const handleStopRecording = useCallback(() => {
+    stopRecording();
+    handleNextQuestion(); // Move to next question after recording
+  }, [stopRecording, handleNextQuestion]);
 
-  // Initialize the test when component mounts
+  // Calculate total questions
+  const totalQuestions = useCallback(() => {
+    if (!speakingContent) return 0;
+    return speakingContent.questions.filter((q: any) => q.part === 1).length;
+  }, [speakingContent])();
+
+  // Cleanup
   useEffect(() => {
-    if (currentTest) {
-      const speakingSection = currentTest.sections.find(section => section.type === 'speaking');
-      if (speakingSection) {
-        startSection(speakingSection.id);
-        
-        // Set total questions - since we're only doing part 1, hardcode to 4
-        setTotalQuestions(4);
-      }
-    }
-
-    // Clean up audio resources when component unmounts
     return () => {
       cleanupExaminerTimeout();
-      cleanupRecordingTimeout();
     };
-  }, [currentTest, startSection, setTotalQuestions, cleanupExaminerTimeout, cleanupRecordingTimeout]);
-
-  // Save transcripts to test context when they change
-  useEffect(() => {
-    Object.entries(transcripts).forEach(([key, value]) => {
-      saveAnswer(key, value);
-    });
-  }, [transcripts, saveAnswer]);
+  }, [cleanupExaminerTimeout]);
 
   return {
+    // All the existing properties and functions
     currentPhase,
     isStarted,
     isRecording,
@@ -139,10 +131,14 @@ export const useSpeakingTest = () => {
     totalQuestions,
     questionNumber,
     getCurrentPartQuestions,
-    getCurrentQuestion,
     handleStart,
     handleStartRecording,
     handleStopRecording,
-    handleNavigateResults
+    handleNavigateResults,
+    
+    // New properties for audio interaction
+    hasUserInteracted,
+    audioError,
+    simulateUserInteraction
   };
 };

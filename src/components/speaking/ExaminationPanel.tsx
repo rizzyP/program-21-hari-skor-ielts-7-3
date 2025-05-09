@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Volume2 } from 'lucide-react';
 import { Phase } from '@/components/test/TestPhases';
 import ExaminerAvatar from './ExaminerAvatar';
 import RecordingControls from './RecordingControls';
@@ -22,6 +22,8 @@ interface ExaminationPanelProps {
   currentPart: number;
   currentQuestion: number;
   transcripts: Record<string, string>;
+  hasUserInteracted?: boolean;
+  onEnableAudio?: () => void;
 }
 
 const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
@@ -37,6 +39,8 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
   currentPart,
   currentQuestion,
   transcripts,
+  hasUserInteracted = true,
+  onEnableAudio
 }) => {
   const [recordingTime, setRecordingTime] = useState<number>(0);
   
@@ -70,6 +74,23 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
       </CardHeader>
       
       <CardContent className="pt-6 pb-4">
+        {/* Audio warning when user hasn't interacted */}
+        {!hasUserInteracted && onEnableAudio && examinerSpeaking && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md flex items-center justify-between">
+            <span className="text-sm text-blue-700">
+              Audio playback requires interaction. Click the button to enable audio.
+            </span>
+            <Button 
+              onClick={onEnableAudio}
+              variant="outline" 
+              size="sm" 
+              className="bg-white flex items-center gap-2"
+            >
+              <Volume2 className="h-4 w-4" /> Enable Audio
+            </Button>
+          </div>
+        )}
+
         {/* Current question displayed prominently in the center */}
         {currentPhase === Phase.SPEAKING_PART1 && !examinerSpeaking && (
           <div className="text-center my-8 max-w-2xl mx-auto">

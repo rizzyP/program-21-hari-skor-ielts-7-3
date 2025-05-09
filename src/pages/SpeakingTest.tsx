@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { TestPhases, Phase } from '@/components/test/TestPhases';
 import Timer from '@/components/test/Timer';
@@ -7,6 +7,9 @@ import { useSpeakingTest } from '@/hooks/useSpeakingTest';
 import TestInstructions from '@/components/speaking/TestInstructions';
 import ExaminationPanel from '@/components/speaking/ExaminationPanel';
 import ProgressIndicator from '@/components/speaking/ProgressIndicator';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const SpeakingTest = () => {
   const {
@@ -29,8 +32,17 @@ const SpeakingTest = () => {
     handleStart,
     handleStartRecording,
     handleStopRecording,
-    handleNavigateResults
+    handleNavigateResults,
+    hasUserInteracted,
+    simulateUserInteraction,
+    audioError
   } = useSpeakingTest();
+
+  // Effect to attempt auto-unlock of audio context
+  useEffect(() => {
+    // Try to unlock audio as soon as component mounts
+    simulateUserInteraction();
+  }, [simulateUserInteraction]);
 
   if (!speakingSection || !speakingContent) {
     return (
@@ -45,8 +57,37 @@ const SpeakingTest = () => {
   return (
     <Layout className="pb-16">
       <div className="max-w-4xl mx-auto space-y-6">
+        {!hasUserInteracted && (
+          <Alert variant="warning" className="bg-yellow-50 text-yellow-800 border-yellow-200">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            <AlertDescription className="flex items-center justify-between w-full">
+              <span>Audio playback requires user interaction. Please click the button below to enable audio:</span>
+              <Button 
+                onClick={simulateUserInteraction}
+                variant="outline" 
+                size="sm" 
+                className="ml-4 flex items-center gap-2 bg-white"
+              >
+                <Volume2 className="h-4 w-4" /> Enable Audio
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {audioError && (
+          <Alert variant="destructive" className="bg-red-50 text-red-800 border-red-200">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            <AlertDescription>
+              {audioError} Please click anywhere on the page to enable audio playback.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         {!isStarted ? (
-          <TestInstructions onStart={handleStart} />
+          <TestInstructions onStart={() => {
+            simulateUserInteraction(); // Try to unlock audio
+            handleStart(); // Start the test
+          }} />
         ) : (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -76,6 +117,8 @@ const SpeakingTest = () => {
               currentPart={currentPart}
               currentQuestion={currentQuestion}
               transcripts={transcripts}
+              hasUserInteracted={hasUserInteracted}
+              onEnableAudio={simulateUserInteraction}
             />
             
             {/* Progress indicator */}
