@@ -17,6 +17,7 @@ import WritingTest from "./pages/WritingTest";
 import Results from "./pages/Results";
 import Curriculum from "./pages/Curriculum";
 import CurriculumDay1 from "./pages/CurriculumDay1";
+import CurriculumDay2 from "./pages/CurriculumDay2";
 import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
                 <Route path="/results" element={<Results />} />
                 <Route path="/curriculum" element={<Curriculum />} />
                 <Route path="/curriculum/day1" element={<CurriculumDay1 />} />
+                <Route path="/curriculum/day2" element={<CurriculumDay2 />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />

@@ -47,6 +47,7 @@ const CurriculumPage = () => {
       duration: "85 min", 
       progress: "0/4",
       locked: false,
+      route: "/curriculum/day2",
       items: [
         { title: "Chapter 1.5: Mendalami Percakapan Sehari-hari (Everyday Conversations)", duration: "25 min" },
         { title: "Chapter 1.6: Strategi Jitu Section 1 (Percakapan Sehari-hari)", duration: "20 min" },
