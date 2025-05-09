@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -37,13 +36,31 @@ const ListeningTest = () => {
   const [audioMuted, setAudioMuted] = useState<boolean>(false);
   const [userInteracted, setUserInteracted] = useState<boolean>(false);
   
-  // Use the enhanced audio player hook
-  const { isPlaying, isReady, playAudio, forcePlayAudio, stopAudio, audioRef } = useAudioPlayer();
+  // Use the audio player hook
+  const { isPlaying, isReady, playAudio, stopAudio, pauseAudio } = useAudioPlayer();
+  
+  // Create a local audio ref for tracking playback progress
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Refs for timers
   const previewTimerRef = useRef<NodeJS.Timeout | null>(null);
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
   const reviewTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Initialize audio element
+  useEffect(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.volume = 1.0;
+    }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, []);
   
   // Load audio source when section changes
   useEffect(() => {
@@ -177,22 +194,25 @@ const ListeningTest = () => {
     if (audioRef.current) {
       audioRef.current.muted = audioMuted;
       
-      // Try to play the audio
-      playAudio(audioSource)
-        .then(() => {
-          toast.info('Audio is now playing', {
-            description: 'Listen carefully as it will only play once.'
+      try {
+        audioRef.current.play()
+          .then(() => {
+            toast.info('Audio is now playing', {
+              description: 'Listen carefully as it will only play once.'
+            });
+          })
+          .catch(error => {
+            console.error('Audio failed to play automatically:', error);
+            
+            // Show a message to the user that they need to interact
+            toast.error('Audio failed to play automatically', {
+              description: 'Please click the play button to start the audio.',
+              duration: 5000
+            });
           });
-        })
-        .catch(error => {
-          console.error('Audio failed to play automatically:', error);
-          
-          // Show a message to the user that they need to interact
-          toast.error('Audio failed to play automatically', {
-            description: 'Please click the play button to start the audio.',
-            duration: 5000
-          });
-        });
+      } catch (error) {
+        console.error('Error starting audio playback:', error);
+      }
     }
   };
   
@@ -203,20 +223,26 @@ const ListeningTest = () => {
       setUserInteracted(true);
       
       if (!isPlaying) {
-        forcePlayAudio()
-          .then(() => {
-            toast.success('Audio now playing', {
-              description: 'Listen carefully as it will only play once.'
+        try {
+          audioRef.current.play()
+            .then(() => {
+              toast.success('Audio now playing', {
+                description: 'Listen carefully as it will only play once.'
+              });
+            })
+            .catch(error => {
+              console.error('Manual play failed:', error);
+              toast.error('Audio failed to play', {
+                description: 'Please check your audio settings and try again.'
+              });
             });
-          })
-          .catch(error => {
-            console.error('Manual play failed:', error);
-            toast.error('Audio failed to play', {
-              description: 'Please check your audio settings and try again.'
-            });
-          });
+        } catch (error) {
+          console.error('Error in manual play:', error);
+        }
       } else {
-        stopAudio();
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
       }
     }
   };
@@ -292,7 +318,9 @@ const ListeningTest = () => {
 
   // Skip this section and move to the next one (for demo purposes)
   const handleSkipSection = () => {
-    stopAudio();
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
     setAudioProgress(100);
     
     if (currentSectionIndex < 1) {
@@ -316,7 +344,9 @@ const ListeningTest = () => {
     if (reviewTimerRef.current) clearInterval(reviewTimerRef.current);
     
     // Stop audio
-    stopAudio();
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
     
     submitSection();
     toast.success('Test submitted', {
