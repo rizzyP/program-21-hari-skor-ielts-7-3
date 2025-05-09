@@ -12,7 +12,7 @@ const Index = () => {
       <div className="max-w-6xl mx-auto">
         {/* Hero Section */}
         <section className="py-12 text-center">
-          <h1 className="text-4xl font-bold mb-4">Prepare for IELTS with AI-Powered Guidance</h1>
+          <h1 className="text-4xl font-bold mb-4">Program 21 Hari Skor IELTS 7.0</h1>
           <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
             Master all IELTS sections with personalized practice, instant feedback, and proven strategies.
           </p>
