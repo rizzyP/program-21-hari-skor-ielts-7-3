@@ -13,13 +13,22 @@ export type AssessmentResult = {
 
 export const saveAssessmentResult = async (result: AssessmentResult) => {
   try {
+    // Get the current user session
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+    
+    if (!userId) {
+      throw new Error("User must be logged in to save assessment results");
+    }
+    
     const { data, error } = await supabase
       .from('assessment_results')
-      .insert([{
+      .insert({
+        user_id: userId,
         test_type: result.test_type,
         score: result.score,
         answers: result.answers as any, // Cast to any to handle type mismatch
-      }])
+      })
       .select();
     
     if (error) throw error;

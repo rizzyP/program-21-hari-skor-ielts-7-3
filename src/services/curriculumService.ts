@@ -13,12 +13,21 @@ export type CurriculumProgress = {
 
 export const markSectionCompleted = async (day: number, section: string) => {
   try {
+    // Get the current user session
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+    
+    if (!userId) {
+      throw new Error("User must be logged in to mark sections as completed");
+    }
+    
     // Check if there's already an entry
     const { data: existingEntry } = await supabase
       .from('curriculum_progress')
       .select('*')
       .eq('day', day)
       .eq('section', section)
+      .eq('user_id', userId)
       .maybeSingle();
     
     if (existingEntry) {
@@ -39,6 +48,7 @@ export const markSectionCompleted = async (day: number, section: string) => {
       const { data, error } = await supabase
         .from('curriculum_progress')
         .insert({
+          user_id: userId,
           day,
           section,
           completed: true,
