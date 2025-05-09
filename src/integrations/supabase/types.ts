@@ -9,6 +9,63 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      assessment_results: {
+        Row: {
+          answers: Json | null
+          created_at: string
+          id: string
+          score: number | null
+          test_type: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          score?: number | null
+          test_type: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          score?: number | null
+          test_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      curriculum_progress: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string
+          day: number
+          id: string
+          section: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          day: number
+          id?: string
+          section: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          day?: number
+          id?: string
+          section?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

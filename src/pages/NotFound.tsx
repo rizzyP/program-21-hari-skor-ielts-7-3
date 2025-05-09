@@ -1,12 +1,14 @@
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
+import { useAuth } from "@/context/AuthContext";
 
 const NotFound = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     console.error(
@@ -14,6 +16,10 @@ const NotFound = () => {
       location.pathname
     );
   }, [location.pathname]);
+
+  const handleGoBack = () => {
+    navigate(user ? "/" : "/auth");
+  };
 
   return (
     <Layout>
@@ -28,14 +34,16 @@ const NotFound = () => {
             </p>
           </div>
           <div className="space-y-3">
-            <Button asChild className="bg-ielts-blue hover:bg-ielts-lightblue">
-              <Link to="/">Return to Home</Link>
+            <Button onClick={handleGoBack} className="bg-ielts-blue hover:bg-ielts-lightblue">
+              {user ? "Return to Home" : "Go to Login"}
             </Button>
-            <div className="pt-2">
-              <Link to="/test" className="text-ielts-blue hover:underline">
-                Go to Test Selection
-              </Link>
-            </div>
+            {user && (
+              <div className="pt-2">
+                <Button variant="link" onClick={() => navigate("/test")} className="text-ielts-blue hover:underline">
+                  Go to Test Selection
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
