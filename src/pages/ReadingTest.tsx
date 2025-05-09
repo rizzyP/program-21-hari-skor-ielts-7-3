@@ -58,6 +58,7 @@ const ReadingTest = () => {
     toast.success('Reading test completed', {
       description: 'Your answers have been submitted for evaluation.'
     });
+    // Navigate to writing test next (change from previous version)
     navigate('/test/writing');
   };
 

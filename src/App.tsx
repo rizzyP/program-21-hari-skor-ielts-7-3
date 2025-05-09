@@ -39,6 +39,7 @@ const App = () => (
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Index />} />
                 <Route path="/test" element={<TestSelection />} />
+                {/* Test flow routes in the correct sequential order */}
                 <Route path="/test/listening" element={<ListeningTest />} />
                 <Route path="/test/reading" element={<ReadingTest />} />
                 <Route path="/test/writing" element={<WritingTest />} />

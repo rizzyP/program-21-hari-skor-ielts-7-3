@@ -82,9 +82,12 @@ const Results = () => {
         
         <DetailedResults testResults={testResults} />
         
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-8 space-x-4">
           <Button onClick={() => navigate('/test')} size="lg">
             Return to Test Selection
+          </Button>
+          <Button onClick={() => navigate('/')} variant="outline" size="lg">
+            Return to Home
           </Button>
         </div>
       </div>

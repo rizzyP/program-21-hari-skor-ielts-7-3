@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -64,7 +63,7 @@ const WritingTest = () => {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setIsSubmitting(true);
     
     try {
@@ -82,8 +81,8 @@ const WritingTest = () => {
         description: 'Your answer has been submitted for evaluation.'
       });
       
-      // Redirect to results page
-      navigate('/results');
+      // Navigate to speaking test instead of results
+      navigate('/test/speaking');
     } catch (error) {
       toast.error('Error submitting answer', {
         description: 'Please try again.'

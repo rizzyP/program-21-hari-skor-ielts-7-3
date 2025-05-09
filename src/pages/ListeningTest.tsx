@@ -355,6 +355,24 @@ const ListeningTest = () => {
     navigate('/test/reading');
   };
 
+  const handleSubmit = () => {
+    // Clear all timers
+    if (previewTimerRef.current) clearInterval(previewTimerRef.current);
+    if (transitionTimerRef.current) clearInterval(transitionTimerRef.current);
+    if (reviewTimerRef.current) clearInterval(reviewTimerRef.current);
+    
+    // Stop audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    
+    submitSection();
+    toast.success('Test submitted', {
+      description: 'Your answers have been submitted.'
+    });
+    navigate('/test/reading');
+  };
+
   if (!listeningSection || !listeningContent) {
     return (
       <Layout>

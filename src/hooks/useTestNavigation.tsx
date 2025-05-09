@@ -156,6 +156,11 @@ export const useTestNavigation = (
     toast.success('Speaking test completed', {
       description: 'You have completed the IELTS speaking test!'
     });
+    
+    // Navigate to results instead of directly to results
+    setTimeout(() => {
+      handleNavigateResults();
+    }, 2000);
   };
 
   const handleNavigateResults = () => {
