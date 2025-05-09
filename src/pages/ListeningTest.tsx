@@ -719,18 +719,6 @@ const ListeningTest = () => {
                 Skip Preview
               </Button>
             )}
-            
-            {/* Emergency submit button (administrative use only) */}
-            {currentPhase !== Phase.COMPLETED && 
-             currentPhase !== Phase.FINAL_REVIEW && (
-              <Button 
-                variant="outline" 
-                onClick={handleForceSubmit}
-                className="ml-auto"
-              >
-                Force Submit (Admin)
-              </Button>
-            )}
           </div>
         </div>
       </div>
