@@ -107,7 +107,13 @@ export const useSpeakingTest = () => {
         setTotalQuestions(4);
       }
     }
-  }, [currentTest, startSection, setTotalQuestions]);
+
+    // Clean up audio resources when component unmounts
+    return () => {
+      cleanupExaminerTimeout();
+      cleanupRecordingTimeout();
+    };
+  }, [currentTest, startSection, setTotalQuestions, cleanupExaminerTimeout, cleanupRecordingTimeout]);
 
   // Save transcripts to test context when they change
   useEffect(() => {
@@ -115,14 +121,6 @@ export const useSpeakingTest = () => {
       saveAnswer(key, value);
     });
   }, [transcripts, saveAnswer]);
-
-  // Clean up timeouts when component unmounts
-  useEffect(() => {
-    return () => {
-      cleanupExaminerTimeout();
-      cleanupRecordingTimeout();
-    };
-  }, [cleanupExaminerTimeout, cleanupRecordingTimeout]);
 
   return {
     currentPhase,

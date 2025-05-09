@@ -1,6 +1,5 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { transcribeAudioWithGemini } from '@/services/openRouterService';
 
 interface UseVoiceRecorderProps {
   onTranscriptionComplete?: (text: string) => void;
@@ -76,7 +75,7 @@ export const useVoiceRecorder = ({
         
         // Start transcription
         try {
-          await transcribeAudio(audioBlob);
+          await transcribeRecording(audioBlob);
         } catch (error) {
           console.error('Transcription error:', error);
           setError('Failed to transcribe audio. Please try again.');
@@ -102,14 +101,33 @@ export const useVoiceRecorder = ({
     }
   }, [maxDuration, cleanupResources, isRecording, stopRecording]);
 
-  // Transcribe audio function
-  const transcribeAudio = async (audioBlob: Blob) => {
+  // Transcribe recording using Web Speech API or simulated response
+  const transcribeRecording = async (audioBlob: Blob) => {
     setIsTranscribing(true);
     
     try {
-      // In a production environment, we would upload the blob to a server or directly to Whisper API
-      // For now, we'll use our simulated transcription with Gemini
-      const simulatedText = await transcribeAudioWithGemini(question);
+      // In a real implementation, we would use actual Web Speech API or server-side transcription
+      // Since browser speech recognition is limited, for demo purposes we'll simulate a response
+      // based on the question
+      
+      // Simulated responses based on question types (better than random text)
+      let simulatedText = '';
+      
+      if (question.includes('artistic hobbies') || question.includes('painting')) {
+        simulatedText = "I enjoy several artistic hobbies. I particularly like painting with watercolors and sketching landscapes. I find it really relaxing, and it helps me express my creativity. I've been doing it since I was in school, but I'm still learning new techniques.";
+      }
+      else if (question.includes('art lessons') || question.includes('school')) {
+        simulatedText = "In my school, we had art lessons twice a week. We learned different techniques like drawing, painting, and sometimes sculpting with clay. Our teacher was quite passionate about art history too, so we learned about famous artists alongside practical skills.";
+      }
+      else if (question.includes('traditional') || question.includes('new')) {
+        simulatedText = "I'd say our art lessons were a mix of both traditional and new approaches. We learned classical techniques like perspective drawing and color theory, but our teacher also encouraged digital art and mixed media projects, which felt more contemporary.";
+      }
+      else if (question.includes('useful') || question.includes('study art')) {
+        simulatedText = "I think studying art at school is very useful because it develops creativity and problem-solving skills that can be applied to many areas of life. It also teaches patience and attention to detail, which are valuable in any profession. Art education helps students express themselves in non-verbal ways too.";
+      }
+      else {
+        simulatedText = "I think that's an interesting question. Based on my experience, I would say it depends on various factors. There are certainly advantages and disadvantages to consider, and different people might have different perspectives on this issue.";
+      }
       
       setTranscription(simulatedText);
       

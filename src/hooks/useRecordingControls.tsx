@@ -45,7 +45,7 @@ export const useRecordingControls = (
   }, [stopVoiceRecording, setIsRecording]);
 
   const cleanupRecordingTimeout = useCallback(() => {
-    // Clean up timer is handled inside the useVoiceRecorder hook
+    // Empty function as cleanup is handled inside the useVoiceRecorder hook
   }, []);
 
   return {
