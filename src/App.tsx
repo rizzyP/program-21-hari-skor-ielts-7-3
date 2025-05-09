@@ -12,8 +12,8 @@ import TestSelection from "./pages/TestSelection";
 import ListeningTest from "./pages/ListeningTest";
 import ReadingTest from "./pages/ReadingTest";
 import WritingTest from "./pages/WritingTest";
-// Removed SpeakingTest import
 import Results from "./pages/Results";
+import Curriculum from "./pages/Curriculum";
 
 const queryClient = new QueryClient();
 
@@ -30,8 +30,8 @@ const App = () => (
             <Route path="/test/listening" element={<ListeningTest />} />
             <Route path="/test/reading" element={<ReadingTest />} />
             <Route path="/test/writing" element={<WritingTest />} />
-            {/* Removed route for speaking test */}
             <Route path="/results" element={<Results />} />
+            <Route path="/curriculum" element={<Curriculum />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

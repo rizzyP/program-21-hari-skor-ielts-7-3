@@ -26,6 +26,9 @@ const Layout: React.FC<LayoutProps> = ({ children, className }) => {
             <Link to="/">
               <Button variant="ghost" size="sm">Home</Button>
             </Link>
+            <Link to="/curriculum">
+              <Button variant="ghost" size="sm">Curriculum</Button>
+            </Link>
             <Link to="/test">
               <Button variant="ghost" size="sm">Take Test</Button>
             </Link>
