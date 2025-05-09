@@ -58,7 +58,7 @@ const SpeakingTest = () => {
     <Layout className="pb-16">
       <div className="max-w-4xl mx-auto space-y-6">
         {!hasUserInteracted && (
-          <Alert variant="warning" className="bg-yellow-50 text-yellow-800 border-yellow-200">
+          <Alert variant="default" className="bg-yellow-50 text-yellow-800 border-yellow-200">
             <AlertCircle className="h-4 w-4 mr-2" />
             <AlertDescription className="flex items-center justify-between w-full">
               <span>Audio playback requires user interaction. Please click the button below to enable audio:</span>

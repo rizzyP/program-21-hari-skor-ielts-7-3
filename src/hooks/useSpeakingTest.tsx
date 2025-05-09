@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+
+import { useEffect, useCallback } from 'react';
 import { useTest } from '@/context/TestContext';
 import { Phase } from '@/components/test/TestPhases';
 import { useExaminerSimulation } from './useExaminerSimulation';
@@ -38,14 +39,16 @@ export const useSpeakingTest = () => {
   const {
     startRecording,
     stopRecording
-  } = useVoiceRecorder(setIsRecording, setIsTranscribing, (transcript: string) => {
-    // Handle transcription with existing code...
-    const questionId = `p${currentPart}q${currentQuestion}`;
-    setTranscripts(prev => ({
-      ...prev,
-      [questionId]: transcript
-    }));
-    setIsTranscribing(false);
+  } = useVoiceRecorder({
+    onTranscriptionComplete: (transcript: string) => {
+      // Handle transcription with existing code...
+      const questionId = `p${currentPart}q${currentQuestion}`;
+      setTranscripts(prev => ({
+        ...prev,
+        [questionId]: transcript
+      }));
+      setIsTranscribing(false);
+    }
   });
 
   // Examiner simulation with audio capabilities
@@ -65,7 +68,8 @@ export const useSpeakingTest = () => {
   const getCurrentPartQuestions = useCallback(() => {
     // This function likely exists in your codebase - keep its implementation
     if (!speakingContent) return [];
-    return speakingContent.questions.filter((q: any) => q.part === currentPart).map((q: any) => q.text);
+    if (!speakingContent.parts) return [];
+    return speakingContent.parts.find((p) => p.partNumber === currentPart)?.questions || [];
   }, [speakingContent, currentPart]);
 
   // Setup test navigation
@@ -103,7 +107,9 @@ export const useSpeakingTest = () => {
   // Calculate total questions
   const totalQuestions = useCallback(() => {
     if (!speakingContent) return 0;
-    return speakingContent.questions.filter((q: any) => q.part === 1).length;
+    if (!speakingContent.parts) return 0;
+    const part1 = speakingContent.parts.find(p => p.partNumber === 1);
+    return part1 ? part1.questions.length : 0;
   }, [speakingContent])();
 
   // Cleanup

@@ -29,18 +29,18 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
     simulateUserInteraction
   } = useAudioInteraction(audioRef);
 
+  // Set up audio events handling - moved up before it's used
+  const { isPlaying, isReady, setIsPlaying } = useAudioEvents(
+    audioRef.current,
+    processNextInQueue // Forward reference is fine in JavaScript but needs proper order in TS
+  );
+
   // Set up audio queue processing
   const {
     processNextInQueue,
     queueAudioWithDelays,
     cleanupAudio
   } = useAudioQueue(audioRef, setIsPlaying, setAudioError, hasUserInteracted);
-
-  // Set up audio events handling
-  const { isPlaying, isReady, setIsPlaying } = useAudioEvents(
-    audioRef.current,
-    processNextInQueue
-  );
 
   // Regular play function with proper promise handling
   const playAudio = useCallback(async (src?: string) => {

@@ -7,6 +7,7 @@ export const useSpeakingTestState = () => {
   const [currentPhase, setCurrentPhase] = useState<Phase>(Phase.INSTRUCTIONS);
   const [isStarted, setIsStarted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false); // Added missing state
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [currentPart, setCurrentPart] = useState<number>(1);
   const [transcripts, setTranscripts] = useState<Record<string, string>>({});
@@ -35,6 +36,8 @@ export const useSpeakingTestState = () => {
     setIsStarted,
     isRecording,
     setIsRecording,
+    isTranscribing,
+    setIsTranscribing,
     currentQuestion,
     setCurrentQuestion,
     currentPart,
