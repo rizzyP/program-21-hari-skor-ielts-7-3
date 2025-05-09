@@ -1,7 +1,6 @@
-
 import { useCallback, useRef, useState } from 'react';
 import { Phase } from '@/components/test/TestPhases';
-import { useAudioPlayer } from './useAudioPlayer';
+import { useAudioPlayer, checkAudioExists } from '@/hooks/audio';
 import { toast } from 'sonner';
 
 export const useExaminerSimulation = (
@@ -27,17 +26,6 @@ export const useExaminerSimulation = (
     }
     cleanupAudio();
   }, [cleanupAudio]);
-
-  // Check if audio file exists before playing
-  const checkAudioExists = useCallback(async (src: string): Promise<boolean> => {
-    try {
-      const response = await fetch(src, { method: 'HEAD' });
-      return response.ok;
-    } catch (error) {
-      console.error(`Error checking audio file ${src}:`, error);
-      return false;
-    }
-  }, []);
 
   // Simulate examiner speaking with audio
   const simulateExaminerSpeaking = useCallback(
