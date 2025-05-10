@@ -179,19 +179,15 @@ export const evaluateReadingAnswers = (
     ],
     overallScore: bandScore,
     strengths: [
-      correctCount > 0 ? 'Good understanding of main ideas' : '',
+      'Good understanding of main ideas',
       percentageCorrect >= 70 ? 'Ability to locate specific information' : ''
     ].filter(Boolean),
     weaknesses: [
-      percentageCorrect < 70 ? 'Difficulty with inference questions' : '',
-      percentageCorrect < 80 ? 'Challenges with academic vocabulary' : ''
+      'Some grammatical errors in complex sentences',
+      'Limited range of vocabulary for academic writing',
+      'Occasionally unclear expressions'
     ].filter(Boolean),
-    recommendations: 
-      percentageCorrect < 60 
-        ? 'Focus on improving your vocabulary and practice reading academic texts more frequently. Work on skimming and scanning techniques.' 
-        : percentageCorrect < 80 
-          ? 'Continue working on understanding detailed information and inference questions. Practice with a wider range of text types.'
-          : 'Excellent reading skills. To improve further, focus on speed reading techniques and expanding your academic vocabulary.'
+    recommendations: 'Work on using a wider range of academic vocabulary and practice writing more complex sentences accurately. Focus on fully developing all parts of the question with relevant examples and explanations.'
   };
 };
 
@@ -206,7 +202,11 @@ export const evaluateListeningAnswers = (
   
   // Section One questions (1-5) need special handling - they're evaluated as a set
   const sectionOneQuestionIds = ['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'];
-  const sectionOneCorrectAnswers = ['B', 'D', 'C', 'F', 'I'];
+  
+  // Extract correct answers for section one from correctAnswers object
+  const sectionOneCorrectAnswers = sectionOneQuestionIds.map(id => 
+    correctAnswers[id]?.trim().toUpperCase() || ''
+  ).filter(Boolean);
   
   // Create a map to track which correct answers have been matched
   const sectionOneMatched = new Map();
@@ -234,6 +234,9 @@ export const evaluateListeningAnswers = (
     });
     
     console.log(`Section 1 evaluation (order-insensitive): ${sectionOneMatched.size}/${sectionOneQuestionIds.length} correct`);
+    console.log('User answers:', [...sectionOneUserAnswers.entries()]);
+    console.log('Correct answers:', sectionOneCorrectAnswers);
+    console.log('Matched answers:', [...sectionOneMatched.entries()]);
   }
   
   // Process other questions normally
@@ -319,6 +322,11 @@ const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: 
 
 // Correct answers for the listening test
 export const listeningCorrectAnswers: Record<string, string> = {
+  'l-q1': 'B', // Oil Painting classes
+  'l-q2': 'D', // Print making classes
+  'l-q3': 'C', // Digital Art classes
+  'l-q4': 'F', // Photography classes
+  'l-q5': 'I', // Jewellery design classes
   'l-q6': '2',
   'l-q7': '375',
   'l-q8': '245',
