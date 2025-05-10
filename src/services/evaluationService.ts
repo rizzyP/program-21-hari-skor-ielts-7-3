@@ -305,22 +305,6 @@ const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: 
     return normalizedUserAnswer.charAt(0) === normalizedCorrectAnswer.charAt(0);
   }
   
-  // Special handling for question 6 - accepts "2" or "two"
-  if (questionId === 'l-q6') {
-    const validAnswers = ['2', 'two'];
-    return validAnswers.includes(normalizedUserAnswer);
-  }
-  
-  // Special handling for question 7 - accepts "375"
-  if (questionId === 'l-q7') {
-    return normalizedUserAnswer.replace(/\s+|[$]/g, '') === '375';
-  }
-  
-  // Special handling for question 8 - accepts "245"
-  if (questionId === 'l-q8') {
-    return normalizedUserAnswer.replace(/\s+|[$]/g, '') === '245';
-  }
-  
   // Special handling for questions with dollar amounts (remaining dollar-related questions)
   if (questionId.startsWith('l-q') && (normalizedCorrectAnswer.includes('$') || normalizedUserAnswer.includes('$'))) {
     // Remove any dollar signs, spaces and compare
@@ -335,11 +319,6 @@ const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: 
 
 // Correct answers for the listening test
 export const listeningCorrectAnswers: Record<string, string> = {
-  'l-q1': 'B', // Oil Painting classes
-  'l-q2': 'D', // Print making classes
-  'l-q3': 'C', // Digital Art classes
-  'l-q4': 'F', // Photography classes
-  'l-q5': 'I', // Jewellery design classes
   'l-q6': '2',
   'l-q7': '375',
   'l-q8': '245',
