@@ -82,7 +82,7 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
       
       <CardContent className="pt-6 pb-4">
         {/* Current question displayed prominently in the center */}
-        {currentPhase === Phase.SPEAKING_PART1 && !examinerSpeaking && (
+        {currentPhase === Phase.SPEAKING_PART1 && (
           <div className="text-center my-8 max-w-2xl mx-auto">
             <h2 className="text-2xl font-medium text-slate-800">{examinerMessage}</h2>
           </div>
@@ -107,7 +107,7 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
                     onPause={onPauseAudio}
                     isPlaying={isPlayingAudio}
                     isCurrentTrack={getCurrentSrc().includes(audioSrc)}
-                    label="Play audio"
+                    label="Play examiner audio"
                   />
                 </div>
               )}

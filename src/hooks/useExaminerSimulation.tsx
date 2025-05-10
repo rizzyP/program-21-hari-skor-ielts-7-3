@@ -32,7 +32,7 @@ export const useExaminerSimulation = (
     cleanupAudio();
   }, [cleanupAudio]);
 
-  // Simulate examiner speaking with audio that can be manually played
+  // Simulate examiner speaking but don't auto-play audio
   const simulateExaminerSpeaking = useCallback(
     async (message: string, audioFile: string | null, duration: number = 3000, currentPhase: Phase) => {
       // Set examiner state
@@ -49,18 +49,7 @@ export const useExaminerSimulation = (
           setAudioSrc(audioFile);
         }
 
-        // No automatic playback, just set up for manual play
-        // After a duration, move to the next phase if no audio playback
-        if (!audioFile) {
-          timeoutRef.current = setTimeout(() => {
-            setExaminerSpeaking(false);
-            
-            // Enable recording if in speaking part
-            if (currentPhase === Phase.SPEAKING_PART1) {
-              setIsRecording(true);
-            }
-          }, duration);
-        }
+        // For manual playback only - don't automatically play or move to next phase
       }, 300);
     },
     [setIsRecording]
@@ -69,13 +58,16 @@ export const useExaminerSimulation = (
   // Handle manual audio playback
   const playExaminerAudio = useCallback(async (src: string) => {
     try {
+      console.log('Playing audio:', src);
       await playAudio(src);
       
-      // Once audio has completed, move to next phase
+      // Monitor when audio completes and move to next phase
       const audio = new Audio(src);
       audio.addEventListener('ended', () => {
+        console.log('Audio completed:', src);
         setExaminerSpeaking(false);
-        // Enable recording if needed
+        
+        // Enable recording if needed - only after part 1 questions
         if (audioSrc && audioSrc.includes('speaking-section-1')) {
           setIsRecording(true);
         }

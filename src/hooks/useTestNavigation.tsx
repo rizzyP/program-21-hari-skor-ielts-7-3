@@ -50,7 +50,7 @@ export const useTestNavigation = (
     setIsStarted(true);
     setCurrentPhase(Phase.SPEAKING_INTRO);
     
-    // Show first examiner message with audio file
+    // Show first examiner message with audio file - but don't auto-play
     simulateExaminerSpeaking(
       "Hello, my name is Dr. Sarah Wilson and I'll be your examiner today.",
       AUDIO_FILES.opening[0],
@@ -59,7 +59,7 @@ export const useTestNavigation = (
     );
     
     toast.info('Speaking test started', {
-      description: 'Click the play button to hear examiner instructions.'
+      description: 'Click the play button to hear the examiner instructions.'
     });
   };
 
@@ -72,7 +72,7 @@ export const useTestNavigation = (
     // Use the fixed question for part 1 instead of from content
     const firstQuestion = FIXED_PART1_QUESTIONS[0];
     
-    // Play Part 1 first question with callback to start recording after
+    // Play Part 1 first question without auto-playing
     simulateExaminerSpeaking(
       firstQuestion, 
       AUDIO_FILES.part1[0], 
