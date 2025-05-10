@@ -313,6 +313,8 @@ const ListeningTest = () => {
   };
 
   const handleAnswerChange = (questionId: string, value: string) => {
+    // Pass the value directly to saveAnswer without modifying it
+    // The TestContext will handle the extraction of the option letter
     saveAnswer(questionId, value);
   };
 
@@ -512,24 +514,23 @@ const ListeningTest = () => {
                     <div>I. Jewellery design classes</div>
                   </div>
                   
-                  {listeningContent.sections[0].questions.map((question: any, index: number) => {
-                    if (index > 4) return null; // Only show first 5 questions
-                      
-                    const savedAnswer = userAnswers.find(a => a.questionId === question.id)?.userResponse || '';
-                      
+                  {listeningContent.sections[0].questions.slice(0, 5).map((question: any, index: number) => {
+                    const questionId = question.id;
+                    const savedAnswer = userAnswers.find(a => a.questionId === questionId)?.userResponse || '';
+                    
                     return (
-                      <div key={question.id} className="mb-4">
+                      <div key={questionId} className="mb-4">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="font-medium">{index + 1}.</span>
                           <RadioGroup 
                             value={savedAnswer} 
-                            onValueChange={(value) => handleAnswerChange(question.id, value)}
+                            onValueChange={(value) => handleAnswerChange(questionId, value)}
                             className="flex flex-wrap gap-4"
                           >
-                            {question.options.map((option: string) => (
+                            {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].map((option) => (
                               <div key={option} className="flex items-center space-x-2">
-                                <RadioGroupItem value={option} id={`q${question.id}-${option}`} />
-                                <Label htmlFor={`q${question.id}-${option}`}>{option}</Label>
+                                <RadioGroupItem value={option} id={`${questionId}-${option}`} />
+                                <Label htmlFor={`${questionId}-${option}`}>{option}</Label>
                               </div>
                             ))}
                           </RadioGroup>
