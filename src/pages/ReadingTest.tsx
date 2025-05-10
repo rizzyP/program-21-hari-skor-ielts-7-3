@@ -187,28 +187,17 @@ const ReadingTest = () => {
                       </CardHeader>
                       <CardContent>
                         {question.questionType === 'multiple-choice' && (
-                          <div className="space-y-3">
-                            {question.options.map((option: string, optionIndex: number) => {
-                              const optionId = `q${questionId}-${optionIndex}`;
-                              const isChecked = savedAnswer === option;
-                              
-                              return (
-                                <div key={optionIndex} className="flex items-center space-x-2">
-                                  <Checkbox 
-                                    id={optionId} 
-                                    checked={isChecked}
-                                    onCheckedChange={() => handleAnswerChange(questionId, option)}
-                                  />
-                                  <Label 
-                                    htmlFor={optionId}
-                                    className={isChecked ? "font-medium" : ""}
-                                  >
-                                    {option}
-                                  </Label>
-                                </div>
-                              );
-                            })}
-                          </div>
+                          <RadioGroup 
+                            value={savedAnswer} 
+                            onValueChange={(value) => handleAnswerChange(questionId, value)}
+                          >
+                            {question.options.map((option: string, optionIndex: number) => (
+                              <div key={optionIndex} className="flex items-center space-x-2">
+                                <RadioGroupItem value={option} id={`q${questionId}-${optionIndex}`} />
+                                <Label htmlFor={`q${questionId}-${optionIndex}`}>{option}</Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
                         )}
                         
                         {question.questionType === 'true-false-notgiven' && (
