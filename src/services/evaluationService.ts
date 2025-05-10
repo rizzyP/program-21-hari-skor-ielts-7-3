@@ -1,3 +1,4 @@
+
 import { TestResult, Feedback } from '@/types/test';
 import { assessSpeakingResponse, assessWritingTask } from './aiService';
 
@@ -204,12 +205,32 @@ export const evaluateListeningAnswers = (
   
   let correctCount = 0;
   
+  // Special handling for questions 1-5 as a group
+  const sectionOneCorrectAnswers = ['B', 'D', 'C', 'F', 'I'];
+  const userSectionOneAnswers: string[] = [];
+  
   userResponseEntries.forEach(([questionId, userResponse]) => {
-    const correct = correctAnswers[questionId];
-    if (correct && isCorrectAnswer(questionId, userResponse, correct)) {
-      correctCount++;
+    // For questions 1-5, collect the answers separately
+    if (['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'].includes(questionId)) {
+      // Extract just the letter for these questions
+      const answerLetter = userResponse.trim().charAt(0).toUpperCase();
+      userSectionOneAnswers.push(answerLetter);
+    } else {
+      // For other questions, check normally
+      const correct = correctAnswers[questionId];
+      if (correct && isCorrectAnswer(questionId, userResponse, correct)) {
+        correctCount++;
+      }
     }
   });
+  
+  // Now evaluate section 1 questions as a group (order-insensitive)
+  const sectionOneCount = userSectionOneAnswers.reduce((count, answer) => {
+    return sectionOneCorrectAnswers.includes(answer) ? count + 1 : count;
+  }, 0);
+  
+  // Add section one correct answers to the total
+  correctCount += sectionOneCount;
   
   const percentageCorrect = (correctCount / totalQuestions) * 100;
   
