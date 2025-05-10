@@ -151,10 +151,11 @@ const ReadingTest = () => {
                 <h2 className="text-xl font-semibold">Questions</h2>
                 
                 {readingContent.questions.map((question: any, index: number) => {
-                  const savedAnswer = userAnswers.find(a => a.questionId === question.id)?.userResponse || '';
+                  const questionId = question.id;
+                  const savedAnswer = userAnswers.find(a => a.questionId === questionId)?.userResponse || '';
                   
                   return (
-                    <Card key={question.id} className="bg-white shadow-sm">
+                    <Card key={questionId} className="bg-white shadow-sm">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base font-medium">
                           Question {index + 1}: {question.questionText}
@@ -164,12 +165,12 @@ const ReadingTest = () => {
                         {question.questionType === 'multiple-choice' && (
                           <RadioGroup 
                             value={savedAnswer} 
-                            onValueChange={(value) => handleAnswerChange(question.id, value)}
+                            onValueChange={(value) => handleAnswerChange(questionId, value)}
                           >
                             {question.options.map((option: string, optionIndex: number) => (
                               <div key={optionIndex} className="flex items-center space-x-2">
-                                <RadioGroupItem value={option} id={`q${question.id}-${optionIndex}`} />
-                                <Label htmlFor={`q${question.id}-${optionIndex}`}>{option}</Label>
+                                <RadioGroupItem value={option} id={`q${questionId}-${optionIndex}`} />
+                                <Label htmlFor={`q${questionId}-${optionIndex}`}>{option}</Label>
                               </div>
                             ))}
                           </RadioGroup>
@@ -178,12 +179,12 @@ const ReadingTest = () => {
                         {question.questionType === 'true-false-notgiven' && (
                           <RadioGroup 
                             value={savedAnswer} 
-                            onValueChange={(value) => handleAnswerChange(question.id, value)}
+                            onValueChange={(value) => handleAnswerChange(questionId, value)}
                           >
                             {['true', 'false', 'not given'].map((option, optionIndex) => (
                               <div key={optionIndex} className="flex items-center space-x-2">
-                                <RadioGroupItem value={option} id={`q${question.id}-${option}`} />
-                                <Label htmlFor={`q${question.id}-${option}`}>
+                                <RadioGroupItem value={option} id={`q${questionId}-${option}`} />
+                                <Label htmlFor={`q${questionId}-${option}`}>
                                   {option.charAt(0).toUpperCase() + option.slice(1)}
                                 </Label>
                               </div>
@@ -195,22 +196,24 @@ const ReadingTest = () => {
                           <Input 
                             placeholder="Type your answer here" 
                             value={savedAnswer}
-                            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                            onChange={(e) => handleAnswerChange(questionId, e.target.value)}
                             className="max-w-full md:max-w-sm"
                           />
                         )}
                         
                         {question.questionType === 'matching' && (
-                          <select 
-                            value={savedAnswer}
-                            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                            className="border rounded p-2 w-full max-w-full md:max-w-sm"
-                          >
-                            <option value="">Select an option</option>
-                            {question.options.map((option: string, optionIndex: number) => (
-                              <option key={optionIndex} value={option}>{option}</option>
-                            ))}
-                          </select>
+                          <div className="w-full">
+                            <select 
+                              value={savedAnswer}
+                              onChange={(e) => handleAnswerChange(questionId, e.target.value)}
+                              className="w-full md:max-w-sm p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            >
+                              <option value="">Select an option</option>
+                              {question.options.map((option: string, optionIndex: number) => (
+                                <option key={optionIndex} value={option}>{option}</option>
+                              ))}
+                            </select>
+                          </div>
                         )}
                       </CardContent>
                     </Card>
