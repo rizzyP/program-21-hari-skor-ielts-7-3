@@ -89,7 +89,6 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
             <Timer 
               seconds={prepTime} 
               className="bg-yellow-50 border-yellow-200 text-yellow-700" 
-              label="Preparation Time"
             />
           )}
         </div>
@@ -106,7 +105,7 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
         {currentPhase === Phase.SPEAKING_PART2 && (
           <div className="my-6 max-w-2xl mx-auto">
             {isPreparing ? (
-              <CueCard question={examinerMessage} />
+              <CueCard topic={examinerMessage} />
             ) : (
               <div className="text-center">
                 <h2 className="text-2xl font-medium text-slate-800">{examinerMessage}</h2>

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useTest } from '@/context/TestContext';
 import { cn } from '@/lib/utils';
@@ -8,13 +9,15 @@ interface TimerProps {
   className?: string;
   seconds?: number; // Optional prop to set a specific time
   onTick?: (timeRemaining: number) => void; // Callback for each tick
+  label?: string; // Added label prop
 }
 
 const Timer: React.FC<TimerProps> = ({ 
   onTimeUp, 
   className,
   seconds,
-  onTick
+  onTick,
+  label
 }) => {
   const { timeRemaining: contextTimeRemaining, setTimeRemaining: setContextTimeRemaining, isTestActive } = useTest();
   const [localTimeRemaining, setLocalTimeRemaining] = useState(seconds || contextTimeRemaining);
@@ -82,6 +85,7 @@ const Timer: React.FC<TimerProps> = ({
     >
       <Clock className="text-current" />
       <span>{formatTime(localTimeRemaining)}</span>
+      {label && <span className="text-xs ml-1">({label})</span>}
     </div>
   );
 };
