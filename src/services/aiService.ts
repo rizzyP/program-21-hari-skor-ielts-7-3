@@ -1,6 +1,9 @@
-
 import { UserAnswer, Feedback } from '@/types/test';
-import { evaluateWritingWithGemini, evaluateSpeakingWithGemini } from './openRouterService';
+import { 
+  evaluateWritingWithGemini, 
+  evaluateSpeakingWithGemini,
+  evaluateOverallResultsWithGemini
+} from './openRouterService';
 
 export async function assessWritingTask(
   prompt: string,
@@ -135,32 +138,72 @@ export async function generateOverallAnalysis(sectionScores: {
   recommendations: string;
 }> {
   try {
-    // In a production app, this would make a real API call to OpenAI
-    console.log('Generating overall analysis...', sectionScores);
+    // Call the Gemini API for overall analysis
+    console.log('Generating overall analysis with Gemini...', sectionScores);
+    
+    // Calculate overall band score (rounded to nearest 0.5) as fallback
+    const sum = sectionScores.listening + sectionScores.reading + sectionScores.writing + sectionScores.speaking;
+    const average = sum / 4;
+    const fallbackScore = Math.round(average * 2) / 2;
+    
+    // Call Gemini API for evaluation
+    const geminiResponse = await evaluateOverallResultsWithGemini(sectionScores);
+    console.log('Raw Gemini overall analysis response:', geminiResponse.substring(0, 200) + '...');
+    
+    try {
+      // Try different approaches to parse the response as JSON
+      let parsedResponse;
+      try {
+        // First try direct parsing
+        parsedResponse = JSON.parse(geminiResponse);
+      } catch (initialParseError) {
+        console.log("Initial JSON parsing failed, trying alternative methods...");
+        
+        // Look for a JSON object in the response string
+        const jsonMatch = geminiResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            parsedResponse = JSON.parse(jsonMatch[0]);
+            console.log("Successfully extracted JSON from response");
+          } catch (extractError) {
+            console.error("Failed to parse extracted JSON:", extractError);
+            throw initialParseError;
+          }
+        } else {
+          throw initialParseError;
+        }
+      }
+      
+      // Validate the response has the expected structure
+      if (typeof parsedResponse.overallBandScore !== 'number' || 
+          !Array.isArray(parsedResponse.strengths) || 
+          !Array.isArray(parsedResponse.weaknesses) ||
+          typeof parsedResponse.recommendations !== 'string') {
+        console.error('Invalid Gemini response structure for overall analysis:', parsedResponse);
+        throw new Error('Invalid response structure');
+      }
+      
+      return {
+        overallBandScore: parsedResponse.overallBandScore,
+        strengths: parsedResponse.strengths,
+        weaknesses: parsedResponse.weaknesses,
+        recommendations: parsedResponse.recommendations
+      };
+    } catch (parseError) {
+      console.error('Error parsing Gemini overall analysis response:', parseError);
+      // If parsing fails, return a fallback response
+      return mockOverallAnalysis(sectionScores, fallbackScore);
+    }
+  } catch (error) {
+    console.error('Error generating overall analysis:', error);
     
     // Calculate overall band score (rounded to nearest 0.5)
     const sum = sectionScores.listening + sectionScores.reading + sectionScores.writing + sectionScores.speaking;
     const average = sum / 4;
     const rounded = Math.round(average * 2) / 2;
     
-    // This is a mock response for demonstration purposes
-    return {
-      overallBandScore: rounded,
-      strengths: [
-        'Strong vocabulary usage in speaking and writing',
-        'Good comprehension skills demonstrated in reading test',
-        'Effective organization of ideas in written responses'
-      ],
-      weaknesses: [
-        'Grammar accuracy needs improvement, especially in complex sentences',
-        'Listening comprehension of specific details could be enhanced',
-        'Task 1 writing requires more data analysis and comparison'
-      ],
-      recommendations: 'Focus on improving grammar by practicing with complex sentence structures. Enhance listening skills by regularly practicing with various accents. For writing task 1, practice describing trends and making comparisons between data points. Consider dedicating 30 minutes daily to targeted practice in your weakest areas.'
-    };
-  } catch (error) {
-    console.error('Error generating overall analysis:', error);
-    throw new Error('Failed to generate overall analysis');
+    // Fallback to mock response in case of error
+    return mockOverallAnalysis(sectionScores, rounded);
   }
 }
 
@@ -279,5 +322,56 @@ function mockSpeakingAIResponse(): Feedback {
       'Occasional pronunciation issues with specific sounds'
     ],
     recommendations: 'Practice speaking at length about complex topics to reduce hesitation. Record yourself speaking and identify patterns of grammatical errors to work on. Focus on the specific pronunciation issues identified, particularly with certain vowel sounds.'
+  };
+}
+
+// New function for fallback mock overall analysis
+function mockOverallAnalysis(
+  sectionScores: {
+    listening: number;
+    reading: number;
+    writing: number;
+    speaking: number;
+  },
+  overallScore: number
+): {
+  overallBandScore: number;
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string;
+} {
+  const { listening, reading, writing, speaking } = sectionScores;
+  
+  let strengths: string[] = [];
+  let weaknesses: string[] = [];
+  
+  // Determine strengths and weaknesses based on section scores
+  if (listening >= 7.0) strengths.push('Strong listening comprehension skills');
+  else if (listening < 6.5) weaknesses.push('Needs improvement in listening comprehension');
+  
+  if (reading >= 7.0) strengths.push('Good reading ability and comprehension');
+  else if (reading < 6.5) weaknesses.push('Needs improvement in reading comprehension');
+  
+  if (writing >= 7.0) strengths.push('Effective written communication skills');
+  else if (writing < 6.5) weaknesses.push('Written expression needs further development');
+  
+  if (speaking >= 7.0) strengths.push('Clear and fluent verbal communication');
+  else if (speaking < 6.5) weaknesses.push('Speaking fluency and accuracy need improvement');
+  
+  // Generate recommendations
+  let recommendations = '';
+  if (overallScore >= 7.5) {
+    recommendations = 'Your English proficiency is very good. Focus on refining specific aspects of your language skills to aim for band 8+. Consider advanced vocabulary and complex grammatical structures.';
+  } else if (overallScore >= 6.5) {
+    recommendations = 'You have demonstrated competent English skills suitable for most academic and professional contexts. To improve, focus on the specific areas identified in your section feedback.';
+  } else {
+    recommendations = 'Continue developing your English skills through regular practice. Focus particularly on your areas of weakness and expose yourself to a variety of English contexts daily.';
+  }
+  
+  return {
+    overallBandScore: overallScore,
+    strengths,
+    weaknesses,
+    recommendations
   };
 }

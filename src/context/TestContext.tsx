@@ -7,9 +7,9 @@ import {
   evaluateWritingResponse, 
   evaluateSpeakingResponse,
   listeningCorrectAnswers,
-  readingCorrectAnswers,
-  generateOverallAnalysis
+  readingCorrectAnswers
 } from '@/services/evaluationService';
+import { generateOverallAnalysis } from '@/services/aiService';
 import { toast } from 'sonner';
 
 interface TestContextType {
@@ -166,8 +166,8 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         speaking: speakingScore
       };
 
-      // Generate overall analysis
-      console.log('Generating overall analysis...', sectionScores);
+      // Generate overall analysis using Gemini AI
+      console.log('Generating overall analysis with Gemini...', sectionScores);
       const overallAnalysis = await generateOverallAnalysis(sectionScores);
 
       // Create test result

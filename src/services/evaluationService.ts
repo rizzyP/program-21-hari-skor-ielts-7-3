@@ -1,4 +1,3 @@
-
 import { TestResult, Feedback } from '@/types/test';
 import { assessSpeakingResponse, assessWritingTask } from './aiService';
 
@@ -148,23 +147,27 @@ export const evaluateReadingAnswers = (
     }
   });
   
-  const percentageCorrect = (correctCount / totalQuestions) * 100;
+  const percentageCorrect = (correctCount / Math.max(totalQuestions, 1)) * 100;
+  console.log(`Reading evaluation: ${correctCount}/${totalQuestions} correct (${percentageCorrect.toFixed(1)}%)`);
   
-  // Map percentage to IELTS band score (approximate conversion)
+  // Map percentage to IELTS band score (more accurate conversion)
   let bandScore = 0;
   
-  if (percentageCorrect >= 90) bandScore = 9.0;
-  else if (percentageCorrect >= 85) bandScore = 8.5;
+  // Fixed the band score calculation to be more accurate
+  if (percentageCorrect >= 95) bandScore = 9.0;
+  else if (percentageCorrect >= 90) bandScore = 8.5;
   else if (percentageCorrect >= 80) bandScore = 8.0;
   else if (percentageCorrect >= 75) bandScore = 7.5;
-  else if (percentageCorrect >= 70) bandScore = 7.0;
-  else if (percentageCorrect >= 65) bandScore = 6.5;
-  else if (percentageCorrect >= 60) bandScore = 6.0;
-  else if (percentageCorrect >= 55) bandScore = 5.5;
-  else if (percentageCorrect >= 50) bandScore = 5.0;
-  else if (percentageCorrect >= 40) bandScore = 4.0;
-  else if (percentageCorrect >= 30) bandScore = 3.0;
-  else bandScore = 2.0;
+  else if (percentageCorrect >= 65) bandScore = 7.0;
+  else if (percentageCorrect >= 60) bandScore = 6.5;
+  else if (percentageCorrect >= 55) bandScore = 6.0;
+  else if (percentageCorrect >= 50) bandScore = 5.5;
+  else if (percentageCorrect >= 40) bandScore = 5.0;
+  else if (percentageCorrect >= 35) bandScore = 4.5;
+  else if (percentageCorrect >= 30) bandScore = 4.0;
+  else if (percentageCorrect >= 25) bandScore = 3.5;
+  else if (percentageCorrect >= 20) bandScore = 3.0;
+  else bandScore = 2.5;
   
   return {
     criteria: [
@@ -176,9 +179,9 @@ export const evaluateReadingAnswers = (
     ],
     overallScore: bandScore,
     strengths: [
-      'Good understanding of main ideas',
-      'Ability to locate specific information'
-    ],
+      correctCount > 0 ? 'Good understanding of main ideas' : '',
+      percentageCorrect >= 70 ? 'Ability to locate specific information' : ''
+    ].filter(Boolean),
     weaknesses: [
       percentageCorrect < 70 ? 'Difficulty with inference questions' : '',
       percentageCorrect < 80 ? 'Challenges with academic vocabulary' : ''
@@ -306,7 +309,7 @@ export const listeningCorrectAnswers: Record<string, string> = {
   'l-q15': 'around the world'
 };
 
-// Correct answers for the academic reading test
+// Updated correct answers for the academic reading test
 export const readingCorrectAnswers: Record<string, string> = {
   'r-academic-q1': 'not given',
   'r-academic-q2': 'true',

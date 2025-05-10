@@ -125,6 +125,38 @@ export const evaluateSpeakingWithGemini = async (
   return await callGemini(messages);
 }
 
+// New function to evaluate overall test results using Gemini
+export const evaluateOverallResultsWithGemini = async (
+  sectionScores: {
+    listening: number;
+    reading: number;
+    writing: number;
+    speaking: number;
+  }
+): Promise<string> => {
+  const systemPrompt = `You are an IELTS examiner providing overall analysis of a candidate's test results 
+                        across the four sections: Listening, Reading, Writing, and Speaking.`;
+  
+  const messages: Message[] = [
+    {
+      role: 'system',
+      content: systemPrompt
+    },
+    {
+      role: 'user',
+      content: `Section scores: 
+      Listening: ${sectionScores.listening}
+      Reading: ${sectionScores.reading}
+      Writing: ${sectionScores.writing}
+      Speaking: ${sectionScores.speaking || "Not available"}
+      
+      Please calculate the overall band score (average rounded to nearest 0.5) and provide detailed analysis of the candidate's strengths, weaknesses, and specific recommendations for improvement. Format the response as JSON with these keys: overallBandScore (number), strengths (array of strings), weaknesses (array of strings), recommendations (string).`
+    }
+  ];
+  
+  return await callGemini(messages);
+}
+
 // Function to transcribe audio (simulated for now)
 export const transcribeAudioWithGemini = async (prompt: string): Promise<string> => {
   // In a real implementation, this would upload the audio file to a service that can transcribe it
