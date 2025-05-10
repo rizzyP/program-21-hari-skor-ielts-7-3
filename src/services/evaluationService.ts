@@ -1,3 +1,4 @@
+
 import { TestResult, Feedback } from '@/types/test';
 import { assessSpeakingResponse, assessWritingTask } from './aiService';
 
@@ -193,7 +194,8 @@ export const evaluateListeningAnswers = (
   let correctCount = 0;
   
   userResponseEntries.forEach(([questionId, userResponse]) => {
-    if (correctAnswers[questionId]?.toLowerCase() === userResponse.toLowerCase()) {
+    const correct = correctAnswers[questionId];
+    if (correct && isCorrectAnswer(questionId, userResponse, correct)) {
       correctCount++;
     }
   });
@@ -242,37 +244,83 @@ export const evaluateListeningAnswers = (
   };
 };
 
-// Correct answers for the listening test
-export const listeningCorrectAnswers: Record<string, string> = {
-  'l-q1': 'C', // Digital Art classes
-  'l-q2': 'E', // Fine Art classes
-  'l-q3': 'F', // Photography classes
-  'l-q4': 'H', // Ceramic and Pottery classes
-  'l-q5': 'I', // Jewellery design classes
-  'l-q6': 'three',
-  'l-q7': '$350',
-  'l-q8': '$250',
-  'l-q9': '15th',
-  'l-q10': 'Robertson',
-  'l-q11': 'boundary between',
-  'l-q12': 'market',
-  'l-q13': 'religion',
-  'l-q14': 'the scope',
-  'l-q15': 'internationally'
+// Helper function to determine if an answer is correct, including special cases
+const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: string): boolean => {
+  // Normalize both answers to lowercase for case-insensitive comparison
+  const normalizedUserAnswer = userAnswer.toLowerCase().trim();
+  const normalizedCorrectAnswer = correctAnswer.toLowerCase().trim();
+  
+  // Special handling for listening questions 1-5 (MCQ with options A-I)
+  if (['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'].includes(questionId)) {
+    // For these questions, we only need to check if the first character matches (the option letter)
+    return normalizedUserAnswer.charAt(0) === normalizedCorrectAnswer.charAt(0);
+  }
+  
+  // Special handling for questions with dollar amounts
+  if (['l-q7', 'l-q8'].includes(questionId)) {
+    // Remove any dollar signs, spaces and convert to number for comparison
+    const userValue = normalizedUserAnswer.replace(/[$\s]/g, '');
+    const correctValue = normalizedCorrectAnswer.replace(/[$\s]/g, '');
+    return userValue === correctValue;
+  }
+  
+  // Special handling for number words vs. digits
+  if (questionId === 'l-q6') {
+    const numberMap: Record<string, string> = {
+      'two': '2',
+      '2': 'two'
+    };
+    
+    return normalizedUserAnswer === normalizedCorrectAnswer || 
+           normalizedUserAnswer === numberMap[normalizedCorrectAnswer];
+  }
+  
+  // Default case: direct comparison
+  return normalizedUserAnswer === normalizedCorrectAnswer;
 };
 
-// Correct answers for the reading test
+// Correct answers for the listening test
+export const listeningCorrectAnswers: Record<string, string> = {
+  'l-q1': 'B', // Oil Painting classes
+  'l-q2': 'D', // Print making classes
+  'l-q3': 'C', // Digital Art classes
+  'l-q4': 'F', // Photography classes
+  'l-q5': 'I', // Jewellery design classes
+  'l-q6': 'two',
+  'l-q7': '$375',
+  'l-q8': '$245',
+  'l-q9': '23rd',
+  'l-q10': 'Carol Pearstone',
+  'l-q11': 'line between',
+  'l-q12': 'centres of gravity',
+  'l-q13': 'wealth and elitism',
+  'l-q14': 'the boundaries',
+  'l-q15': 'around the world'
+};
+
+// Correct answers for the academic reading test
 export const readingCorrectAnswers: Record<string, string> = {
-  'r-q1': 'true',
-  'r-q2': 'false',
-  'r-q3': 'not given',
-  'r-q4': 'B',
-  'r-q5': 'E',
-  'r-q6': 'C',
-  'r-q7': 'invasive',
-  'r-q8': 'radiation',
-  'r-q9': 'false',
-  'r-q10': 'true'
+  'r-academic-q1': 'not given',
+  'r-academic-q2': 'true',
+  'r-academic-q3': 'true',
+  'r-academic-q4': 'storage',
+  'r-academic-q5': 'warrenlike',
+  'r-academic-q6': 'A',
+  'r-academic-q7': 'B',
+  'r-academic-q8': 'A',
+  'r-academic-q9': 'B',
+  'r-academic-q10': 'B',
+  // General training reading answers
+  'r-general-q1': 'upscale boutiques',
+  'r-general-q2': 'munitions',
+  'r-general-q3': 'warrenlike',
+  'r-general-q4': 'sell',
+  'r-general-q5': 'false',
+  'r-general-q6': 'true',
+  'r-general-q7': 'false',
+  'r-general-q8': 'B',
+  'r-general-q9': 'C',
+  'r-general-q10': 'B'
 };
 
 // Generate the overall analysis based on section scores
