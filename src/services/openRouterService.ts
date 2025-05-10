@@ -1,6 +1,5 @@
-
-// OpenRouter API service to access Gemini 2.5 Pro
-const OPENROUTER_API_KEY = "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";
+// OpenRouter API service to access Gemini 2.0 Flash
+const OPENROUTER_API_KEY = "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";
 const SITE_URL = window.location.origin;
 const SITE_NAME = "IELTS Practice Test";
 
@@ -39,7 +38,7 @@ export const callGemini = async (messages: Message[]): Promise<string> => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "google/gemini-1.5-flash",  // Updated to a more reliable model
+        "model": "google/gemini-2.0-flash-exp:free",  // Updated to the free model
         "messages": messages
       })
     });

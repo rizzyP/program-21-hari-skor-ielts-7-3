@@ -1,4 +1,3 @@
-
 import { UserAnswer, Feedback } from '@/types/test';
 import { evaluateWritingWithGemini, evaluateSpeakingWithGemini } from './openRouterService';
 
@@ -8,17 +7,31 @@ export async function assessWritingTask(
   taskType: 1 | 2
 ): Promise<Feedback> {
   try {
-    console.log('Assessing writing with Gemini...', {prompt, userAnswer});
+    console.log('Assessing writing with Gemini...', {prompt, userAnswerLength: userAnswer.length});
+    
+    if (!prompt || !userAnswer.trim()) {
+      console.error('Invalid input for writing assessment');
+      throw new Error('Missing prompt or essay content');
+    }
     
     // Call Gemini API for evaluation
     const geminiResponse = await evaluateWritingWithGemini(prompt, userAnswer, taskType);
+    console.log('Raw Gemini response received:', geminiResponse.substring(0, 200) + '...');
     
     try {
       // Try to parse the response as JSON
       const parsedResponse = JSON.parse(geminiResponse);
+      
+      // Validate the response has the expected structure
+      if (!parsedResponse.criteria || !Array.isArray(parsedResponse.criteria) || 
+          parsedResponse.criteria.length === 0 || typeof parsedResponse.overallScore !== 'number') {
+        console.error('Invalid Gemini response structure:', parsedResponse);
+        throw new Error('Invalid response structure');
+      }
+      
       return parsedResponse;
     } catch (parseError) {
-      console.error('Error parsing Gemini response:', parseError);
+      console.error('Error parsing Gemini response:', parseError, 'Raw response:', geminiResponse);
       // If parsing fails, return a fallback response
       return mockAIResponse(taskType);
     }
@@ -34,17 +47,31 @@ export async function assessSpeakingResponse(
   transcription: string
 ): Promise<Feedback> {
   try {
-    console.log('Assessing speaking with Gemini...', {question, transcription});
+    console.log('Assessing speaking with Gemini...', {question, transcriptionLength: transcription.length});
+    
+    if (!question || !transcription.trim()) {
+      console.error('Invalid input for speaking assessment');
+      throw new Error('Missing question or transcription content');
+    }
     
     // Call Gemini API for evaluation
     const geminiResponse = await evaluateSpeakingWithGemini(question, transcription);
+    console.log('Raw Gemini response received:', geminiResponse.substring(0, 200) + '...');
     
     try {
       // Try to parse the response as JSON
       const parsedResponse = JSON.parse(geminiResponse);
+      
+      // Validate the response has the expected structure
+      if (!parsedResponse.criteria || !Array.isArray(parsedResponse.criteria) || 
+          parsedResponse.criteria.length === 0 || typeof parsedResponse.overallScore !== 'number') {
+        console.error('Invalid Gemini response structure:', parsedResponse);
+        throw new Error('Invalid response structure');
+      }
+      
       return parsedResponse;
     } catch (parseError) {
-      console.error('Error parsing Gemini response:', parseError);
+      console.error('Error parsing Gemini response:', parseError, 'Raw response:', geminiResponse);
       // If parsing fails, return a fallback response
       return mockSpeakingAIResponse();
     }
