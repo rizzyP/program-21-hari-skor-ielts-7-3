@@ -1,4 +1,3 @@
-
 import { TestResult, Feedback } from '@/types/test';
 import { assessSpeakingResponse, assessWritingTask } from './aiService';
 
@@ -287,28 +286,20 @@ const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: 
     return normalizedUserAnswer.charAt(0) === normalizedCorrectAnswer.charAt(0);
   }
   
-  // Special handling for question 6 - accepts "two" or "2"
+  // Special handling for question 6 - accepts "2" or "two"
   if (questionId === 'l-q6') {
-    const validAnswers = ['two', '2'];
+    const validAnswers = ['2', 'two'];
     return validAnswers.includes(normalizedUserAnswer);
   }
   
-  // Special handling for question 7 - accepts "375", "$375", "375 dollars"
+  // Special handling for question 7 - accepts "375"
   if (questionId === 'l-q7') {
-    const validAnswers = ['375', '$375', '375 dollars'];
-    return validAnswers.some(answer => 
-      normalizedUserAnswer === answer.toLowerCase() ||
-      normalizedUserAnswer.replace(/\s+|[$]/g, '') === '375'
-    );
+    return normalizedUserAnswer.replace(/\s+|[$]/g, '') === '375';
   }
   
-  // Special handling for question 8 - accepts "245", "$245", "245 dollars"
+  // Special handling for question 8 - accepts "245"
   if (questionId === 'l-q8') {
-    const validAnswers = ['245', '$245', '245 dollars'];
-    return validAnswers.some(answer => 
-      normalizedUserAnswer === answer.toLowerCase() ||
-      normalizedUserAnswer.replace(/\s+|[$]/g, '') === '245'
-    );
+    return normalizedUserAnswer.replace(/\s+|[$]/g, '') === '245';
   }
   
   // Special handling for questions with dollar amounts (remaining dollar-related questions)
@@ -330,9 +321,9 @@ export const listeningCorrectAnswers: Record<string, string> = {
   'l-q3': 'C', // Digital Art classes
   'l-q4': 'F', // Photography classes
   'l-q5': 'I', // Jewellery design classes
-  'l-q6': 'two',
-  'l-q7': '$375',
-  'l-q8': '$245',
+  'l-q6': '2',
+  'l-q7': '375',
+  'l-q8': '245',
   'l-q9': '23rd',
   'l-q10': 'Carol Pearstone',
   'l-q11': 'line between',

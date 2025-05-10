@@ -554,10 +554,11 @@ const ListeningTest = () => {
                         <li className="flex items-center gap-2">
                           <span>Question 6:</span>
                           <Input 
-                            placeholder="Type your answer" 
+                            placeholder="Number only" 
                             value={userAnswers.find(a => a.questionId === 'l-q6')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q6', e.target.value)}
                             className="w-32 inline-block h-7"
+                            numericOnly={true}
                           /> evening courses
                         </li>
                         <li>Basic fee: $450</li>
@@ -572,10 +573,11 @@ const ListeningTest = () => {
                         <li className="flex items-center gap-2">
                           <span>Basic fee (Question 7):</span>
                           <Input 
-                            placeholder="Type your answer" 
+                            placeholder="Number only" 
                             value={userAnswers.find(a => a.questionId === 'l-q7')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q7', e.target.value)}
                             className="w-32 inline-block h-7"
+                            numericOnly={true}
                           />
                         </li>
                         <li>Plus $50 enrolment fee</li>
@@ -589,10 +591,11 @@ const ListeningTest = () => {
                         <li className="flex items-center gap-2">
                           <span>Basic fee (Question 8):</span>
                           <Input 
-                            placeholder="Type your answer" 
+                            placeholder="Number only" 
                             value={userAnswers.find(a => a.questionId === 'l-q8')?.userResponse || ''}
                             onChange={(e) => handleAnswerChange('l-q8', e.target.value)}
                             className="w-32 inline-block h-7"
+                            numericOnly={true}
                           />
                         </li>
                         <li className="flex items-center gap-2">
