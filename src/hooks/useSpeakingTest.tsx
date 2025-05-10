@@ -153,6 +153,17 @@ export const useSpeakingTest = () => {
     handleNextQuestion();
   }, [stopRecording, handleNextQuestion, completePart2, currentPhase, isPreparing]);
 
+  // Custom audio playback handler that automatically progresses
+  const handlePlayExaminerAudio = useCallback(async (src: string) => {
+    try {
+      const result = await playExaminerAudio(src);
+      return result;
+    } catch (error) {
+      console.error('Error playing examiner audio:', error);
+      return false;
+    }
+  }, [playExaminerAudio]);
+
   // Check for audio completion and execute next actions
   useEffect(() => {
     if (audioCompleted) {
@@ -228,7 +239,8 @@ export const useSpeakingTest = () => {
     // New properties for audio player
     audioSrc,
     isPlayingAudio,
-    playExaminerAudio,
+    audioCompleted,
+    playExaminerAudio: handlePlayExaminerAudio,
     pauseExaminerAudio,
     getCurrentSrc,
     audioError

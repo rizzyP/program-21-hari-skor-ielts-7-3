@@ -24,6 +24,7 @@ export const useExaminerSimulation = (
   } = useAudioPlayer();
   
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const audioEndedCallbackRef = useRef<(() => void) | null>(null);
 
   // Clean up timeout to prevent memory leaks
   const cleanupExaminerTimeout = useCallback(() => {
@@ -90,20 +91,18 @@ export const useExaminerSimulation = (
   // Handle manual audio playback
   const playExaminerAudio = useCallback(async (src: string) => {
     try {
-      await playAudio(src);
+      // Create a new audio element to track when this specific audio ends
+      const audio = new Audio(src);
       
       // Set up the audio completion listener
-      const audio = new Audio(src);
       audio.addEventListener('ended', () => {
         console.log('Audio completed:', src);
         setAudioCompleted(true);
         setExaminerSpeaking(false);
-        
-        // Enable recording based on the audio action
-        if (audioAction === 'startRecording') {
-          setIsRecording(true);
-        }
       });
+      
+      // Play the audio using the audio player hook
+      await playAudio(src);
       
       return true;
     } catch (error) {
@@ -113,7 +112,7 @@ export const useExaminerSimulation = (
       });
       return false;
     }
-  }, [playAudio, setIsRecording, audioAction]);
+  }, [playAudio]);
 
   // Get the audio action that should happen after audio completes
   const getAudioAction = useCallback(() => {

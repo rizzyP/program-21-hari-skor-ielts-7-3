@@ -28,6 +28,7 @@ interface ExaminationPanelProps {
   transcripts: Record<string, string>;
   audioSrc?: string | null;
   isPlayingAudio?: boolean;
+  audioCompleted?: boolean;
   onPlayAudio?: (src: string) => Promise<boolean | void>;
   onPauseAudio?: () => void;
   getCurrentSrc?: () => string;
@@ -50,6 +51,7 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
   transcripts,
   audioSrc = null,
   isPlayingAudio = false,
+  audioCompleted = false,
   onPlayAudio = async () => {},
   onPauseAudio = () => {},
   getCurrentSrc = () => ""
@@ -82,13 +84,15 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
             <Timer 
               seconds={recordingTime} 
               onTimeUp={onStopRecording}
-              className="bg-red-50 border-red-200 text-red-700" 
+              className="bg-red-50 border-red-200 text-red-700"
+              label="Recording" 
             />
           )}
           {isPreparing && !isRecording && (
             <Timer 
               seconds={prepTime} 
-              className="bg-yellow-50 border-yellow-200 text-yellow-700" 
+              className="bg-yellow-50 border-yellow-200 text-yellow-700"
+              label="Preparation Time"
             />
           )}
         </div>
@@ -139,7 +143,8 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
                     onPause={onPauseAudio}
                     isPlaying={isPlayingAudio}
                     isCurrentTrack={getCurrentSrc().includes(audioSrc)}
-                    label="Play examiner audio"
+                    label={audioCompleted ? "Audio completed" : "Play examiner audio"}
+                    disabled={audioCompleted}
                   />
                 </div>
               )}

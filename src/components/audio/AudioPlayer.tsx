@@ -12,6 +12,7 @@ interface AudioPlayerProps {
   className?: string;
   isCurrentTrack: boolean;
   label?: string;
+  disabled?: boolean;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({
@@ -21,7 +22,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   isPlaying,
   className,
   isCurrentTrack,
-  label
+  label,
+  disabled = false
 }) => {
   const handlePlayPause = async () => {
     if (isPlaying && isCurrentTrack) {
@@ -37,7 +39,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         onClick={handlePlayPause}
         variant="outline" 
         size="sm"
-        className="flex items-center gap-2 bg-white"
+        disabled={disabled}
+        className={cn(
+          "flex items-center gap-2 bg-white",
+          disabled && "opacity-50 cursor-not-allowed"
+        )}
       >
         {isPlaying && isCurrentTrack ? (
           <Pause className="h-4 w-4" />

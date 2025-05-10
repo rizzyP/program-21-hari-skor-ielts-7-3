@@ -36,6 +36,7 @@ const SpeakingTest = () => {
     handleNavigateResults,
     audioSrc,
     isPlayingAudio,
+    audioCompleted,
     playExaminerAudio,
     pauseExaminerAudio,
     getCurrentSrc,
@@ -99,6 +100,7 @@ const SpeakingTest = () => {
               transcripts={transcripts}
               audioSrc={audioSrc}
               isPlayingAudio={isPlayingAudio}
+              audioCompleted={audioCompleted}
               onPlayAudio={playExaminerAudio}
               onPauseAudio={pauseExaminerAudio}
               getCurrentSrc={getCurrentSrc}
