@@ -1,4 +1,3 @@
-
 import { TestResult, Feedback } from '@/types/test';
 import { assessSpeakingResponse, assessWritingTask } from './aiService';
 
@@ -206,26 +205,16 @@ export const evaluateListeningAnswers = (
   let correctCount = 0;
   
   // Special handling for questions 1-5 as a group
-  // Update: This has been fixed to properly check in order
-  const sectionOneQuestionIds = ['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'];
   const sectionOneCorrectAnswers = ['B', 'D', 'C', 'F', 'I'];
+  const userSectionOneAnswers: string[] = [];
   
-  // Process Section 1 questions (1-5) individually
-  sectionOneQuestionIds.forEach((questionId, index) => {
-    const userAnswer = userAnswers[questionId] || '';
-    // Extract just the letter for multiple choice
-    const answerLetter = userAnswer.trim().charAt(0).toUpperCase();
-    
-    // Compare with the correct answer at the same position
-    if (answerLetter === sectionOneCorrectAnswers[index]) {
-      correctCount++;
-    }
-  });
-  
-  // Process other questions normally
   userResponseEntries.forEach(([questionId, userResponse]) => {
-    // Skip the questions 1-5 as we already processed them
-    if (!sectionOneQuestionIds.includes(questionId)) {
+    // For questions 1-5, collect the answers separately
+    if (['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'].includes(questionId)) {
+      // Extract just the letter for these questions
+      const answerLetter = userResponse.trim().charAt(0).toUpperCase();
+      userSectionOneAnswers.push(answerLetter);
+    } else {
       // For other questions, check normally
       const correct = correctAnswers[questionId];
       if (correct && isCorrectAnswer(questionId, userResponse, correct)) {
@@ -233,6 +222,14 @@ export const evaluateListeningAnswers = (
       }
     }
   });
+  
+  // Now evaluate section 1 questions as a group (order-insensitive)
+  const sectionOneCount = userSectionOneAnswers.reduce((count, answer) => {
+    return sectionOneCorrectAnswers.includes(answer) ? count + 1 : count;
+  }, 0);
+  
+  // Add section one correct answers to the total
+  correctCount += sectionOneCount;
   
   const percentageCorrect = (correctCount / totalQuestions) * 100;
   
