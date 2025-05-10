@@ -11,6 +11,8 @@ export const useExaminerSimulation = (
   const [examinerMessage, setExaminerMessage] = useState('');
   const [fadeIn, setFadeIn] = useState(true);
   const [audioSrc, setAudioSrc] = useState<string | null>(null);
+  const [audioCompleted, setAudioCompleted] = useState(false);
+  const [audioAction, setAudioAction] = useState<string | null>(null);
   
   const { 
     playAudio,
@@ -32,9 +34,12 @@ export const useExaminerSimulation = (
     cleanupAudio();
   }, [cleanupAudio]);
 
-  // Simulate examiner speaking but don't auto-play audio
+  // Simulate examiner speaking - manual playback only
   const simulateExaminerSpeaking = useCallback(
     async (message: string, audioFile: string | null, duration: number = 3000, currentPhase: Phase) => {
+      // Reset audio completion state
+      setAudioCompleted(false);
+      
       // Set examiner state
       setFadeIn(false);
       
@@ -47,9 +52,36 @@ export const useExaminerSimulation = (
         // Set the audio source for manual playback
         if (audioFile) {
           setAudioSrc(audioFile);
+          
+          // Determine the appropriate action based on the audio file
+          if (audioFile.includes('speaking-section-opening-1')) {
+            setAudioAction('startPart1');
+          } else if (audioFile.includes('speaking-section-1a') || 
+                    audioFile.includes('speaking-section-1b') || 
+                    audioFile.includes('speaking-section-1c') || 
+                    audioFile.includes('speaking-section-1d')) {
+            setAudioAction('startRecording');
+          } else if (audioFile.includes('speaking-section-1-end')) {
+            setAudioAction('startPart2');
+          } else if (audioFile.includes('speaking-section-2.wav')) {
+            setAudioAction('startPreparation');
+          } else if (audioFile.includes('speaking-section-2-mid')) {
+            setAudioAction('startLongRecording');
+          } else if (audioFile.includes('speaking-section-2-end')) {
+            setAudioAction('startPart3');
+          } else if (audioFile.includes('speaking-section-3a') || 
+                    audioFile.includes('speaking-section-3b') || 
+                    audioFile.includes('speaking-section-3c')) {
+            setAudioAction('startRecording');
+          } else if (audioFile.includes('speaking-section-3-end')) {
+            setAudioAction('endTest');
+          } else {
+            setAudioAction(null);
+          }
+        } else {
+          setAudioSrc(null);
+          setAudioAction(null);
         }
-
-        // For manual playback only - don't automatically play or move to next phase
       }, 300);
     },
     [setIsRecording]
@@ -58,17 +90,17 @@ export const useExaminerSimulation = (
   // Handle manual audio playback
   const playExaminerAudio = useCallback(async (src: string) => {
     try {
-      console.log('Playing audio:', src);
       await playAudio(src);
       
-      // Monitor when audio completes and move to next phase
+      // Set up the audio completion listener
       const audio = new Audio(src);
       audio.addEventListener('ended', () => {
         console.log('Audio completed:', src);
+        setAudioCompleted(true);
         setExaminerSpeaking(false);
         
-        // Enable recording if needed - only after part 1 questions
-        if (audioSrc && audioSrc.includes('speaking-section-1')) {
+        // Enable recording based on the audio action
+        if (audioAction === 'startRecording') {
           setIsRecording(true);
         }
       });
@@ -81,19 +113,35 @@ export const useExaminerSimulation = (
       });
       return false;
     }
-  }, [playAudio, setIsRecording, audioSrc]);
+  }, [playAudio, setIsRecording, audioAction]);
+
+  // Get the audio action that should happen after audio completes
+  const getAudioAction = useCallback(() => {
+    const action = audioAction;
+    // Clear the action after it's retrieved to avoid repeat executions
+    setAudioAction(null);
+    return action;
+  }, [audioAction]);
+
+  // Reset audio completion status
+  const resetAudioCompleted = useCallback(() => {
+    setAudioCompleted(false);
+  }, []);
 
   return {
     examinerSpeaking,
     examinerMessage,
     fadeIn,
     audioSrc,
+    audioCompleted,
     isPlayingAudio: isPlaying,
     simulateExaminerSpeaking,
     playExaminerAudio,
     pauseExaminerAudio: pauseAudio,
     cleanupExaminerTimeout,
     getCurrentSrc,
+    getAudioAction,
+    resetAudioCompleted,
     audioError
   };
 };

@@ -9,12 +9,15 @@ import ExaminerAvatar from './ExaminerAvatar';
 import RecordingControls from './RecordingControls';
 import Timer from '../test/Timer';
 import AudioPlayer from '../audio/AudioPlayer';
+import CueCard from './CueCard';
 
 interface ExaminationPanelProps {
   currentPhase: Phase;
   examinerSpeaking: boolean;
   examinerMessage: string;
   isRecording: boolean;
+  isPreparing?: boolean;
+  prepTime?: number;
   isTranscribing?: boolean;
   onStartRecording: () => void;
   onStopRecording: () => void;
@@ -35,6 +38,8 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
   examinerSpeaking,
   examinerMessage,
   isRecording,
+  isPreparing = false,
+  prepTime = 60,
   isTranscribing = false,
   onStartRecording,
   onStopRecording,
@@ -49,11 +54,13 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
   onPauseAudio = () => {},
   getCurrentSrc = () => ""
 }) => {
-  const [recordingTime, setRecordingTime] = useState<number>(0);
+  const [recordingTime, setRecordingTime] = useState<number>(30);
   
   // Set recording time based on current part
   useEffect(() => {
-    if (currentPart === 1) setRecordingTime(30);
+    if (currentPart === 1) setRecordingTime(20);
+    else if (currentPart === 2) setRecordingTime(120);
+    else if (currentPart === 3) setRecordingTime(40);
   }, [currentPart]);
 
   return (
@@ -70,6 +77,7 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
               </p>
             </div>
           </div>
+          {/* Show appropriate timer based on state */}
           {isRecording && (
             <Timer 
               seconds={recordingTime} 
@@ -77,12 +85,37 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
               className="bg-red-50 border-red-200 text-red-700" 
             />
           )}
+          {isPreparing && !isRecording && (
+            <Timer 
+              seconds={prepTime} 
+              className="bg-yellow-50 border-yellow-200 text-yellow-700" 
+              label="Preparation Time"
+            />
+          )}
         </div>
       </CardHeader>
       
       <CardContent className="pt-6 pb-4">
-        {/* Current question displayed prominently in the center */}
+        {/* Show appropriate content based on phase */}
         {currentPhase === Phase.SPEAKING_PART1 && (
+          <div className="text-center my-8 max-w-2xl mx-auto">
+            <h2 className="text-2xl font-medium text-slate-800">{examinerMessage}</h2>
+          </div>
+        )}
+        
+        {currentPhase === Phase.SPEAKING_PART2 && (
+          <div className="my-6 max-w-2xl mx-auto">
+            {isPreparing ? (
+              <CueCard question={examinerMessage} />
+            ) : (
+              <div className="text-center">
+                <h2 className="text-2xl font-medium text-slate-800">{examinerMessage}</h2>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {currentPhase === Phase.SPEAKING_PART3 && (
           <div className="text-center my-8 max-w-2xl mx-auto">
             <h2 className="text-2xl font-medium text-slate-800">{examinerMessage}</h2>
           </div>
@@ -129,6 +162,7 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
           examinerSpeaking={examinerSpeaking}
           onStartRecording={onStartRecording}
           onStopRecording={onStopRecording}
+          isPreparing={isPreparing}
         />
       </CardContent>
       
@@ -147,6 +181,13 @@ const ExaminationPanel: React.FC<ExaminationPanelProps> = ({
           <div className="mr-auto flex items-center">
             <span className="h-3 w-3 bg-red-500 rounded-full mr-2 animate-pulse"></span>
             <span className="text-sm text-red-600 font-semibold">Recording</span>
+          </div>
+        )}
+        
+        {isPreparing && (
+          <div className="mr-auto flex items-center">
+            <span className="h-3 w-3 bg-yellow-500 rounded-full mr-2 animate-pulse"></span>
+            <span className="text-sm text-yellow-600 font-semibold">Preparation Time</span>
           </div>
         )}
       </CardFooter>

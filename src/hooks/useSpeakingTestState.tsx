@@ -7,12 +7,15 @@ export const useSpeakingTestState = () => {
   const [currentPhase, setCurrentPhase] = useState<Phase>(Phase.INSTRUCTIONS);
   const [isStarted, setIsStarted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false); // Added missing state
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [isPreparing, setIsPreparing] = useState(false); // Added for Part 2 preparation time
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [currentPart, setCurrentPart] = useState<number>(1);
   const [transcripts, setTranscripts] = useState<Record<string, string>>({});
   const [partCompleted, setPartCompleted] = useState<Record<string, boolean>>({
-    part1: false
+    part1: false,
+    part2: false,
+    part3: false
   });
   
   // Animation states
@@ -38,6 +41,8 @@ export const useSpeakingTestState = () => {
     setIsRecording,
     isTranscribing,
     setIsTranscribing,
+    isPreparing,
+    setIsPreparing,
     currentQuestion,
     setCurrentQuestion,
     currentPart,

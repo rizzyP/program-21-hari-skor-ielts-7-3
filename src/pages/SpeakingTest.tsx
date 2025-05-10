@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Layout from '@/components/layout/Layout';
 import { TestPhases, Phase } from '@/components/test/TestPhases';
 import Timer from '@/components/test/Timer';
@@ -16,6 +16,8 @@ const SpeakingTest = () => {
     isStarted,
     isRecording,
     isTranscribing,
+    isPreparing,
+    prepTime,
     currentQuestion,
     currentPart,
     transcripts,
@@ -74,7 +76,7 @@ const SpeakingTest = () => {
             </div>
 
             {/* Show overall test timer only when not recording */}
-            {!isRecording && (
+            {!isRecording && !isPreparing && (
               <div className="flex justify-end">
                 <Timer />
               </div>
@@ -85,6 +87,8 @@ const SpeakingTest = () => {
               examinerSpeaking={examinerSpeaking}
               examinerMessage={examinerMessage}
               isRecording={isRecording}
+              isPreparing={isPreparing}
+              prepTime={prepTime}
               isTranscribing={isTranscribing}
               onStartRecording={handleStartRecording}
               onStopRecording={handleStopRecording}
@@ -100,7 +104,7 @@ const SpeakingTest = () => {
               getCurrentSrc={getCurrentSrc}
             />
             
-            {/* Progress indicator - pass current part to getCurrentPartQuestions */}
+            {/* Progress indicator */}
             {currentPhase !== Phase.INSTRUCTIONS && 
              currentPhase !== Phase.COMPLETED && 
              currentPhase !== Phase.SPEAKING_INTRO && (

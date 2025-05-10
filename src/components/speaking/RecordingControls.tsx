@@ -7,6 +7,7 @@ interface RecordingControlsProps {
   isRecording: boolean;
   isTranscribing?: boolean;
   examinerSpeaking: boolean;
+  isPreparing?: boolean;
   onStartRecording: () => void;
   onStopRecording: () => void;
 }
@@ -15,6 +16,7 @@ const RecordingControls: React.FC<RecordingControlsProps> = ({
   isRecording,
   isTranscribing = false,
   examinerSpeaking,
+  isPreparing = false,
   onStartRecording,
   onStopRecording,
 }) => {
@@ -53,6 +55,19 @@ const RecordingControls: React.FC<RecordingControlsProps> = ({
           <span className="flex items-center">
             <span className="h-2 w-2 bg-yellow-500 rounded-full mr-2 animate-pulse"></span>
             Examiner is speaking...
+          </span>
+        </div>
+      </div>
+    );
+  }
+  
+  if (isPreparing) {
+    return (
+      <div className="flex justify-center mt-4">
+        <div className="px-3 py-2 rounded-md bg-yellow-100 text-yellow-700">
+          <span className="flex items-center">
+            <span className="h-2 w-2 bg-yellow-500 rounded-full mr-2 animate-pulse"></span>
+            Preparation time - make notes if needed
           </span>
         </div>
       </div>
