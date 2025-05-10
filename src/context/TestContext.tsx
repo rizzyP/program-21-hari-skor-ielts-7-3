@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { IELTSTest, TestSection, UserAnswer, TestResult } from '@/types/test';
 import { sampleTest } from '@/data/sampleTest';
@@ -72,6 +73,15 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const saveAnswer = (questionId: string, answer: string) => {
+    // For multiple-choice questions, extract just the option letter (A, B, C, etc.)
+    let processedAnswer = answer;
+    
+    // Check if the answer starts with a letter followed by a period (e.g., "A. Some text")
+    if (/^[A-Z]\.\s/.test(answer)) {
+      // Extract just the first character (the option letter)
+      processedAnswer = answer.charAt(0);
+    }
+
     setUserAnswers(prev => {
       // Check if we already have an answer for this question
       const existingAnswerIndex = prev.findIndex(a => a.questionId === questionId);
@@ -79,11 +89,11 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (existingAnswerIndex !== -1) {
         // Update existing answer
         const updatedAnswers = [...prev];
-        updatedAnswers[existingAnswerIndex] = { questionId, userResponse: answer };
+        updatedAnswers[existingAnswerIndex] = { questionId, userResponse: processedAnswer };
         return updatedAnswers;
       } else {
         // Add new answer
-        return [...prev, { questionId, userResponse: answer }];
+        return [...prev, { questionId, userResponse: processedAnswer }];
       }
     });
   };
