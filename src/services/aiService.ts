@@ -1,3 +1,4 @@
+
 import { UserAnswer, Feedback } from '@/types/test';
 import { evaluateWritingWithGemini, evaluateSpeakingWithGemini } from './openRouterService';
 
@@ -19,8 +20,28 @@ export async function assessWritingTask(
     console.log('Raw Gemini response received:', geminiResponse.substring(0, 200) + '...');
     
     try {
-      // Try to parse the response as JSON
-      const parsedResponse = JSON.parse(geminiResponse);
+      // Try different approaches to parse the response as JSON
+      let parsedResponse;
+      try {
+        // First try direct parsing
+        parsedResponse = JSON.parse(geminiResponse);
+      } catch (initialParseError) {
+        console.log("Initial JSON parsing failed, trying alternative methods...");
+        
+        // Look for a JSON object in the response string
+        const jsonMatch = geminiResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            parsedResponse = JSON.parse(jsonMatch[0]);
+            console.log("Successfully extracted JSON from response");
+          } catch (extractError) {
+            console.error("Failed to parse extracted JSON:", extractError);
+            throw initialParseError;
+          }
+        } else {
+          throw initialParseError;
+        }
+      }
       
       // Validate the response has the expected structure
       if (!parsedResponse.criteria || !Array.isArray(parsedResponse.criteria) || 
@@ -59,8 +80,28 @@ export async function assessSpeakingResponse(
     console.log('Raw Gemini response received:', geminiResponse.substring(0, 200) + '...');
     
     try {
-      // Try to parse the response as JSON
-      const parsedResponse = JSON.parse(geminiResponse);
+      // Try different approaches to parse the response as JSON
+      let parsedResponse;
+      try {
+        // First try direct parsing
+        parsedResponse = JSON.parse(geminiResponse);
+      } catch (initialParseError) {
+        console.log("Initial JSON parsing failed, trying alternative methods...");
+        
+        // Look for a JSON object in the response string
+        const jsonMatch = geminiResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            parsedResponse = JSON.parse(jsonMatch[0]);
+            console.log("Successfully extracted JSON from response");
+          } catch (extractError) {
+            console.error("Failed to parse extracted JSON:", extractError);
+            throw initialParseError;
+          }
+        } else {
+          throw initialParseError;
+        }
+      }
       
       // Validate the response has the expected structure
       if (!parsedResponse.criteria || !Array.isArray(parsedResponse.criteria) || 

@@ -1,3 +1,4 @@
+
 // OpenRouter API service to access Gemini 2.0 Flash
 const OPENROUTER_API_KEY = "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";
 const SITE_URL = window.location.origin;
@@ -38,7 +39,7 @@ export const callGemini = async (messages: Message[]): Promise<string> => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "google/gemini-2.0-flash-exp:free",  // Updated to the free model
+        "model": "google/gemini-2.0-flash-exp:free",  // Using the free model
         "messages": messages
       })
     });
@@ -50,7 +51,23 @@ export const callGemini = async (messages: Message[]): Promise<string> => {
     }
 
     const data: GeminiResponse = await response.json();
-    return data.choices[0].message.content;
+    
+    // Extract the content and sanitize it
+    const content = data.choices[0].message.content;
+    
+    // Clean up the response - remove any backtick formatting that might be causing JSON parse errors
+    let cleanedContent = content;
+    
+    // Check if the content is wrapped in markdown code blocks and remove them
+    const jsonBlockRegex = /```(?:json)?\s*([\s\S]*?)```/;
+    const match = jsonBlockRegex.exec(content);
+    
+    if (match && match[1]) {
+      cleanedContent = match[1].trim();
+      console.log("Extracted JSON from code block:", cleanedContent.substring(0, 100) + "...");
+    }
+    
+    return cleanedContent;
   } catch (error) {
     console.error("Error calling Gemini:", error);
     throw error;
