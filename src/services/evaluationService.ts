@@ -1,3 +1,4 @@
+
 import { TestResult, Feedback } from '@/types/test';
 import { assessSpeakingResponse, assessWritingTask } from './aiService';
 
@@ -136,14 +137,27 @@ export const evaluateReadingAnswers = (
   userAnswers: Record<string, string>,
   correctAnswers: Record<string, string>
 ): Feedback => {
-  const userResponseEntries = Object.entries(userAnswers);
-  const totalQuestions = userResponseEntries.length;
+  // First, ensure all questions in correctAnswers have a corresponding user answer
+  // even if the user didn't provide one (set to empty string)
+  const completeUserAnswers = { ...userAnswers };
+  
+  Object.keys(correctAnswers).forEach(questionId => {
+    if (completeUserAnswers[questionId] === undefined) {
+      completeUserAnswers[questionId] = '';
+    }
+  });
+  
+  const userResponseEntries = Object.entries(completeUserAnswers);
+  const totalQuestions = Object.keys(correctAnswers).length;
   
   let correctCount = 0;
   
   userResponseEntries.forEach(([questionId, userResponse]) => {
-    if (isCorrectAnswer(questionId, userResponse, correctAnswers[questionId] || '')) {
-      correctCount++;
+    // Only check questions that have correct answers defined
+    if (correctAnswers[questionId] !== undefined) {
+      if (isCorrectAnswer(questionId, userResponse, correctAnswers[questionId] || '')) {
+        correctCount++;
+      }
     }
   });
   
@@ -168,6 +182,25 @@ export const evaluateReadingAnswers = (
   else if (percentageCorrect >= 22) bandScore = 3.5;
   else if (percentageCorrect >= 17) bandScore = 3.0;
   else bandScore = 2.5;
+
+  // Create appropriate feedback based on performance
+  const strengths = [];
+  const weaknesses = [];
+
+  if (percentageCorrect >= 75) {
+    strengths.push('Good understanding of main ideas');
+    strengths.push('Ability to locate specific information');
+  } else if (percentageCorrect >= 60) {
+    strengths.push('Good understanding of main ideas');
+    weaknesses.push('Some difficulty with specific details');
+  } else {
+    weaknesses.push('Difficulty understanding main ideas');
+    weaknesses.push('Struggles with locating specific information');
+  }
+
+  if (percentageCorrect < 50) {
+    weaknesses.push('Needs improvement in vocabulary related to the passage');
+  }
   
   return {
     criteria: [
@@ -178,16 +211,13 @@ export const evaluateReadingAnswers = (
       }
     ],
     overallScore: bandScore,
-    strengths: [
-      'Good understanding of main ideas',
-      percentageCorrect >= 70 ? 'Ability to locate specific information' : ''
-    ].filter(Boolean),
-    weaknesses: [
-      'Some grammatical errors in complex sentences',
-      'Limited range of vocabulary for academic writing',
-      'Occasionally unclear expressions'
-    ].filter(Boolean),
-    recommendations: 'Work on using a wider range of academic vocabulary and practice writing more complex sentences accurately. Focus on fully developing all parts of the question with relevant examples and explanations.'
+    strengths: strengths.filter(Boolean),
+    weaknesses: weaknesses.filter(Boolean),
+    recommendations: percentageCorrect < 60 
+      ? 'Practice reading academic texts regularly. Focus on identifying main ideas and specific details. Expand your academic vocabulary.'
+      : percentageCorrect < 80
+        ? 'Continue practicing with academic texts. Work on improving your skimming and scanning techniques to locate information more efficiently.'
+        : 'Excellent reading skills. To improve further, challenge yourself with more complex texts and time constraints.'
   };
 };
 
@@ -195,7 +225,16 @@ export const evaluateListeningAnswers = (
   userAnswers: Record<string, string>,
   correctAnswers: Record<string, string>
 ): Feedback => {
-  const userResponseEntries = Object.entries(userAnswers);
+  // Ensure all questions have answers (even if empty)
+  const completeUserAnswers = { ...userAnswers };
+  
+  Object.keys(correctAnswers).forEach(questionId => {
+    if (completeUserAnswers[questionId] === undefined) {
+      completeUserAnswers[questionId] = '';
+    }
+  });
+  
+  const userResponseEntries = Object.entries(completeUserAnswers);
   const totalQuestions = userResponseEntries.length;
   
   let correctCount = 0;
@@ -207,8 +246,8 @@ export const evaluateListeningAnswers = (
   // Collect user's answers for questions 1-5
   const userSelectedOptions: string[] = [];
   sectionOneQuestionIds.forEach(qId => {
-    if (userAnswers[qId] && userAnswers[qId].trim() !== '') {
-      userSelectedOptions.push(userAnswers[qId].trim());
+    if (completeUserAnswers[qId] && completeUserAnswers[qId].trim() !== '') {
+      userSelectedOptions.push(completeUserAnswers[qId].trim());
     }
   });
   
@@ -281,6 +320,9 @@ export const evaluateListeningAnswers = (
 
 // Helper function to determine if an answer is correct, including special cases
 const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: string): boolean => {
+  // Empty answers are always incorrect
+  if (!userAnswer.trim()) return false;
+  
   // Normalize both answers to lowercase for case-insensitive comparison
   const normalizedUserAnswer = userAnswer.toLowerCase().trim();
   const normalizedCorrectAnswer = correctAnswer.toLowerCase().trim();

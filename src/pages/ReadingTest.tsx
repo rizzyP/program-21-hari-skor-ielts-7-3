@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const ReadingTest = () => {
   const navigate = useNavigate();
@@ -46,6 +47,19 @@ const ReadingTest = () => {
   );
   const readingContent = readingSection?.content as any;
 
+  // Pre-fill all question IDs with empty strings to ensure all questions are accounted for
+  useEffect(() => {
+    if (readingContent && isStarted) {
+      readingContent.questions.forEach((question: any) => {
+        const existingAnswer = userAnswers.find(a => a.questionId === question.id);
+        if (!existingAnswer) {
+          // Initialize with empty string
+          saveAnswer(question.id, '');
+        }
+      });
+    }
+  }, [readingContent, isStarted, userAnswers]);
+
   const handleStart = () => {
     setIsStarted(true);
     toast.info('Reading test started', {
@@ -54,11 +68,21 @@ const ReadingTest = () => {
   };
 
   const handleSubmit = () => {
+    // Make sure all questions have an answer (even if empty)
+    if (readingContent) {
+      readingContent.questions.forEach((question: any) => {
+        const existingAnswer = userAnswers.find(a => a.questionId === question.id);
+        if (!existingAnswer) {
+          saveAnswer(question.id, '');
+        }
+      });
+    }
+    
     submitSection();
     toast.success('Reading test completed', {
       description: 'Your answers have been submitted for evaluation.'
     });
-    // Navigate to writing test next (change from previous version)
+    // Navigate to writing test next
     navigate('/test/writing');
   };
 
@@ -163,17 +187,28 @@ const ReadingTest = () => {
                       </CardHeader>
                       <CardContent>
                         {question.questionType === 'multiple-choice' && (
-                          <RadioGroup 
-                            value={savedAnswer} 
-                            onValueChange={(value) => handleAnswerChange(questionId, value)}
-                          >
-                            {question.options.map((option: string, optionIndex: number) => (
-                              <div key={optionIndex} className="flex items-center space-x-2">
-                                <RadioGroupItem value={option} id={`q${questionId}-${optionIndex}`} />
-                                <Label htmlFor={`q${questionId}-${optionIndex}`}>{option}</Label>
-                              </div>
-                            ))}
-                          </RadioGroup>
+                          <div className="space-y-3">
+                            {question.options.map((option: string, optionIndex: number) => {
+                              const optionId = `q${questionId}-${optionIndex}`;
+                              const isChecked = savedAnswer === option;
+                              
+                              return (
+                                <div key={optionIndex} className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id={optionId} 
+                                    checked={isChecked}
+                                    onCheckedChange={() => handleAnswerChange(questionId, option)}
+                                  />
+                                  <Label 
+                                    htmlFor={optionId}
+                                    className={isChecked ? "font-medium" : ""}
+                                  >
+                                    {option}
+                                  </Label>
+                                </div>
+                              );
+                            })}
+                          </div>
                         )}
                         
                         {question.questionType === 'true-false-notgiven' && (
