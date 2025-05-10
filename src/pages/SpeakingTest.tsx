@@ -100,14 +100,14 @@ const SpeakingTest = () => {
               getCurrentSrc={getCurrentSrc}
             />
             
-            {/* Progress indicator */}
+            {/* Progress indicator - pass current part to getCurrentPartQuestions */}
             {currentPhase !== Phase.INSTRUCTIONS && 
              currentPhase !== Phase.COMPLETED && 
              currentPhase !== Phase.SPEAKING_INTRO && (
               <ProgressIndicator
                 currentPart={currentPart}
                 currentQuestion={currentQuestion}
-                totalQuestions={getCurrentPartQuestions().length}
+                totalQuestions={getCurrentPartQuestions(currentPart).length}
                 partCompleted={partCompleted}
               />
             )}

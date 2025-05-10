@@ -1,7 +1,7 @@
 
-import { useEffect, useCallback } from 'react';
-import { useTest } from '@/context/TestContext';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { Phase } from '@/components/test/TestPhases';
+import { useAudioPlayer } from '@/hooks/audio';
 import { useExaminerSimulation } from './useExaminerSimulation';
 import { useVoiceRecorder } from './useVoiceRecorder';
 import { useTestContent } from './useTestContent';
@@ -10,7 +10,6 @@ import { useSpeakingTestState } from './useSpeakingTestState';
 
 export const useSpeakingTest = () => {
   // Re-use all of the existing functionality
-  const { currentTest } = useTest();
   const { speakingSection, speakingContent, getCurrentPartQuestions } = useTestContent();
   
   // State management
@@ -68,7 +67,7 @@ export const useSpeakingTest = () => {
     audioError
   } = useExaminerSimulation(setIsRecording);
 
-  // Setup test navigation
+  // Setup test navigation - pass the current part to getCurrentPartQuestions
   const {
     handleStart,
     handleNextQuestion,
@@ -82,7 +81,7 @@ export const useSpeakingTest = () => {
     setPartCompleted,
     setQuestionNumber,
     simulateExaminerSpeaking,
-    getCurrentPartQuestions,
+    () => getCurrentPartQuestions(currentPart),
     currentPart,
     currentQuestion,
     currentPhase

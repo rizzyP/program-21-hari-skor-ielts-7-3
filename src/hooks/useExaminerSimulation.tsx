@@ -17,7 +17,8 @@ export const useExaminerSimulation = (
     isPlaying,
     pauseAudio,
     getCurrentSrc,
-    cleanupAudio
+    cleanupAudio,
+    audioError
   } = useAudioPlayer();
   
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -100,6 +101,7 @@ export const useExaminerSimulation = (
     playExaminerAudio,
     pauseExaminerAudio: pauseAudio,
     cleanupExaminerTimeout,
-    getCurrentSrc
+    getCurrentSrc,
+    audioError
   };
 };

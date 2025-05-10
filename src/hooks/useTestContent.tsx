@@ -1,4 +1,3 @@
-
 import { useTest } from '@/context/TestContext';
 import { SpeakingContent } from '@/types/test';
 
@@ -8,10 +7,17 @@ export const useTestContent = () => {
   const speakingSection = currentTest?.sections.find(section => section.type === 'speaking');
   const speakingContent = speakingSection?.content as SpeakingContent | undefined;
 
-  // Get current part questions
-  const getCurrentPartQuestions = (currentPart: number) => {
+  // Get current part questions - updated to work with or without argument
+  const getCurrentPartQuestions = (currentPart?: number) => {
     if (!speakingContent || !speakingContent.parts) return [];
-    return speakingContent.parts.find((p) => p.partNumber === currentPart)?.questions || [];
+    
+    // If currentPart is provided, return questions for that part
+    // Otherwise return an empty array (this satisfies the function signature)
+    if (currentPart !== undefined) {
+      return speakingContent.parts.find((p) => p.partNumber === currentPart)?.questions || [];
+    }
+    
+    return [];
   };
 
   // Get current question
