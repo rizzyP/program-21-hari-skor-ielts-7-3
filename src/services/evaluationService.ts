@@ -155,19 +155,19 @@ export const evaluateReadingAnswers = (
   let bandScore = 0;
   
   // Fixed the band score calculation to be more accurate
-  if (percentageCorrect >= 95) bandScore = 9.0;
-  else if (percentageCorrect >= 90) bandScore = 8.5;
-  else if (percentageCorrect >= 80) bandScore = 8.0;
-  else if (percentageCorrect >= 75) bandScore = 7.5;
-  else if (percentageCorrect >= 65) bandScore = 7.0;
-  else if (percentageCorrect >= 60) bandScore = 6.5;
-  else if (percentageCorrect >= 55) bandScore = 6.0;
+  if (percentageCorrect >= 99) bandScore = 9.0;
+  else if (percentageCorrect >= 94) bandScore = 8.5;
+  else if (percentageCorrect >= 90) bandScore = 8.0;
+  else if (percentageCorrect >= 85) bandScore = 7.5;
+  else if (percentageCorrect >= 80) bandScore = 7.0;
+  else if (percentageCorrect >= 70) bandScore = 6.5;
+  else if (percentageCorrect >= 60) bandScore = 6.0;
   else if (percentageCorrect >= 50) bandScore = 5.5;
   else if (percentageCorrect >= 40) bandScore = 5.0;
   else if (percentageCorrect >= 35) bandScore = 4.5;
   else if (percentageCorrect >= 30) bandScore = 4.0;
-  else if (percentageCorrect >= 25) bandScore = 3.5;
-  else if (percentageCorrect >= 20) bandScore = 3.0;
+  else if (percentageCorrect >= 20) bandScore = 3.5;
+  else if (percentageCorrect >= 15) bandScore = 3.0;
   else bandScore = 2.5;
   
   return {
