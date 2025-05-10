@@ -131,14 +131,6 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       });
 
-      // Get speaking answers
-      const speakingAnswers: Record<string, string> = {};
-      Object.entries(answersMap).forEach(([key, value]) => {
-        if (key.startsWith('p')) {
-          speakingAnswers[key] = value;
-        }
-      });
-
       // Evaluate each section
       const listeningFeedback = evaluateListeningAnswers(listeningAnswers, listeningCorrectAnswers);
       const readingFeedback = evaluateReadingAnswers(readingAnswers, readingCorrectAnswers);
@@ -146,24 +138,12 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // These would be AI-based evaluations in a real app
       const writingFeedback = await evaluateWritingResponse(writingAnswers);
       
-      // For speaking, generate actual feedback if we have responses
-      const speakingFeedback = Object.keys(speakingAnswers).length > 0
-        ? await evaluateSpeakingResponse(speakingAnswers)
-        : {
-            overallScore: 0,
-            criteria: [],
-            strengths: ["No speaking responses available"],
-            weaknesses: ["No speaking responses available"]
-          };
-
-      // Calculate overall score including speaking if available
-      const speakingScore = Object.keys(speakingAnswers).length > 0 ? speakingFeedback.overallScore : 0;
-      
+      // Calculate overall score without speaking
       const sectionScores = {
         listening: listeningFeedback.overallScore,
         reading: readingFeedback.overallScore,
         writing: writingFeedback.overallScore,
-        speaking: speakingScore
+        speaking: 0 // Set to 0 as it's disabled
       };
 
       // Generate overall analysis using Gemini AI
@@ -220,16 +200,6 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 strengths: [],
                 weaknesses: []
               }
-            }
-          },
-          {
-            sectionType: 'speaking',
-            bandScore: speakingScore,
-            userAnswers: userAnswers.filter(a => a.questionId.startsWith('p')),
-            details: {
-              criteria: speakingFeedback.criteria || [],
-              strengths: speakingFeedback.strengths || ["Speaking evaluation completed"],
-              weaknesses: speakingFeedback.weaknesses || ["Check your speaking responses for areas to improve"]
             }
           }
         ],

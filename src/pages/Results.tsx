@@ -284,7 +284,6 @@ const DetailedResults = ({ testResults }: { testResults: TestResult }) => (
           <TabsTrigger value="listening">Listening</TabsTrigger>
           <TabsTrigger value="reading">Reading</TabsTrigger>
           <TabsTrigger value="writing">Writing</TabsTrigger>
-          {/* Removed Speaking tab */}
         </TabsList>
         
         <TabsContent value="listening">
@@ -345,8 +344,6 @@ const DetailedResults = ({ testResults }: { testResults: TestResult }) => (
             </div>
           </div>
         </TabsContent>
-        
-        {/* Removed Speaking TabsContent */}
       </Tabs>
     </CardContent>
   </Card>
