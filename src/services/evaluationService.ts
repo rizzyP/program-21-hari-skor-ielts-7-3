@@ -79,8 +79,16 @@ export const evaluateWritingResponse = async (
     const essay = essays[firstKey] || "";
     const prompt = "Describe the chart and make comparisons where relevant."; // Default prompt if not available
     
+    if (!essay.trim()) {
+      console.warn('Empty essay submitted for evaluation');
+      throw new Error('Essay is empty');
+    }
+    
+    console.log('Sending essay for evaluation:', { prompt, essayLength: essay.length });
+    
     // Call the AI service for evaluation
     const feedback = await assessWritingTask(prompt, essay, 1); // Assume Task 1 for now
+    console.log('Received feedback:', feedback);
     return feedback;
   } catch (error) {
     console.error('Error evaluating writing response:', error);

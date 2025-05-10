@@ -27,6 +27,9 @@ interface GeminiResponse {
 
 export const callGemini = async (messages: Message[]): Promise<string> => {
   try {
+    // Log the request for debugging
+    console.log("Calling OpenRouter API with messages:", JSON.stringify(messages));
+    
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -36,14 +39,14 @@ export const callGemini = async (messages: Message[]): Promise<string> => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "google/gemini-2.5-pro-exp-03-25",
+        "model": "google/gemini-1.5-flash",  // Updated to a more reliable model
         "messages": messages
       })
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Gemini API error:", errorData);
+      const errorData = await response.text(); // Get the error response as text
+      console.error("Gemini API error:", errorData, "Status:", response.status);
       throw new Error(`Gemini API error: ${response.status}`);
     }
 
