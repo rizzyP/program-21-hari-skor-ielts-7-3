@@ -200,50 +200,35 @@ export const evaluateListeningAnswers = (
   
   let correctCount = 0;
   
-  // Section One questions (1-5) need special handling - they're evaluated as a set
+  // For questions 1-5, evaluate them as a single multi-select question
   const sectionOneQuestionIds = ['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'];
+  const correctSectionOneOptions = ['B', 'C', 'D', 'F', 'I']; // The correct 5 options
   
-  // Extract correct answers for section one from correctAnswers object
-  const sectionOneCorrectAnswers = sectionOneQuestionIds.map(id => 
-    correctAnswers[id]?.trim().toUpperCase() || ''
-  ).filter(Boolean);
-  
-  // Create a map to track which correct answers have been matched
-  const sectionOneMatched = new Map();
-  // Extract user answers for these special questions
-  const sectionOneUserAnswers = new Map();
-  
-  // Collect user answers for section one questions
-  sectionOneQuestionIds.forEach(id => {
-    if (userAnswers[id]) {
-      // Extract just the letter for multiple choice
-      const answerLetter = userAnswers[id].trim().charAt(0).toUpperCase();
-      sectionOneUserAnswers.set(id, answerLetter);
+  // Collect user's answers for questions 1-5
+  const userSelectedOptions: string[] = [];
+  sectionOneQuestionIds.forEach(qId => {
+    if (userAnswers[qId] && userAnswers[qId].trim() !== '') {
+      userSelectedOptions.push(userAnswers[qId].trim());
     }
   });
   
-  // Count correct matches using a set-based approach (order-insensitive)
-  if (sectionOneUserAnswers.size > 0) {
-    // First check if each user answer matches ANY of the correct answers
-    sectionOneUserAnswers.forEach((userAnswer, questionId) => {
-      // If this answer is in the correct set and hasn't been matched yet
-      if (sectionOneCorrectAnswers.includes(userAnswer) && !sectionOneMatched.has(userAnswer)) {
-        sectionOneMatched.set(userAnswer, questionId);
-        correctCount++;
-      }
-    });
-    
-    console.log(`Section 1 evaluation (order-insensitive): ${sectionOneMatched.size}/${sectionOneQuestionIds.length} correct`);
-    console.log('User answers:', [...sectionOneUserAnswers.entries()]);
-    console.log('Correct answers:', sectionOneCorrectAnswers);
-    console.log('Matched answers:', [...sectionOneMatched.entries()]);
-  }
+  // Count how many correct options the user selected out of the 5
+  const sectionOneCorrectCount = correctSectionOneOptions.reduce((count, option) => {
+    return userSelectedOptions.includes(option) ? count + 1 : count;
+  }, 0);
   
-  // Process other questions normally
+  console.log('Section 1 evaluation:');
+  console.log('User selected options:', userSelectedOptions);
+  console.log('Correct options:', correctSectionOneOptions);
+  console.log(`Correct selections: ${sectionOneCorrectCount}/5`);
+  
+  // Add the number of correct answers from section 1
+  correctCount += sectionOneCorrectCount;
+  
+  // Process other questions normally (questions 6-15)
   userResponseEntries.forEach(([questionId, userResponse]) => {
-    // Skip the questions 1-5 as we already processed them
+    // Skip questions 1-5 as we've already evaluated them
     if (!sectionOneQuestionIds.includes(questionId)) {
-      // For other questions, check normally
       const correct = correctAnswers[questionId];
       if (correct && isCorrectAnswer(questionId, userResponse, correct)) {
         correctCount++;
@@ -300,15 +285,7 @@ const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: 
   const normalizedUserAnswer = userAnswer.toLowerCase().trim();
   const normalizedCorrectAnswer = correctAnswer.toLowerCase().trim();
   
-  // Special handling for listening questions 1-5 (MCQ with options A-I)
-  // Note: These are now handled separately in the evaluateListeningAnswers function
-  // but we'll keep this check for backwards compatibility
-  if (['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'].includes(questionId)) {
-    // For these questions, we only need to check if the first character matches (the option letter)
-    return normalizedUserAnswer.charAt(0) === normalizedCorrectAnswer.charAt(0);
-  }
-  
-  // Special handling for questions with dollar amounts (remaining dollar-related questions)
+  // Special handling for questions with dollar amounts
   if (questionId.startsWith('l-q') && (normalizedCorrectAnswer.includes('$') || normalizedUserAnswer.includes('$'))) {
     // Remove any dollar signs, spaces and compare
     const userValue = normalizedUserAnswer.replace(/[$\s]/g, '');

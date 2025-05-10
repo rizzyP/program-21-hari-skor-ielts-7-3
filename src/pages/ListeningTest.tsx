@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -9,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Clock, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { TestPhases, Phase } from '@/components/test/TestPhases';
@@ -35,6 +37,9 @@ const ListeningTest = () => {
   const [audioProgress, setAudioProgress] = useState<number>(0);
   const [audioMuted, setAudioMuted] = useState<boolean>(false);
   const [userInteracted, setUserInteracted] = useState<boolean>(false);
+  
+  // State for the checkbox group (questions 1-5)
+  const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
   
   // Use the audio player hook
   const { isPlaying, isReady, playAudio, stopAudio, pauseAudio } = useAudioPlayer();
@@ -163,8 +168,55 @@ const ListeningTest = () => {
     };
   }, [currentTest, startSection]);
 
+  // Initialize checkedOptions with any previously saved answers
+  useEffect(() => {
+    const savedOptions = ['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5']
+      .map(id => {
+        const answer = userAnswers.find(a => a.questionId === id);
+        return answer ? answer.userResponse : null;
+      })
+      .filter(Boolean) as string[];
+    
+    setCheckedOptions(savedOptions);
+  }, [userAnswers]);
+
   const listeningSection = currentTest?.sections.find(section => section.type === 'listening');
   const listeningContent = listeningSection?.content as any;
+
+  // Handle checkbox changes for questions 1-5
+  const handleCheckboxChange = (option: string) => {
+    setCheckedOptions(prev => {
+      let updatedOptions: string[];
+      
+      if (prev.includes(option)) {
+        // Remove the option if already selected
+        updatedOptions = prev.filter(item => item !== option);
+      } else {
+        // Add the option, but limit to 5 selections
+        updatedOptions = [...prev, option];
+        if (updatedOptions.length > 5) {
+          updatedOptions.shift(); // Remove the first item if we exceed 5 selections
+        }
+      }
+      
+      // Update the answers in TestContext for all 5 questions
+      updateAllQuestionResponses(updatedOptions);
+      
+      return updatedOptions;
+    });
+  };
+  
+  // Update all 5 questions with the selected options
+  const updateAllQuestionResponses = (selectedOptions: string[]) => {
+    // Create a mapping of question IDs to their corresponding answers
+    const questionIds = ['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'];
+    
+    // Save each selected option to its corresponding question
+    questionIds.forEach((questionId, index) => {
+      const answer = selectedOptions[index] || '';
+      saveAnswer(questionId, answer);
+    });
+  };
 
   const startPreviewTimer = () => {
     setPreviewTimeRemaining(30);
@@ -495,49 +547,41 @@ const ListeningTest = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Section 1: Questions 1-5 (Multiple choice) */}
+              {/* Section 1: Questions 1-5 (Multiple choice) - Now as checkboxes */}
               {(currentSectionIndex === 0 || currentPhase === Phase.FINAL_REVIEW) && (
                 <div className={currentPhase !== Phase.FINAL_REVIEW || currentSectionIndex === 0 ? '' : 'mt-8 pt-8 border-t'}>
                   <h3 className="font-medium mb-4">Section 1: Questions 1-5</h3>
                   <p className="text-sm mb-2">Complete the information below about the courses available at Southmead Art College.</p>
-                  <p className="text-sm mb-4 italic">Which five courses are available? Choose from options A-I.</p>
+                  <p className="text-sm mb-2 italic">Which five courses are available? Choose exactly 5 options from A-I.</p>
+                  <p className="text-sm mb-4 text-red-500 font-medium">Please select exactly 5 options. {checkedOptions.length}/5 selected.</p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 mb-4 text-sm">
-                    <div>A. Fibre Art classes</div>
-                    <div>B. Oil Painting classes</div>
-                    <div>C. Digital Art classes</div>
-                    <div>D. Print making classes</div>
-                    <div>E. Fine Art classes</div>
-                    <div>F. Photography classes</div>
-                    <div>G. Weekend courses</div>
-                    <div>H. Ceramic and Pottery classes</div>
-                    <div>I. Jewellery design classes</div>
-                  </div>
-                  
-                  {listeningContent.sections[0].questions.slice(0, 5).map((question: any, index: number) => {
-                    const questionId = question.id;
-                    const savedAnswer = userAnswers.find(a => a.questionId === questionId)?.userResponse || '';
-                    
-                    return (
-                      <div key={questionId} className="mb-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium">{index + 1}.</span>
-                          <RadioGroup 
-                            value={savedAnswer} 
-                            onValueChange={(value) => handleAnswerChange(questionId, value)}
-                            className="flex flex-wrap gap-4"
-                          >
-                            {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].map((option) => (
-                              <div key={option} className="flex items-center space-x-2">
-                                <RadioGroupItem value={option} id={`${questionId}-${option}`} />
-                                <Label htmlFor={`${questionId}-${option}`}>{option}</Label>
-                              </div>
-                            ))}
-                          </RadioGroup>
-                        </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-4 mb-4">
+                    {[
+                      { id: 'A', label: 'Fibre Art classes' },
+                      { id: 'B', label: 'Oil Painting classes' },
+                      { id: 'C', label: 'Digital Art classes' },
+                      { id: 'D', label: 'Print making classes' },
+                      { id: 'E', label: 'Fine Art classes' },
+                      { id: 'F', label: 'Photography classes' },
+                      { id: 'G', label: 'Weekend courses' },
+                      { id: 'H', label: 'Ceramic and Pottery classes' },
+                      { id: 'I', label: 'Jewellery design classes' }
+                    ].map((option) => (
+                      <div key={option.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`option-${option.id}`} 
+                          checked={checkedOptions.includes(option.id)}
+                          onCheckedChange={() => handleCheckboxChange(option.id)} 
+                        />
+                        <label
+                          htmlFor={`option-${option.id}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {option.id}. {option.label}
+                        </label>
                       </div>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
               )}
               

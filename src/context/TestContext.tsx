@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { IELTSTest, TestSection, UserAnswer, TestResult } from '@/types/test';
 import { sampleTest } from '@/data/sampleTest';
@@ -182,11 +183,9 @@ export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             bandScore: readingFeedback.overallScore,
             userAnswers: userAnswers.filter(a => a.questionId.startsWith('r-')),
             details: {
-              correctAnswers: Object.keys(readingAnswers).reduce((count, key) => 
-                readingCorrectAnswers[key]?.toLowerCase() === readingAnswers[key]?.toLowerCase() ? count + 1 : count, 0),
+              correctAnswers: readingFeedback.criteria[0].feedback.match(/(\d+) out of/)?.[1] || '0',
               totalQuestions: Object.keys(readingAnswers).length,
-              accuracy: `${((Object.keys(readingAnswers).reduce((count, key) => 
-                readingCorrectAnswers[key]?.toLowerCase() === readingAnswers[key]?.toLowerCase() ? count + 1 : count, 0) / 
+              accuracy: `${((Number(readingFeedback.criteria[0].feedback.match(/(\d+) out of/)?.[1] || 0) / 
                 Math.max(Object.keys(readingAnswers).length, 1)) * 100).toFixed(0)}%`,
               strengths: readingFeedback.strengths,
               weaknesses: readingFeedback.weaknesses
