@@ -1,6 +1,7 @@
+
 import { useCallback, useRef, useState } from 'react';
 import { Phase } from '@/components/test/TestPhases';
-import { useAudioPlayer, checkAudioExists } from '@/hooks/audio';
+import { useAudioPlayer } from '@/hooks/audio';
 import { toast } from 'sonner';
 
 export const useExaminerSimulation = (
@@ -9,13 +10,16 @@ export const useExaminerSimulation = (
   const [examinerSpeaking, setExaminerSpeaking] = useState(false);
   const [examinerMessage, setExaminerMessage] = useState('');
   const [fadeIn, setFadeIn] = useState(true);
+  const [audioSrc, setAudioSrc] = useState<string | null>(null);
+  
   const { 
-    queueAudioWithDelays, 
-    cleanupAudio, 
-    hasUserInteracted, 
-    audioError, 
-    simulateUserInteraction 
+    playAudio,
+    isPlaying,
+    pauseAudio,
+    getCurrentSrc,
+    cleanupAudio
   } = useAudioPlayer();
+  
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Clean up timeout to prevent memory leaks
@@ -27,90 +31,26 @@ export const useExaminerSimulation = (
     cleanupAudio();
   }, [cleanupAudio]);
 
-  // Simulate examiner speaking with audio
+  // Simulate examiner speaking with audio that can be manually played
   const simulateExaminerSpeaking = useCallback(
     async (message: string, audioFile: string | null, duration: number = 3000, currentPhase: Phase) => {
       // Set examiner state
       setFadeIn(false);
       
       // Short timeout for fade out/in effect
-      timeoutRef.current = setTimeout(async () => {
+      timeoutRef.current = setTimeout(() => {
         setExaminerMessage(message);
         setExaminerSpeaking(true);
         setFadeIn(true);
         
-        // Check if audio file exists and is accessible
-        let audioExists = false;
+        // Set the audio source for manual playback
         if (audioFile) {
-          audioExists = await checkAudioExists(audioFile);
-          if (!audioExists) {
-            console.warn(`Audio file not found: ${audioFile}, using timeout instead`);
-          }
+          setAudioSrc(audioFile);
         }
 
-        // If user hasn't interacted yet, show a toast notification
-        if (!hasUserInteracted && audioFile) {
-          toast.info('Audio requires interaction', {
-            description: 'Please click anywhere on the page to enable audio playback',
-            duration: 5000
-          });
-          
-          // Try to simulate user interaction (may not work in all browsers)
-          simulateUserInteraction();
-        }
-
-        // If audio file provided and exists, play it
-        if (audioFile && audioExists) {
-          try {
-            // Queue the audio with proper promise handling
-            queueAudioWithDelays([
-              {
-                src: audioFile,
-                onEnd: () => {
-                  // After audio ends, set examiner to not speaking
-                  // and enable recording if needed
-                  setExaminerSpeaking(false);
-
-                  // If in Part 1 of speaking, enable recording
-                  if (currentPhase === Phase.SPEAKING_PART1) {
-                    setIsRecording(true);
-                  }
-                },
-              },
-            ]).catch(error => {
-              console.error('Audio playback error:', error);
-              
-              // Show a helpful message to the user
-              if (error.message?.includes('User interaction required')) {
-                toast.error('Audio playback blocked', {
-                  description: 'Please click anywhere on the screen to enable audio',
-                  duration: 5000
-                });
-              }
-              
-              // Still continue with the simulation even if audio fails
-              setExaminerSpeaking(false);
-              
-              // Enable recording if in speaking part
-              if (currentPhase === Phase.SPEAKING_PART1) {
-                setIsRecording(true);
-              }
-            });
-          } catch (error) {
-            console.error('Error playing examiner audio:', error);
-            // Still continue with the simulation even if audio fails
-            timeoutRef.current = setTimeout(() => {
-              setExaminerSpeaking(false);
-              
-              // Enable recording if in speaking part
-              if (currentPhase === Phase.SPEAKING_PART1) {
-                setIsRecording(true);
-              }
-            }, duration);
-          }
-        } else {
-          // No audio or audio file doesn't exist, just use timeout
-          console.log('Using timeout instead of audio playback');
+        // No automatic playback, just set up for manual play
+        // After a duration, move to the next phase if no audio playback
+        if (!audioFile) {
           timeoutRef.current = setTimeout(() => {
             setExaminerSpeaking(false);
             
@@ -122,124 +62,44 @@ export const useExaminerSimulation = (
         }
       }, 300);
     },
-    [checkAudioExists, queueAudioWithDelays, setIsRecording, hasUserInteracted, simulateUserInteraction]
+    [setIsRecording]
   );
 
-  // Play a sequence of examiner audio files with messages
-  const playExaminerAudioSequence = useCallback(
-    async (audioSequence: { src: string; message: string; delayAfter?: number; onEnd?: () => void }[]) => {
-      setExaminerSpeaking(true);
-
-      // If user hasn't interacted yet, show a toast notification
-      if (!hasUserInteracted && audioSequence.length > 0) {
-        toast.info('Audio requires interaction', {
-          description: 'Please click anywhere on the page to enable audio playback',
-          duration: 5000
-        });
-        
-        // Try to simulate user interaction (may not work in all browsers)
-        simulateUserInteraction();
-      }
+  // Handle manual audio playback
+  const playExaminerAudio = useCallback(async (src: string) => {
+    try {
+      await playAudio(src);
       
-      // Check and filter out non-existent audio files
-      const validatedSequence = [];
-      for (const item of audioSequence) {
-        const exists = await checkAudioExists(item.src);
-        if (exists) {
-          validatedSequence.push(item);
-        } else {
-          console.warn(`Audio file not found: ${item.src}`);
-          // Add the item without src so the message still shows
-          validatedSequence.push({...item, src: ''});
-        }
-      }
-      
-      if (validatedSequence.length === 0) {
-        console.error('No valid audio files in sequence');
+      // Once audio has completed, move to next phase
+      const audio = new Audio(src);
+      audio.addEventListener('ended', () => {
         setExaminerSpeaking(false);
-        return;
-      }
+        // Enable recording if needed
+        if (audioSrc && audioSrc.includes('speaking-section-1')) {
+          setIsRecording(true);
+        }
+      });
       
-      // Convert audio sequence to the format needed by queueAudioWithDelays
-      const formattedSequence = validatedSequence.map((item, index) => {
-        // Skip empty src items
-        if (!item.src) {
-          // For items without audio, just show message and move on
-          setExaminerMessage(item.message);
-          if (item.onEnd) item.onEnd();
-          return null;
-        }
-        
-        return {
-          src: item.src,
-          delayAfter: item.delayAfter || 0,
-          onEnd: () => {
-            // Update examiner message before playing
-            setExaminerMessage(item.message);
-            
-            // If it's the last item, stop examiner speaking
-            if (index === validatedSequence.length - 1) {
-              setExaminerSpeaking(false);
-            }
-            
-            // Call original onEnd if provided
-            if (item.onEnd) {
-              item.onEnd();
-            }
-          }
-        };
-      }).filter(Boolean); // Remove null items
-      
-      try {
-        // Set the initial examiner message
-        if (validatedSequence.length > 0) {
-          setExaminerMessage(validatedSequence[0].message);
-        }
-        
-        // Queue and play all audio files if there are any valid ones
-        if (formattedSequence.length > 0) {
-          await queueAudioWithDelays(formattedSequence).catch(error => {
-            console.error('Audio sequence error:', error);
-            
-            // Show a helpful message to the user
-            if (error.message?.includes('User interaction required')) {
-              toast.error('Audio playback blocked', {
-                description: 'Please click anywhere on the screen to enable audio',
-                duration: 5000
-              });
-            }
-            
-            // Continue with the test anyway
-            setExaminerSpeaking(false);
-          });
-        } else {
-          // No valid audio files, just end examiner speaking after a delay
-          setTimeout(() => {
-            setExaminerSpeaking(false);
-          }, 3000);
-        }
-      } catch (error) {
-        console.error('Error playing examiner audio sequence:', error);
-        setExaminerSpeaking(false);
-      }
-    },
-    [
-      checkAudioExists, 
-      queueAudioWithDelays, 
-      hasUserInteracted, 
-      simulateUserInteraction
-    ]
-  );
+      return true;
+    } catch (error) {
+      console.error('Error playing examiner audio:', error);
+      toast.error('Audio playback failed', {
+        description: 'Please try again'
+      });
+      return false;
+    }
+  }, [playAudio, setIsRecording, audioSrc]);
 
   return {
     examinerSpeaking,
     examinerMessage,
     fadeIn,
+    audioSrc,
+    isPlayingAudio: isPlaying,
     simulateExaminerSpeaking,
-    playExaminerAudioSequence,
+    playExaminerAudio,
+    pauseExaminerAudio: pauseAudio,
     cleanupExaminerTimeout,
-    hasUserInteracted,
-    audioError,
-    simulateUserInteraction
+    getCurrentSrc
   };
 };

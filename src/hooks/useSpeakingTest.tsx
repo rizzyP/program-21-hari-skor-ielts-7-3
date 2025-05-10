@@ -10,8 +10,8 @@ import { useSpeakingTestState } from './useSpeakingTestState';
 
 export const useSpeakingTest = () => {
   // Re-use all of the existing functionality
-  const { currentTest, testType } = useTest();
-  const { speakingSection, speakingContent } = useTestContent();
+  const { currentTest } = useTest();
+  const { speakingSection, speakingContent, getCurrentPartQuestions } = useTestContent();
   
   // State management
   const {
@@ -32,7 +32,9 @@ export const useSpeakingTest = () => {
     partCompleted, 
     setPartCompleted,
     questionNumber,
-    setQuestionNumber
+    setQuestionNumber,
+    totalQuestions,
+    setTotalQuestions
   } = useSpeakingTestState();
 
   // Voice recording functionality
@@ -56,21 +58,15 @@ export const useSpeakingTest = () => {
     examinerSpeaking,
     examinerMessage,
     fadeIn,
+    audioSrc,
+    isPlayingAudio,
     simulateExaminerSpeaking,
-    playExaminerAudioSequence,
+    playExaminerAudio,
+    pauseExaminerAudio,
     cleanupExaminerTimeout,
-    hasUserInteracted,
-    audioError,
-    simulateUserInteraction
+    getCurrentSrc,
+    audioError
   } = useExaminerSimulation(setIsRecording);
-
-  // Get the available questions for the current part
-  const getCurrentPartQuestions = useCallback(() => {
-    // This function likely exists in your codebase - keep its implementation
-    if (!speakingContent) return [];
-    if (!speakingContent.parts) return [];
-    return speakingContent.parts.find((p) => p.partNumber === currentPart)?.questions || [];
-  }, [speakingContent, currentPart]);
 
   // Setup test navigation
   const {
@@ -86,7 +82,6 @@ export const useSpeakingTest = () => {
     setPartCompleted,
     setQuestionNumber,
     simulateExaminerSpeaking,
-    playExaminerAudioSequence,
     getCurrentPartQuestions,
     currentPart,
     currentQuestion,
@@ -103,14 +98,6 @@ export const useSpeakingTest = () => {
     stopRecording();
     handleNextQuestion(); // Move to next question after recording
   }, [stopRecording, handleNextQuestion]);
-
-  // Calculate total questions
-  const totalQuestions = useCallback(() => {
-    if (!speakingContent) return 0;
-    if (!speakingContent.parts) return 0;
-    const part1 = speakingContent.parts.find(p => p.partNumber === 1);
-    return part1 ? part1.questions.length : 0;
-  }, [speakingContent])();
 
   // Cleanup
   useEffect(() => {
@@ -142,9 +129,12 @@ export const useSpeakingTest = () => {
     handleStopRecording,
     handleNavigateResults,
     
-    // New properties for audio interaction
-    hasUserInteracted,
-    audioError,
-    simulateUserInteraction
+    // New properties for audio player
+    audioSrc,
+    isPlayingAudio,
+    playExaminerAudio,
+    pauseExaminerAudio,
+    getCurrentSrc,
+    audioError
   };
 };

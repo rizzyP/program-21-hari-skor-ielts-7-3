@@ -12,7 +12,6 @@ export const useTestNavigation = (
   setPartCompleted: (value: React.SetStateAction<Record<string, boolean>>) => void,
   setQuestionNumber: (value: React.SetStateAction<number>) => void,
   simulateExaminerSpeaking: (message: string, audioFile: string | null, duration: number, currentPhase: Phase) => void,
-  playExaminerAudioSequence: (audioSequence: {src: string, message: string, delayAfter?: number, onEnd?: () => void}[]) => Promise<void>,
   getCurrentPartQuestions: () => string[],
   currentPart: number,
   currentQuestion: number,
@@ -51,42 +50,16 @@ export const useTestNavigation = (
     setIsStarted(true);
     setCurrentPhase(Phase.SPEAKING_INTRO);
     
-    // Play opening audio sequence
-    const openingSequence = [
-      { 
-        src: AUDIO_FILES.opening[0], 
-        message: "Hello, my name is Dr. Sarah Wilson and I'll be your examiner today.",
-        delayAfter: 2000 
-      },
-      { 
-        src: AUDIO_FILES.opening[1], 
-        message: "Could you tell me your name, please?",
-        delayAfter: 5000 
-      },
-      { 
-        src: AUDIO_FILES.opening[2], 
-        message: "Can I see your identification, please?",
-        delayAfter: 10000 
-      },
-      { 
-        src: AUDIO_FILES.opening[3], 
-        message: "Let's begin with some questions about yourself.",
-        onEnd: () => {
-          // Move to Part 1 after opening sequence
-          startPart1();
-        }
-      }
-    ];
-    
-    playExaminerAudioSequence(openingSequence)
-      .catch(error => {
-        console.error('Failed to play opening sequence:', error);
-        // Continue to Part 1 even if audio fails
-        setTimeout(startPart1, 5000);
-      });
+    // Show first examiner message with audio file
+    simulateExaminerSpeaking(
+      "Hello, my name is Dr. Sarah Wilson and I'll be your examiner today.",
+      AUDIO_FILES.opening[0],
+      3000,
+      Phase.SPEAKING_INTRO
+    );
     
     toast.info('Speaking test started', {
-      description: 'The examiner will guide you through the test.'
+      description: 'Click the play button to hear examiner instructions.'
     });
   };
 
@@ -171,6 +144,7 @@ export const useTestNavigation = (
     handleStart,
     handleNextQuestion,
     handleComplete,
-    handleNavigateResults
+    handleNavigateResults,
+    startPart1
   };
 };

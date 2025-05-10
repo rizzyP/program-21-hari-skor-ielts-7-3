@@ -69,13 +69,6 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
         return Promise.reject(new Error("No audio source set"));
       }
       
-      // Check if user has interacted with the page
-      if (!hasUserInteracted) {
-        console.warn('Audio playback attempted before user interaction. Autoplay may not work.');
-        setAudioError('User interaction required before audio can play automatically.');
-        return Promise.reject(new Error('User interaction required'));
-      }
-      
       // Use play() with promise handling
       const playPromise = audio.play();
       
@@ -87,7 +80,7 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
           })
           .catch(error => {
             console.error('Failed to play audio:', error);
-            setAudioError('Audio playback failed. Please interact with the page first.');
+            setAudioError('Audio playback failed.');
             setIsPlaying(false);
             return Promise.reject(error);
           });
@@ -100,7 +93,7 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
       setIsPlaying(false);
       return Promise.reject(error);
     }
-  }, [ensureAudioElement, hasUserInteracted, setAudioError, setIsPlaying]);
+  }, [ensureAudioElement, setAudioError, setIsPlaying]);
 
   // Pause audio playback
   const pauseAudio = useCallback(() => {
@@ -109,6 +102,11 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
       setIsPlaying(false);
     }
   }, [setIsPlaying]);
+
+  // Get current audio source
+  const getCurrentSrc = useCallback(() => {
+    return audioRef.current?.src || '';
+  }, []);
 
   return {
     isPlaying,
@@ -120,6 +118,7 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
     stopAudio: cleanupAudio,
     pauseAudio,
     simulateUserInteraction,
-    cleanupAudio
+    cleanupAudio,
+    getCurrentSrc
   };
 };
