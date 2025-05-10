@@ -1,4 +1,3 @@
-
 import { TestResult, Feedback } from '@/types/test';
 import { assessSpeakingResponse, assessWritingTask } from './aiService';
 
@@ -205,22 +204,37 @@ export const evaluateListeningAnswers = (
   
   let correctCount = 0;
   
-  // Special handling for questions 1-5 as a group
-  // Update: This has been fixed to properly check in order
+  // Section One questions (1-5) need special handling - they're evaluated as a set
   const sectionOneQuestionIds = ['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'];
   const sectionOneCorrectAnswers = ['B', 'D', 'C', 'F', 'I'];
   
-  // Process Section 1 questions (1-5) individually
-  sectionOneQuestionIds.forEach((questionId, index) => {
-    const userAnswer = userAnswers[questionId] || '';
-    // Extract just the letter for multiple choice
-    const answerLetter = userAnswer.trim().charAt(0).toUpperCase();
-    
-    // Compare with the correct answer at the same position
-    if (answerLetter === sectionOneCorrectAnswers[index]) {
-      correctCount++;
+  // Create a map to track which correct answers have been matched
+  const sectionOneMatched = new Map();
+  // Extract user answers for these special questions
+  const sectionOneUserAnswers = new Map();
+  
+  // Collect user answers for section one questions
+  sectionOneQuestionIds.forEach(id => {
+    if (userAnswers[id]) {
+      // Extract just the letter for multiple choice
+      const answerLetter = userAnswers[id].trim().charAt(0).toUpperCase();
+      sectionOneUserAnswers.set(id, answerLetter);
     }
   });
+  
+  // Count correct matches using a set-based approach (order-insensitive)
+  if (sectionOneUserAnswers.size > 0) {
+    // First check if each user answer matches ANY of the correct answers
+    sectionOneUserAnswers.forEach((userAnswer, questionId) => {
+      // If this answer is in the correct set and hasn't been matched yet
+      if (sectionOneCorrectAnswers.includes(userAnswer) && !sectionOneMatched.has(userAnswer)) {
+        sectionOneMatched.set(userAnswer, questionId);
+        correctCount++;
+      }
+    });
+    
+    console.log(`Section 1 evaluation (order-insensitive): ${sectionOneMatched.size}/${sectionOneQuestionIds.length} correct`);
+  }
   
   // Process other questions normally
   userResponseEntries.forEach(([questionId, userResponse]) => {
@@ -284,6 +298,8 @@ const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: 
   const normalizedCorrectAnswer = correctAnswer.toLowerCase().trim();
   
   // Special handling for listening questions 1-5 (MCQ with options A-I)
+  // Note: These are now handled separately in the evaluateListeningAnswers function
+  // but we'll keep this check for backwards compatibility
   if (['l-q1', 'l-q2', 'l-q3', 'l-q4', 'l-q5'].includes(questionId)) {
     // For these questions, we only need to check if the first character matches (the option letter)
     return normalizedUserAnswer.charAt(0) === normalizedCorrectAnswer.charAt(0);
