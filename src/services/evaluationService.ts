@@ -142,7 +142,7 @@ export const evaluateReadingAnswers = (
   let correctCount = 0;
   
   userResponseEntries.forEach(([questionId, userResponse]) => {
-    if (correctAnswers[questionId]?.toLowerCase() === userResponse.toLowerCase()) {
+    if (isCorrectAnswer(questionId, userResponse, correctAnswers[questionId] || '')) {
       correctCount++;
     }
   });
@@ -267,26 +267,39 @@ const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: 
     return normalizedUserAnswer.charAt(0) === normalizedCorrectAnswer.charAt(0);
   }
   
-  // Special handling for questions with dollar amounts
-  if (['l-q7', 'l-q8'].includes(questionId)) {
-    // Remove any dollar signs, spaces and convert to number for comparison
+  // Special handling for question 6 - accepts "two" or "2"
+  if (questionId === 'l-q6') {
+    const validAnswers = ['two', '2'];
+    return validAnswers.includes(normalizedUserAnswer);
+  }
+  
+  // Special handling for question 7 - accepts "375", "$375", "375 dollars"
+  if (questionId === 'l-q7') {
+    const validAnswers = ['375', '$375', '375 dollars'];
+    return validAnswers.some(answer => 
+      normalizedUserAnswer === answer.toLowerCase() ||
+      normalizedUserAnswer.replace(/\s+|[$]/g, '') === '375'
+    );
+  }
+  
+  // Special handling for question 8 - accepts "245", "$245", "245 dollars"
+  if (questionId === 'l-q8') {
+    const validAnswers = ['245', '$245', '245 dollars'];
+    return validAnswers.some(answer => 
+      normalizedUserAnswer === answer.toLowerCase() ||
+      normalizedUserAnswer.replace(/\s+|[$]/g, '') === '245'
+    );
+  }
+  
+  // Special handling for questions with dollar amounts (remaining dollar-related questions)
+  if (questionId.startsWith('l-q') && (normalizedCorrectAnswer.includes('$') || normalizedUserAnswer.includes('$'))) {
+    // Remove any dollar signs, spaces and compare
     const userValue = normalizedUserAnswer.replace(/[$\s]/g, '');
     const correctValue = normalizedCorrectAnswer.replace(/[$\s]/g, '');
     return userValue === correctValue;
   }
   
-  // Special handling for number words vs. digits
-  if (questionId === 'l-q6') {
-    const numberMap: Record<string, string> = {
-      'two': '2',
-      '2': 'two'
-    };
-    
-    return normalizedUserAnswer === normalizedCorrectAnswer || 
-           normalizedUserAnswer === numberMap[normalizedCorrectAnswer];
-  }
-  
-  // Default case: direct comparison
+  // Default case: direct comparison with case insensitivity (already normalized)
   return normalizedUserAnswer === normalizedCorrectAnswer;
 };
 
