@@ -316,11 +316,6 @@ const isCorrectAnswer = (questionId: string, userAnswer: string, correctAnswer: 
 
 // Correct answers for the listening test
 export const listeningCorrectAnswers: Record<string, string> = {
-  'l-q1': 'B', // Oil Painting classes
-  'l-q2': 'D', // Print making classes
-  'l-q3': 'C', // Digital Art classes
-  'l-q4': 'F', // Photography classes
-  'l-q5': 'I', // Jewellery design classes
   'l-q6': '2',
   'l-q7': '375',
   'l-q8': '245',
